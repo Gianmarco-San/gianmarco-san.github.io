@@ -203,10 +203,11 @@ nav li:nth-of-type(1),
 nav li:nth-of-type(2) {
   border-top: none;
 }
-
+/*
 nav li:nth-of-type(2n) {
-  border-left: 1px solid #A8A8A8; /* all of these were #888F95 */
-}
+  border-left: 1px solid #A8A8A8; /* all of these were #888F95 
+}*/
+
 /*
 nav li.selected {
   color: #9DC6EC;
@@ -543,7 +544,7 @@ nav a.selected {
 .carousel_title {
   width: 100%; /* Full width of container */
   text-align: center; /* Center the text */
-  margin: 10px auto; /* Center carousel vertically */
+  margin: 1em auto; /* Center carousel vertically */
 }
 
 
@@ -582,21 +583,8 @@ h3 {
 .rainbow-text {
   display: inline-block;
   /*font-weight: bold;*/
-  background: linear-gradient(30deg, 
-
-  #5D6063,#5D6063,#5D6063,#5D6063,#5D6063,#5D6063, rgba(208,204,177,1), #5D6063,#5D6063,#5D6063,#5D6063, #5D6063,#5D6063
-/*#ADD8E6, #87CEEB, #48D1CC, #20B2AA,  gray, gray, #20B2AA, #48D1CC, #87CEEB, #ADD8E6, #87CEEB, #48D1CC
-
-/*#ADD8E6, #87CEEB, #48D1CC, #9ffcff, #20B2AA,  yellow, lightgray, gray, lightgray, yellow, #20B2AA, #9ffcff, #48D1CC, #87CEEB
-#ADD8E6, #87CEEB, #48D1CC, #9ffcff, #20B2AA,  rgb(255, 255, 70), lightgray, gray, #20B2AA, #9ffcff, #48D1CC, #87CEEB, #ADD8E6
-  
-    #ADD8E6, #87CEEB, #48D1CC, #9ffcff, #20B2AA, #20B2AA, #9ffcff, #48D1CC, #87CEEB, #ADD8E6
-    /* #20B2AA, #00FA9A, #48D1CC, #87CEEB, #ADD8E6 */
-
-/*    
-    #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #8b00ff, #0000ff, #00ff00, 
-    #ffff00, #ff7f00, #ff0000, #ff7f00, #ffff00, #00ff00  /* Rainbow gradient colors */
-    );
+  background: linear-gradient(30deg,
+  #5D6063,#5D6063,#5D6063,#5D6063,#5D6063,#5D6063, rgba(208,204,177,1), #5D6063,#5D6063,#5D6063,#5D6063, #5D6063,#5D6063);
   background-size: 300%; /* Makes gradient stretch across text */
   -webkit-background-clip: text;
   color: transparent;
@@ -611,12 +599,19 @@ h4 {
 
 .timeline {
   position: relative;
-  max-width: 1000px;
+  max-width: 1000px; /* Ensures the width is responsive */ /*62em;*/
   margin: 0 auto;
   padding-left: 3.75em;
   border-bottom: 1.0em;
+  
 }
 
+/* working on responsiveness */
+@media only screen and (max-width: 1111px) {
+  .timeline {
+    max-width: 90%;
+  }
+}
 
 
 .timeline::before {
@@ -917,7 +912,7 @@ iframe {
   color: #B2D6FF;
 }
 
-/* Responsive layout for wider screens */
+/* Responsive layout for wider screens 
 @media (min-width: 600px) {
   .footer-content {
     flex-direction: row;
@@ -928,7 +923,7 @@ iframe {
     flex: 1;
     padding: 0 1em;
   }
-}
+}*/
 
 
 .custom-footer2 {

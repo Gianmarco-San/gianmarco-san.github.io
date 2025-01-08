@@ -193,9 +193,24 @@ nav ul {
 }  
 
 /* working on responsiveness */
-@media only screen and (max-width: 580px) {
+@media only screen and (max-width: 750px) {
   nav ul {
-    max-width: 1000px; /* FIX ME I DON'T WORK */
+    max-width: 90%; /* FIX ME I DON'T WORK */
+  }
+}
+
+@media only screen and (max-width: 750px) {  /* MODIFICAMI PER RENDERE RESPONSIVE LE FOTO */
+  nav {
+    padding-left: 2em;
+    padding-right: 2em;
+  }
+  nav li {
+    width: auto;
+    border-top: none;
+  }
+
+  nav li:nth-of-type(2n) {
+    border-left: none;
   }
 }
 
@@ -550,6 +565,10 @@ nav a.selected {
 }
 
 
+
+
+
+
 .carousel_title {
   width: 100%; /* Full width of container */
   text-align: center; /* Center the text */
@@ -702,8 +721,9 @@ h4 {
 
 
 
+
 /* Styles for each letter with hover animation */
-.funny-fancy:hover span {
+.funny-fancy:hover span{
   display: inline-block;
   animation: mirror-flip 0.5s ease-in-out;
   transform-origin: center;
@@ -732,6 +752,10 @@ h4 {
 .funny-fancy:hover span:nth-child(9) { animation-delay: 0.4s; }
 .funny-fancy:hover span:nth-child(10) { animation-delay: 0.45s; }
 .funny-fancy:hover span:nth-child(11) { animation-delay: 0.5s; }
+.funny-fancy:hover span:nth-child(12) { animation-delay: 0.55s; }
+.funny-fancy:hover span:nth-child(13) { animation-delay: 0.6s; }
+.funny-fancy:hover span:nth-child(14) { animation-delay: 0.65s; }
+.funny-fancy:hover span:nth-child(15) { animation-delay: 0.7s; }
 
 
 /* Waving effect */
@@ -863,7 +887,6 @@ iframe {
   font-weight: 400;
   z-index: 10; /* Ensure it appears above other content */
   pointer-events: none; /* Prevent interactions with the description */
-  overflow:visible;
 }
 
 /* Show the description on hover */

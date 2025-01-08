@@ -365,30 +365,7 @@ nav a.selected {
 }
 
 
-/* working on responsiveness */
-@media only screen and (max-width: 750px) {
-  
 
-  nav ul {
-    width: 80%;
-  }
-  
-  .heroCapPic {
-    flex-direction: column; /* Arrange items vertically */
-  }
-
-  .heroCap {
-    flex-direction: column; /* Arrange items vertically */
-  }
-  .pic-container {
-    width: 15em; /*15em; /* 300px anche gigante senza indicazioni ha del potenziale*/
-    height: 20em; /*20em; /* 400px */
-    overflow: hidden; /* Hide the overflow of the image */
-    border-radius: 15px; /* Optional: Rounded corners */
-    position: relative; /* Position relative for absolute positioning of img */
-  }
-
-}
 
 
 .pic {
@@ -1143,4 +1120,36 @@ iframe {
 .links:visited:active {
   color: #54A5C4;
   text-decoration: underline;
+}
+
+
+
+
+/* working on responsiveness */
+@media only screen and (max-width: 750px) {
+  
+
+  nav ul {
+    width: 80%;
+  }
+  
+  .heroCapPic {
+    flex-direction: column; /* Arrange items vertically */
+  }
+
+  .heroCap {
+    flex-direction: column; /* Arrange items vertically */
+  }
+  .pic-container {
+    width: 15em; /*15em; /* 300px anche gigante senza indicazioni ha del potenziale*/
+    height: 20em; /*20em; /* 400px */
+    overflow: hidden; /* Hide the overflow of the image */
+    border-radius: 15px; /* Optional: Rounded corners */
+    position: relative; /* Position relative for absolute positioning of img */
+  }
+
+  .hide-on-small {
+    display: none;
+  }
+
 }

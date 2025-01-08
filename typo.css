@@ -286,14 +286,13 @@ nav a.selected {
 /* working on responsiveness */
 @media only screen and (max-width: 750px) {
   nav ul {
-    width: 90%;
+    width: 80%;
   }
-  nav {
-    height: 4.0em;
-  }
+  
   .heroCapPic {
     flex-direction: column; /* Arrange items vertically */
   }
+
   .heroCap {
     flex-direction: column; /* Arrange items vertically */
   }
@@ -534,7 +533,7 @@ nav a.selected {
   }
 }
 
-
+/*
 @media only screen and (max-width: 580px) {
   nav ul {
     width: 100%;
@@ -561,7 +560,7 @@ nav a.selected {
   nav li:nth-of-type(2n) {
     border-left: none;
   }
-}
+}*/
 
 
 

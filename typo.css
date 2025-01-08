@@ -67,6 +67,7 @@ body {
   line-height: 1.5em;
   color: #5D6063;
   background-color: #EEEEEE; /* Light gray */
+  
 }
 
 
@@ -283,20 +284,6 @@ nav a.selected {
 }
 
 
-/* working on responsiveness */
-@media only screen and (max-width: 750px) {
-  nav ul {
-    width: 80%;
-  }
-  
-  .heroCapPic {
-    flex-direction: column; /* Arrange items vertically */
-  }
-
-  .heroCap {
-    flex-direction: column; /* Arrange items vertically */
-  }
-}
 
 .heroCap h2 {
   font-size: 1.9em ; /*23px; */
@@ -375,6 +362,32 @@ nav a.selected {
   border-radius: 20px; /* Optional: Rounded corners */
   position: relative; /* Position relative for absolute positioning of img */
  
+}
+
+
+/* working on responsiveness */
+@media only screen and (max-width: 750px) {
+  
+
+  nav ul {
+    width: 80%;
+  }
+  
+  .heroCapPic {
+    flex-direction: column; /* Arrange items vertically */
+  }
+
+  .heroCap {
+    flex-direction: column; /* Arrange items vertically */
+  }
+  .pic-container {
+    width: 15em; /*15em; /* 300px anche gigante senza indicazioni ha del potenziale*/
+    height: 20em; /*20em; /* 400px */
+    overflow: hidden; /* Hide the overflow of the image */
+    border-radius: 15px; /* Optional: Rounded corners */
+    position: relative; /* Position relative for absolute positioning of img */
+  }
+
 }
 
 
@@ -516,8 +529,8 @@ nav a.selected {
 
 @media only screen and (min-width: 580px) {
   .section {
-    margin: 4em auto;
-    padding: 2.5em 3em;
+    /*margin: 4em auto;
+    padding: 2.5em 3em;*/
   }
   .section--gray:first-of-type,
   .section--gray {

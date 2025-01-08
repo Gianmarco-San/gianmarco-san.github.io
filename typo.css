@@ -1144,8 +1144,8 @@ iframe {
     flex-direction: column; /* Arrange items vertically */
   }
   .pic-container {
-    width: 15em; /*15em; /* 300px anche gigante senza indicazioni ha del potenziale*/
-    height: 20em; /*20em; /* 400px */
+    width: 20em; 
+    height: 24em; 
     overflow: hidden; /* Hide the overflow of the image */
     border-radius: 15px; /* Optional: Rounded corners */
     position: relative; /* Position relative for absolute positioning of img */
@@ -1162,7 +1162,7 @@ iframe {
   body {
     font-family: 'Roboto', sans-serif;
     font-weight: 300;
-    font-size: 1.2em;
+    font-size: 0.9em;
     line-height: 1.5em;
     color: #5D6063;
     background-color: #EEEEEE;
@@ -1193,6 +1193,11 @@ iframe {
     padding-bottom: 0em;
     padding-top: 2.8em;
     
+  }
+
+  .timeline-text-image {
+    flex-direction: column; /* Arrange items vertically */
+
   }
 
 }

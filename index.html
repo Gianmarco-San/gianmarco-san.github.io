@@ -50,13 +50,18 @@
             <h1 style="font-family: 'Baskervville', sans-serif;"><span class="lightblue">Hi</span>! I'm Gianmarco.</h1>
             <!--<h1 style="font-family: 'Baskervville', sans-serif;"><span class="lightblue">Hi</span>! <span class="wave">👋🏻</span><br>I'm Gianmarco.</h1> -->
   
-            <div class="hide-on-small" class="carousel_title" >
-              <h2  style="font-weight: 500; font-size: 1.65em;" id="carousel-text">Data Scientist - AI</h2>
+
+            <div class="carousel_title">
+              <div class="hide-on-small">
+              <h2 style="font-weight: 500; font-size: 1.65em;" id="carousel-text">Data Scientist - AI</h2>
+              </div>
+
+              <div class="show-on-small">
+                <h2 style="font-weight: 500; font-size: 1.6em;" id="carousel-text1">Data Scientist - AI</h2>
+                </div>
             </div>
-  
             
             <script>
-              
               const texts = [
               "Data Scientist - AI",
               "Mechanical Engineer - Automation",
@@ -64,16 +69,32 @@
               ];
           
               let currentIndex = 0;
-            
               function changeText() {
                 const carouselText = document.getElementById("carousel-text");
                 currentIndex = (currentIndex + 1) % texts.length; // Loop back to the first text
                 carouselText.innerHTML = texts[currentIndex];
               }
-            
               // Change text every 3 seconds
               setInterval(changeText, 3000);
             </script>
+
+            <script>
+              const texts1 = [
+              "Data Scientist - AI",
+              "Mechanical Engineer - Automation",
+              //"Creative Learner - Future",
+              ];
+
+              let currentIndex1 = 0;
+              function changeText() {
+                const carouselText = document.getElementById("carousel-text1");
+                currentIndex1 = (currentIndex1 + 1) % texts1.length; // Loop back to the first text
+                carouselText.innerHTML = texts1[currentIndex];
+              }
+              // Change text every 3 seconds
+              setInterval(changeText, 3000);
+            </script>
+            </section>
         
         </div>
       </div>
@@ -149,7 +170,7 @@
 
         <p>
           <section class="hide-on-small">
-          <ul class="hide-on-small" style="display: flex; gap: 3em; padding: 1em; list-style-type: circle; padding-left: 1em;">
+          <ul style="display: flex; gap: 3em; padding: 1em; list-style-type: circle; padding-left: 1em;">
             <li>HTML</li>
             <li>CSS</li>
             <li>JS</li>

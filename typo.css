@@ -566,7 +566,7 @@ h4 {
 .timeline-content img {
   max-width: 100%; /* Responsive images */
   height: auto;
-  border-radius: 20px;
+  border-radius: 10px;
 }
 
 
@@ -587,9 +587,8 @@ h4 {
 }
 
 .timeline-image {
-  width: 45%; /* L'immagine occupa metà della larghezza */
+  width: 50%; /* L'immagine occupa metà della larghezza */
   height: auto;
-  border-radius: 20px;
   box-shadow: 0 0 1px rgba(0, 0, 0, 1.0); 
   transition: box-shadow 0.3s ease, transform 0.3s ease; /* Smooth transition */
 }
@@ -1114,11 +1113,14 @@ iframe {
     padding: 0.0em;
   }
 
-  .timeline-image {
-    width: 100%; /* L'immagine occupa metà della larghezza */
+  .timeline-content img {
+    width: 100%; /* Responsive images */
     height: auto;
     border-radius: 5px;
-    padding: 0.0em;
+  }
+
+  .timeline-image {
+    width: 100%; /* L'immagine occupa metà della larghezza */
   }
 
   .timeline-text {

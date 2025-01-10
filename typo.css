@@ -1133,3 +1133,33 @@ iframe {
   }
 
 }
+
+@media only screen and (max-width: 1000px) and (min-width: 750px) {
+  .heroCapPic{
+  gap: 0.1em; /* Adjusts the space between items */
+  padding: 3.0em;
+  }
+
+  .pic-container {
+    width: 24em; /*15em; /* 300px anche gigante senza indicazioni ha del potenziale*/
+    height: 26em; /*20em; /* 400px */
+  }
+
+  .timeline-text-image {
+    flex-direction: column; /* Arrange items vertically */
+    align-items: center;    /* Vertically center the items */
+    
+  }
+
+  .timeline-content img {
+    width: 90%; /* Responsive images */
+    height: auto;
+    margin-bottom: 1em;
+  }
+
+  .timeline-text {
+    
+    margin-bottom: 1em;
+  }
+
+}

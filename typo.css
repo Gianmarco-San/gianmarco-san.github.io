@@ -219,7 +219,7 @@ nav a:active,
 nav a:visited:active {
   color: rgb(197, 182, 84);  /* #54A5C4; */
   background-color: rgba(255, 255, 255, 0.2);
-  text-decoration: underline;
+  /*text-decoration: underline;*/
 }
 
 
@@ -337,13 +337,13 @@ nav a.selected {
 .pic {
   width: 120%; /* Set width to auto to maintain original aspect ratio */
   height: auto; /* Set height to fill the container */
-  transform: translateX(-7%);
+  transform: scale(1) translateX(-7%) translateY(0); /* Default state */
+  transition: transform 0.3s ease; /* Smooth transition */
 }
 
 .pic:hover {
-  transform: scale(1.2) translateX(-5%) translateY(+4%); 
-  transition: transform 0.3s ease; 
-} */
+  transform: scale(1.2) translateX(-5%) translateY(4%); /* Transformed state */
+}
 
 
 
@@ -559,7 +559,7 @@ h4 {
 }
 
 .timeline-content:hover {
-  box-shadow: 0 0 2px rgba(0, 0, 0, 1.0); /* Enhanced shadow on hover */
+  /*box-shadow: 0 0 2px rgba(0, 0, 0, 1.0); /* Enhanced shadow on hover */
   background: #fafafa;
 }
 
@@ -589,7 +589,7 @@ h4 {
 .timeline-image {
   width: 50%; /* L'immagine occupa metà della larghezza */
   height: auto;
-  box-shadow: 0 0 1px rgba(0, 0, 0, 1.0); 
+  box-shadow: 0 0 1px rgba(0, 0, 0, 1.0);
   transition: box-shadow 0.3s ease, transform 0.3s ease; /* Smooth transition */
   border-radius: 10px;
 }
@@ -642,6 +642,8 @@ h4 {
 .funny-fancy:hover span:nth-child(13) { animation-delay: 0.6s; }
 .funny-fancy:hover span:nth-child(14) { animation-delay: 0.65s; }
 .funny-fancy:hover span:nth-child(15) { animation-delay: 0.7s; }
+.funny-fancy:hover span:nth-child(16) { animation-delay: 0.75s; }
+.funny-fancy:hover span:nth-child(17) { animation-delay: 0.8s; }
 
 
 /* Waving effect */

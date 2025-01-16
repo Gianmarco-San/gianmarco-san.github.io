@@ -470,6 +470,8 @@ h3 {
   text-align: center;
   margin-bottom: 3em;
   margin-top: 1.5em;
+  margin-right: 0.5em;
+  margin-left: 0.5em;
 }
 
 /* Rainbow text gradient animation */
@@ -1048,7 +1050,7 @@ iframe {
 
 
 /* working on responsiveness */
-@media only screen and (max-width: 750px) {
+@media only screen and (max-width: 500px) {
   
 
   nav ul {
@@ -1130,20 +1132,40 @@ iframe {
   }
 
   .section {
-    margin: 0.5em;
+    padding: 4em 1em;
+    margin: 2em auto;
+    width: 80%;
   }
 
 }
 
-@media only screen and (max-width: 1000px) and (min-width: 750px) {
+@media only screen and (max-width: 960px) and (min-width: 501px) {
+
+  nav ul {
+    width: 90%;
+    max-width: 500px;
+  }
+
   .heroCapPic{
   gap: 0.1em; /* Adjusts the space between items */
   padding: 3.0em;
+  padding-right: 1em;
+  }
+
+  .heroCap {
+    padding-left: 1em;
+    padding-right: 0em;
   }
 
   .pic-container {
     width: 24em; /*15em; /* 300px anche gigante senza indicazioni ha del potenziale*/
     height: 26em; /*20em; /* 400px */
+  }
+
+  .pic {
+    width: 120%; /* Set width to auto to maintain original aspect ratio */
+    height: auto; /* Set height to fill the container */
+    transform: scale(1) translateX(-7%) translateY(0); /* Default state */
   }
 
   .timeline-text-image {
@@ -1163,4 +1185,16 @@ iframe {
     margin-bottom: 1em;
   }
 
+}
+
+
+
+.horiz-ul{
+  display: flex; 
+  flex-wrap: wrap;
+  gap: 3em;
+  row-gap: 1.5em;
+  padding: 1em;
+  list-style-type: circle;
+  padding-left: 1em;
 }

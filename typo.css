@@ -368,6 +368,8 @@ nav a.selected {
   opacity: 0; /* Hidden by default */
   transition: opacity 0.3s ease;
   font-size: 0.01em;
+  /*font-weight: 500;
+  z-index: 10;*/
 }
 
 /* Show the description on hover */

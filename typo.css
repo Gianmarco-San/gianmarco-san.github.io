@@ -283,10 +283,10 @@ nav a.selected {
 }
 
 @keyframes slideFadeIn {
-  0% { opacity: 0; transform: translateY(-0%); } /* Off-screen above */
+  0% { opacity: 0; transform: translateY(-40%); } /* Off-screen above */
   10% { opacity: 1; transform: translateY(0); } /* Slide down and fade in */
   90% { opacity: 1; transform: translateY(0); } /* Stay visible */
-  100% { opacity: 0; transform: translateY(0%); } /* Slide down and fade out */
+  100% { opacity: 0; transform: translateY(40%); } /* Slide down and fade out */
 }
 
 

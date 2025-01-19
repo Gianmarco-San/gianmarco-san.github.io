@@ -52,13 +52,17 @@
   
 
             <div class="carousel_title">
-              <div class="hide-on-small">
-              <h2 style="font-weight: 500; font-size: 1.65em;" id="carousel-text">Data Scientist - AI</h2>
+              <div class="show-on-big">
+                <h2 style="font-weight: 500; font-size: 1.65em;" id="carousel-text">Data Scientist - AI</h2>
               </div>
 
               <div class="show-on-small">
                 <h2 style="font-weight: 500; font-size: 1.6em;" id="carousel-text1">Data Scientist - AI</h2>
-                </div>
+              </div>
+
+              <div class="show-on-middle">
+                <h2 style="font-weight: 500; font-size: 1.4em;" id="carousel-text2">Data Scientist - AI</h2>
+              </div>
             </div>
             
             <script>
@@ -77,7 +81,8 @@
               // Change text every 3 seconds
               setInterval(changeText, 3000);
             </script>
-
+            
+            <!--FOR SMALL-->
             <script>
               const texts1 = [
               "Data Scientist - AI",
@@ -86,13 +91,31 @@
               ];
 
               let currentIndex1 = 0;
-              function changeText() {
-                const carouselText = document.getElementById("carousel-text1");
+              function changeText1() {
+                const carouselText1 = document.getElementById("carousel-text1");
                 currentIndex1 = (currentIndex1 + 1) % texts1.length; // Loop back to the first text
-                carouselText.innerHTML = texts1[currentIndex];
+                carouselText1.innerHTML = texts1[currentIndex1];
               }
               // Change text every 3 seconds
-              setInterval(changeText, 3000);
+              setInterval(changeText1, 3000);
+            </script>
+
+            <!--FOR MIDDLE-->
+            <script>
+              const texts2 = [
+              "Data Scientist - AI",
+              "Mechanical Engineer - Automation",
+              //"Creative Learner - Future",
+              ];
+
+              let currentIndex2 = 0;
+              function changeText2() {
+                const carouselText2 = document.getElementById("carousel-text2");
+                currentIndex2 = (currentIndex2 + 1) % texts2.length; // Loop back to the first text
+                carouselText2.innerHTML = texts2[currentIndex2];
+              }
+              // Change text every 3 seconds
+              setInterval(changeText2, 3000);
             </script>
             
         
@@ -477,9 +500,15 @@
 
     
     <div class="show-on-small">
-    <br><br><em>To Freedom & Opportunity.</em>
-    <br><br><em>To my Friends. To Ary+. </em>
-    <br><br><em>“It’s never too late”</em>
+      <br><br><em>To Freedom & Opportunity.</em>
+      <br><br><em>To my Friends. To Ary+. </em>
+      <br><br><em>“It’s never too late”</em>
+    </div>
+
+    <div class="show-on-middle">
+      <br><br><em>To Freedom & Opportunity.</em>
+      <br><br><em>To my Friends. To Ary+. </em>
+      <br><br><em>“It’s never too late”</em>
     </div>
 
 
@@ -487,7 +516,7 @@
     <br><br><img class='logo' src='docs/J-favicon_gray.png' style='max-width: 40px; max-height: 40px; border-radius: 50%;'/>
 
 
-    <div class="hide-on-small">
+    <div class="show-on-big">
       <br><br><br>
     <a  style="display: flex; margin: auto 10em; gap: 0.5em; align-items: center; justify-content: space-between;">
       

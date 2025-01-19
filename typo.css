@@ -283,10 +283,10 @@ nav a.selected {
 }
 
 @keyframes slideFadeIn {
-  0% { opacity: 0; transform: translateY(-50%); } /* Off-screen above */
+  0% { opacity: 0; transform: translateY(-0%); } /* Off-screen above */
   10% { opacity: 1; transform: translateY(0); } /* Slide down and fade in */
   90% { opacity: 1; transform: translateY(0); } /* Stay visible */
-  100% { opacity: 0; transform: translateY(50%); } /* Slide down and fade out */
+  100% { opacity: 0; transform: translateY(0%); } /* Slide down and fade out */
 }
 
 
@@ -1037,9 +1037,17 @@ iframe {
   border: 1px solid #F09A9D;
 }
 
-
+/* RESPONSIVENESS SECTION */
 
 .show-on-small {
+  display: none;
+}
+
+.show-on-middle {
+  display: none;
+}
+
+.show-on-big {
   display: none;
 }
 
@@ -1085,34 +1093,30 @@ iframe {
     padding-bottom: 0em;
     padding-top: 2.8em;
   }
+
+  .heroCap h2 {
+    font-size: 1.9em;
+  }
+  
+}
+
+
+@media only screen and (max-width: 425px) {
+  .show-on-small {
+    display: block;
+  }
+}
+
+@media only screen and (max-width: 661px) and (min-width: 426px) {
+  .show-on-middle {
+    display: block;
+  }
 }
 
 
 /* working on responsiveness */
 @media only screen and (max-width: 661px) {
-  
-/*
-  nav ul {
-    width: 90%;
-    max-width: 500px;
-
-    margin: 0.15em auto;
-    padding: 0.3em;
-    padding-top: 0.15em;
-    padding-bottom: 0.15em;
-    margin-top: 1.0em;
-    border-radius: 2.0em;
-    border: 1px solid rgba(255, 255, 255, 0.7)
-  }
     
-  header {
-    font-size: 0.8em;
-    padding-bottom: 0em;
-    padding-top: 2.8em;
-  }
-  
-  */
-  
   .heroCapPic {
     flex-direction: column; /* Arrange items vertically */
   }
@@ -1138,13 +1142,6 @@ iframe {
     position: relative; /* Position relative for absolute positioning of img */
   }
 
-  .hide-on-small {
-    display: none;
-  }
-
-  .show-on-small {
-    display: block;
-  }
 
   body {
     font-family: 'Roboto', sans-serif;
@@ -1199,7 +1196,7 @@ iframe {
   }
 
   .heroCap {
-    padding-left: 1em;
+    padding-left: 0.5em;
     padding-right: 0em;
   }
 
@@ -1230,17 +1227,20 @@ iframe {
     margin-bottom: 1em;
   }
 
-  .hide-on-small {
-    display: none;
-  }
 
-  .show-on-small {
+  .show-on-middle {
     display: block;
   }
 
 }
 
-/* working on responsiveness */
+
+@media only screen and (min-width: 961px) {
+  .show-on-big {
+    display: block;
+  }
+}
+
 @media only screen and (max-width: 1111px) {
   .timeline {
     max-width: 90%;

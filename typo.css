@@ -55,6 +55,11 @@
   /*height: auto;*/
 }
 
+.logo:hover {  
+  box-shadow: 0 0 2px rgba(0, 0, 0, 1.0); /* Enhanced shadow on hover*/
+  }
+
+
 
 body {
   font-family: 'Roboto', sans-serif;
@@ -217,7 +222,7 @@ nav a:hover,
 nav a:visited:hover,
 nav a:active,
 nav a:visited:active {
-  color: rgb(197, 182, 84);  /* #54A5C4; */
+  color: rgb(234, 210, 53);  /* #54A5C4; */
   background-color: rgba(255, 255, 255, 0.2);
   /*text-decoration: underline;*/
 }
@@ -300,8 +305,8 @@ nav a.selected {
 
 
 
-.lightblue {
-  color: rgba(208,204,177,1); /*rgba(200,200,170,1); /* #A5C5E9; /* #B2D6FF;*/
+.color-match {
+  color:rgb(218, 210, 161); /* rgba(208,204,177,1); /*rgba(200,200,170,1); /* #A5C5E9; /* #B2D6FF;*/
 }
 
 .hero {
@@ -555,10 +560,11 @@ h4 {
   margin-bottom: 30px; /* Spazio tra i progetti */
 }
 
+/*
 .timeline-content:hover {
-  /*box-shadow: 0 0 2px rgba(0, 0, 0, 1.0); /* Enhanced shadow on hover */
+  /*box-shadow: 0 0 2px rgba(0, 0, 0, 1.0); /* Enhanced shadow on hover 
   background: #fafafa;
-}
+} */
 
 .timeline-content img {
   max-width: 100%; /* Responsive images */

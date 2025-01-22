@@ -199,21 +199,48 @@
           <img class='logo' src='docs/logo-micc.png' style='max-width: 150px;' alt="MICC Logo"/></a>
           <h4><br>DeepFake Detection Exploiting Self-Attention Maps</h4>
         </div>
+
+        <div class="timeline-text-image" style="place-items: center;">
+          <div class="timeline-text" style="text-align: end;">
+            <p>Research focuses on two-step <em>DeepFake</em> detection:</p>
+              <a style="text-align: start;">
+                <ul style="padding-left: 4em;">
+                <li>Extracting Self-Attention heatmaps</li> 
+                <li>Training a convolutional autoencoder</li></ul></a>
+            <br>
+          </div>
+          <img src="docs/Deepfake.png" alt="Method flow" class="timeline-image">
+        </div>
+
+
+        <div class="timeline-text-image" style="place-items: center;">
+          <img src="docs/transformer.jpg" alt="Vision Trasformer" class="timeline-image">
+          <div class="timeline-text">
+            <p> The Vision Transformer (ViT), pre-trained on face recognition, captures facial features and extracts visual attention maps. <br> Images are split into multiple patches as input-tokens to the transformer encoder.</p>
+            <br>
+          </div>
+        </div>
+
+        <div class="timeline-text-image" style="place-items: center;">
+          <div class="timeline-text" style="text-align: end;">
+            <p>These are used to train the convolutional autoencoder only on real images, enhancing out-of-distribution (OOD) detection by expecting higher reconstruction errors for manipulated images.</p>
+            <br>
+          </div>
+          <img src="docs/autoencoder.jpg" alt="Method flow" class="timeline-image">
+        </div>
+
         
-        <div class="timeline-text-image">
-        <img src="docs/Deepfake.png" alt="Method flow" class="timeline-image">
-        <div class="timeline-text">
-        <p>Research focuses on two-step <em>DeepFake</em> detection: extracting Self-Attention heatmaps and training a convolutional autoencoder. The Vision Transformer (ViT), pre-trained on face recognition, captures facial features and extracts visual attention maps. These are used to train the autoencoder only on real images, enhancing out-of-distribution (OOD) detection by expecting higher reconstruction errors for manipulated images.</p>
-        <br></div>
-      </div>
         
         
         <div class="timeline-text-image" style="place-items: center;">
-          <div class="timeline-text" style=" text-align: end;">
+          
+          <img src="docs/DF_auroc.png" alt="Auc-roc mean value among all forgeries tested" class="timeline-image">
+          <div class="timeline-text">
             <p>Tested on 5 different forgeries, the method shows an AUROC mean value of 0.60, demonstrating potential for transfer learning and generalizability among potential new forgeries.</p>
           </div>
-          <img src="docs/DF_auroc.png" alt="Auc-roc mean value among all forgeries tested" class="timeline-image">
+          
         </div>
+
         <div class="show-on-small"><br></div>
         <br>
         Further material:
@@ -277,7 +304,9 @@
             <img src="docs/3D_Comp.png" alt="Gearbox" class="timeline-image show-on-small" style="width: 80%;">
           </div>
 
-        <br>
+          <div class="show-on-small"><br></div>
+          <div class="show-on-middle"><br></div>
+
         
         <div class="timeline-text-image" style="place-items: center;">
           <img src="docs/gearbox-section.png" alt="Gearbox" class="timeline-image">
@@ -298,9 +327,9 @@
         Further material:
         <ul class="horiz-ul">
           <li><a href="docs/Relazione_progetto.pdf" target="_blank" class="links">Report.pdf</a></li>
-          <li><a href="docs/riduttore.pdf" target="_blank" class="links">Gearbox.pdf</a></li>
-          <li><a href="docs/albero.pdf" target="_blank" class="links">DriverShaft.pdf</a></li>
-          <li><a href="docs/Progetto_CdM.xlsx" target="_blank" class="links">Design & Calculations.xlsx</a></li>
+          <li><a href="docs/riduttore.pdf" target="_blank" class="links">Gearbox-design.pdf</a></li>
+          <li><a href="docs/albero.pdf" target="_blank" class="links">DriverShaft-design.pdf</a></li>
+          <li><a href="docs/Progetto_CdM.xlsx" target="_blank" class="links">Calculations.xlsx</a></li>
         </ul>
         
         <br>

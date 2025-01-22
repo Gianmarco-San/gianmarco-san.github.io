@@ -222,7 +222,7 @@ nav a:hover,
 nav a:visited:hover,
 nav a:active,
 nav a:visited:active {
-  color: rgb(234, 210, 53);  /* #54A5C4; */
+  color: rgb(223, 210, 123); /*rgb(234, 210, 53);  /* #54A5C4; */
   background-color: rgba(255, 255, 255, 0.2);
   /*text-decoration: underline;*/
 }
@@ -1172,10 +1172,11 @@ iframe {
 
   .timeline-image {
     width: 100%; /* L'immagine occupa metà della larghezza */
+    margin-bottom: 1.0em;
   }
 
   .timeline-text {
-    padding: 1.5em;
+    padding: 1.5em 1.0em;
   }
 
   .section {

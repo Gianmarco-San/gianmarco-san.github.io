@@ -200,8 +200,9 @@
           <h4><br>DeepFake Detection Exploiting Self-Attention Maps</h4>
         </div>
 
-        <div class="timeline-text-image" style="place-items: center;">
+        <div class="timeline-text-image">
           <div class="timeline-text" style="text-align: end;">
+            <br>
             <p>Research focuses on two-step <em>DeepFake</em> detection:</p>
               <a style="text-align: start;">
                 <ul style="padding-left: 4em;">
@@ -267,18 +268,90 @@
       <div class="timeline-date">&#x25CF 2023<br><p style="white-space: pre;">   Dec</p></div>
       <div class="timeline-content">
 
-        <h4>Animal Classifier</h4>
-
-        <div class="timeline-text-image">
-          <div class="timeline-text">
-            <p>Confusion matrix of confused animals.</p>
-            <br>
-            <p>Here, as a placeholder for the other projects to be shown.</p>
+          <div class="project-header">
+            <a href="https://www.unifi.it/en" target="_blank" rel="noopener noreferrer" style="display: contents;">
+            <img class='logo' src='docs/UniFi.png' style='max-width: 150px;'/></a>
+            <a href="https://www.imtlucca.it/en" target="_blank" rel="noopener noreferrer" style="display: contents;">
+              <img class='logo' src='docs/IMT.png' style='max-width: 150px;'/></a>
+            <h4><br>CIFAR-10 Images Classifier</h4>
           </div>
+        
+          <div class="timeline-text-image">
+            <div class="timeline-text" style="text-align: end;">
+              <br>
+              In this project I used CNNs to recognize color images from the <a href="https://www.cs.toronto.edu/~kriz/cifar.html" target="_blank" class="links">CIFAR-10 Dataset</a>.
+              <br><br>Labels are integers, values are float and every image is made by 3 channels (R,G,B) with 32 x 32 pixels.
+              <br><br>Here, an example of an image from the dataset, an horse.
+            </div>
+            <img src="docs/horse.png" alt="CM_animals" class="timeline-image show-on-big" style="width: 30%;">
+            <img src="docs/horse.png" alt="CM_animals" class="timeline-image show-on-middle" style="width: 50%;">
+            <img src="docs/horse.png" alt="CM_animals" class="timeline-image show-on-small" style="width: 70%;">
+          </div>
+
+        <div class="timeline-text-image" style="place-items: center;">
+
+          <img src="docs/images.png" alt="CM_animals" class="timeline-image show-on-big" style="width: 40%;">
+          <img src="docs/images.png" alt="CM_animals" class="timeline-image show-on-middle" style="width: 60%;">
+          <img src="docs/images.png" alt="CM_animals" class="timeline-image show-on-small" style="width: 80%;">
+
+          <div class="timeline-text">
+            The CIFAR-10 dataset consists of 60000 32x32 colour images in 10 classes, with 6000 images per class.
+            <br><br>Dataset is splitted into train, validation and test sets as follow:
+            <a style="text-align: start;">
+              <ul style="padding-left: 4em;">
+              <li>Elements in Train set:	48000</li> 
+              <li>Elements in Valid set:	2000</li>
+                <li>Elements in Test set:	10000</li></ul></a>
+          </div>
+        </div>
+
+        <div class="timeline-text-image" style="place-items: center;">
+          <div class="timeline-text" style="text-align: end;">
+            
+            First attempt to images-recogntion with MultiLayerPerceptron (MLP), as a baseline.
+            <br><br>This simple MLP with decreasing size of fully connected hidden layers is the best trade-off between complexity and performace found in test.
+            <br><br>Learning rate varies over the epochs, starting with 0.1 and gradually decreasing to about 0.001 at epoch 20
+          </div>
+          <img src="docs/train-loss-MLP.png" alt="CM_animals" class="timeline-image">
+        </div>
+
+
+        <div class="timeline-text-image" style="place-items: center;">
+
           <img src="docs/CM_animals.png" alt="CM_animals" class="timeline-image show-on-big" style="width: 40%;">
           <img src="docs/CM_animals.png" alt="CM_animals" class="timeline-image show-on-middle" style="width: 60%;">
           <img src="docs/CM_animals.png" alt="CM_animals" class="timeline-image show-on-small" style="width: 80%;">
+
+          <div class="timeline-text">
+            The resulting confusion matrix is shown, with accuracy on test set equal to 53.4%.
+            <br><br>The most misclassified by the model is Cat (accuracy of 33.3%) along with Dog and similarly, Deer with Bird.
+            <br><br>While the best classified is Automobile with 66.4%.
+            <br><br>Finally, there is an imperfect simmetry among classes, e.g. Cat vs Dog and Dog vs Cat.
+          </div>
         </div>
+
+
+        <div class="timeline-text-image" style="place-items: center;">
+          <div class="timeline-text" style="text-align: end;">
+            
+            Second model with convolutionalNerualNetwork (CNN) with two convolutional layers and a max pooling.
+            <br><br>Learning rate varies at the same way as in MLP.
+          </div>
+          <img src="docs/train-loss-CNN.png" alt="CM_animals" class="timeline-image">
+        </div>
+
+        <div class="timeline-text-image" style="place-items: center;">
+
+          <img src="docs/conf-mat.png" alt="CM_animals" class="timeline-image show-on-big" style="width: 40%;">
+          <img src="docs/conf-mat.png" alt="CM_animals" class="timeline-image show-on-middle" style="width: 60%;">
+          <img src="docs/conf-mat.png" alt="CM_animals" class="timeline-image show-on-small" style="width: 80%;">
+
+          <div class="timeline-text">
+            Despite a longer training time, the CNN model performed much better than the MLP with a accuracy of 70,4% vs 53,7% on Test set.
+            <br><br>Both models have similar tendency to predict worse some classes, such as Cat.
+          </div>
+        </div>
+
 
       </div>
     </div>
@@ -349,7 +422,7 @@
           <li>AutoCad</li>
           <li>Word</li>
           <li>Various manuals</li>
-          <li>ISO Standards</li>
+          <li>UNI, EN, ISO, DIN Standards</li>
         </ul>
       
       </div>

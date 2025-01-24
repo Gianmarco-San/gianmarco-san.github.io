@@ -202,7 +202,7 @@
 
         <div class="timeline-text-image">
           <div class="timeline-text" style="text-align: end;">
-            <br>
+            <br class="show-on-big">
             <p>Research focuses on two-step <em>DeepFake</em> detection:</p>
               <a style="text-align: start;">
                 <ul style="padding-left: 4em;">
@@ -218,7 +218,6 @@
           <img src="docs/transformer.jpg" alt="Vision Trasformer" class="timeline-image show-on-big">
           <div class="timeline-text">
             <p> The Vision Transformer (ViT), pre-trained on face recognition, captures facial features and extracts visual attention maps. <br> Images are split into multiple patches as input-tokens to the transformer encoder.</p>
-            
           </div>
           <img src="docs/transformer.jpg" alt="Vision Trasformer" class="timeline-image show-on-small show-on-middle">
         </div>
@@ -278,21 +277,27 @@
         
           <div class="timeline-text-image">
             <div class="timeline-text" style="text-align: end;">
+
+              <div class="show-on-small show-on-middle" style="place-items: center;">
+
+              </div>
+
               <br>
               In this project I used CNNs to recognize color images from the <a href="https://www.cs.toronto.edu/~kriz/cifar.html" target="_blank" class="links">CIFAR-10 Dataset</a>.
               <br><br>Labels are integers, values are float and every image is made by 3 channels (R,G,B) with 32 x 32 pixels.
               <br><br>Here, an example of an image from the dataset, an horse.
             </div>
+
             <img src="docs/horse.png" alt="CM_animals" class="timeline-image show-on-big" style="width: 30%;">
             <img src="docs/horse.png" alt="CM_animals" class="timeline-image show-on-middle" style="width: 50%;">
             <img src="docs/horse.png" alt="CM_animals" class="timeline-image show-on-small" style="width: 70%;">
+
           </div>
+          
 
         <div class="timeline-text-image" style="place-items: center;">
 
           <img src="docs/images.png" alt="CM_animals" class="timeline-image show-on-big" style="width: 40%;">
-          <img src="docs/images.png" alt="CM_animals" class="timeline-image show-on-middle" style="width: 60%;">
-          <img src="docs/images.png" alt="CM_animals" class="timeline-image show-on-small" style="width: 80%;">
 
           <div class="timeline-text">
             The CIFAR-10 dataset consists of 60000 32x32 colour images in 10 classes, with 6000 images per class.
@@ -303,6 +308,10 @@
               <li>Elements in Valid set:	2000</li>
                 <li>Elements in Test set:	10000</li></ul></a>
           </div>
+
+            <img src="docs/images.png" alt="CM_animals" class="timeline-image show-on-middle" style="width: 60%;">
+            <img src="docs/images.png" alt="CM_animals" class="timeline-image show-on-small" style="width: 80%;">
+
         </div>
 
         <div class="timeline-text-image" style="place-items: center;">
@@ -319,8 +328,6 @@
         <div class="timeline-text-image" style="place-items: center;">
 
           <img src="docs/CM_animals.png" alt="CM_animals" class="timeline-image show-on-big" style="width: 40%;">
-          <img src="docs/CM_animals.png" alt="CM_animals" class="timeline-image show-on-middle" style="width: 60%;">
-          <img src="docs/CM_animals.png" alt="CM_animals" class="timeline-image show-on-small" style="width: 80%;">
 
           <div class="timeline-text">
             The resulting confusion matrix is shown, with accuracy on test set equal to 53.4%.
@@ -328,6 +335,10 @@
             <br><br>While the best classified is Automobile with 66.4%.
             <br><br>Finally, there is an imperfect simmetry among classes, e.g. Cat vs Dog and Dog vs Cat.
           </div>
+
+          <img src="docs/CM_animals.png" alt="CM_animals" class="timeline-image show-on-middle" style="width: 60%;">
+          <img src="docs/CM_animals.png" alt="CM_animals" class="timeline-image show-on-small" style="width: 80%;">          
+
         </div>
 
 
@@ -335,21 +346,24 @@
           <div class="timeline-text" style="text-align: end;">
             
             Second model with convolutionalNerualNetwork (CNN) with two convolutional layers and a max pooling.
-            <br><br>Learning rate varies at the same way as in MLP.
+            <br><br>The learning rate varies in the same way as MLP.
           </div>
           <img src="docs/train-loss-CNN.png" alt="CM_animals" class="timeline-image">
         </div>
 
+
         <div class="timeline-text-image" style="place-items: center;">
-
+          
           <img src="docs/conf-mat.png" alt="CM_animals" class="timeline-image show-on-big" style="width: 40%;">
-          <img src="docs/conf-mat.png" alt="CM_animals" class="timeline-image show-on-middle" style="width: 60%;">
-          <img src="docs/conf-mat.png" alt="CM_animals" class="timeline-image show-on-small" style="width: 80%;">
-
+                    
           <div class="timeline-text">
             Despite a longer training time, the CNN model performed much better than the MLP with a accuracy of 70,4% vs 53,7% on Test set.
             <br><br>Both models have similar tendency to predict worse some classes, such as Cat.
           </div>
+          
+          <img src="docs/conf-mat.png" alt="CM_animals" class="timeline-image show-on-middle" style="width: 60%;">
+          <img src="docs/conf-mat.png" alt="CM_animals" class="timeline-image show-on-small" style="width: 80%;">
+
         </div>
 
 

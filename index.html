@@ -411,6 +411,103 @@
             <img class='logo' src='docs/UniFi.png' style='max-width: 150px;'/></a>
             <a href="https://www.imtlucca.it/en" target="_blank" rel="noopener noreferrer" style="display: contents;">
               <img class='logo' src='docs/IMT.png' style='max-width: 150px;'/></a>
+          <h4><br>Fitness classes. Do you book and go?</h4>
+        </div>
+
+        <div class="timeline-text-image">
+          <div class="timeline-text" style="text-align: end;">
+            <br class="show-on-big">
+            
+            In this Project I try to predict whether a member will attend a class or not, ones booked.
+            <br>You'll find:
+            <br><a style="text-align: start;">
+              <ul style="padding-left: 4em;">
+              <li>EDA.</li> 
+              <li>Data management.</li>
+              <li>Models and their performance.</li> </ul></a>
+            
+          </div>
+          <img src="docs/weight.png" alt="Method flow" class="timeline-image">
+        </div>
+
+
+        <div class="timeline-text-image" style="place-items: center;">
+          <img src="docs/month_memeb.png" alt="Vision Trasformer" class="timeline-image show-on-big" style="width: 50%;">
+          <div class="timeline-text">
+            Considering graphs, there are some tendencies:
+            <a style="text-align: start;">
+              <ul style="padding-left: 1em;">
+              <li>Weight vs attendance goes down.</li>
+              <li>Attendance grows with months as member.</li></ul></a>
+              <br>This can lead to operative choice of make the booking of loyal users (the ones with more months as member) affordable.
+          </div>
+          <img src="docs/month_memeb.png" alt="Vision Trasformer" class="timeline-image show-on-small show-on-middle" style="width: 60%;">
+        </div>
+
+        <div class="timeline-text-image" style="place-items: center;">
+          <div class="timeline-text" style="text-align: end;">
+            As expected, there is inverse correlation between mean values of Weight and mean values of Months as member.
+          </div>
+          <img src="docs/mon_wei.png" alt="Method flow" class="timeline-image show-on-big" style="width: 30%;">
+          <img src="docs/wei.png" alt="Method flow" class="timeline-image show-on-big" style="width: 10%;">
+          <img src="docs/mon_wei.png" alt="Method flow" class="timeline-image show-on-middle show-on-small" style="width: 50%;">
+          <img src="docs/wei.png" alt="Method flow" class="timeline-image show-on-middle show-on-small" style="width: 15%;">
+        </div>
+        
+        <div class="timeline-text-image" style="place-items: center;">
+          
+          <img src="docs/conf_attend.png" alt="Auc-roc mean value among all forgeries tested" class="timeline-image show-on-big" style="width: 40%;">
+          <div class="timeline-text">
+            Confusion Matrix with best classifier:
+            <a style="text-align: start;">
+              <ul style="padding-left: 1em;">
+              <li>LogisticRegression(random_state=23)</li>
+              <li>Mean accuracy score: 0.7583</li></ul></a>
+            
+            <br>By changing the proporions of train and test sets I can see that the accuracy is quite stable.
+            <br><br>There is a tendency for outcome to be predicted "0".
+            <br>Considering the unbalanced dataset, where much more records have values "0" as attendance, somehow models tend to learn to predict more often labels of lower value.
+            
+          </div>
+          <img src="docs/conf_attend.png" alt="Auc-roc mean value among all forgeries tested" class="timeline-image show-on-small show-on-middle" style="width: 60%;">
+          
+        </div>
+
+        <div class="show-on-small"><br></div>
+        <br>
+        Further material:
+        <ul class="horiz-ul">
+          <li><a href="https://github.com/Gianmarco-San/Fitness_Classes_Book_and_Attend.git" target="_blank" class="links">GitHub Repo</a></li>
+        </ul>
+
+        </ul>
+        
+        <br>
+        ——
+        <ul class="horiz-ul">
+          <li>Python</li>
+          <li>NumPy</li>
+          <li>Matplotlib</li>
+          <li>Seaborn</li>
+          <li>Pandas</li>
+          <li>Pydot</li>
+          <li>Scikit-learn</li>
+        </ul>
+      
+      </div>
+    </div>
+
+
+
+    <div class="timeline-item">
+      <div class="timeline-date">&#x25CF 2023<br><p style="white-space: pre;">   Oct</p></div>  
+      <div class="timeline-content">
+    
+        <div class="project-header">
+          <a href="https://www.unifi.it/en" target="_blank" rel="noopener noreferrer" style="display: contents;">
+            <img class='logo' src='docs/UniFi.png' style='max-width: 150px;'/></a>
+            <a href="https://www.imtlucca.it/en" target="_blank" rel="noopener noreferrer" style="display: contents;">
+              <img class='logo' src='docs/IMT.png' style='max-width: 150px;'/></a>
           <h4><br>US Salaries Analysis & Prediction</h4>
         </div>
 
@@ -486,10 +583,10 @@
           <li>Python</li>
           <li>NumPy</li>
           <li>Matplotlib</li>
-          <li>seaborn</li>
-          <li>pandas</li>
-          <li>pydot</li>
-          <li>scikit-learn</li>
+          <li>Seaborn</li>
+          <li>Pandas</li>
+          <li>Pydot</li>
+          <li>Scikit-learn</li>
         </ul>
       
       </div>
@@ -507,9 +604,10 @@
           <h4><br>Design of a two-stage reduction gearbox for general applications</h4>
         </div>
         
-          <div class="timeline-text-image" style="align-items: start; place-items: center;">
-            <div class="timeline-text" style=" text-align: end;">
-              <p>The goal was to design a two-stage parallel-axis pendular gearbox.<br><br>Shafts and gears were dimensioned based on key design specifications, starting with a conservative approach and refining iteratively to minimize oversizing.</p>
+          <div class="timeline-text-image">
+            <div class="timeline-text" style="text-align: end;">
+              <br class="show-on-big">
+              The goal was to design a two-stage parallel-axis pendular gearbox.<br><br>Shafts and gears were dimensioned based on key design specifications, starting with a conservative approach and refining iteratively to minimize oversizing.
               <br>
             </div>
             <img src="docs/3D_Comp.png" alt="Gearbox" class="timeline-image show-on-big" style="width: 30%;">
@@ -694,7 +792,7 @@
     <div class='section'>
       <h2>Romagna, the land I come from</h2>
       
-      <a href="https://emiliaromagnaturismo.it/en/riviera" class="links" style="text-align: center;">Riviera Romagnola</a>
+      <a href="https://emiliaromagnaturismo.it/en/riviera" class="links" style="text-align: center; display: block; margin: 0 auto; width: fit-content;">Riviera Romagnola</a>
       <!-- <h3 style="text-align: left;">Details coming soon</h3> -->
       <img class="timeline-image" src="docs/Romagna_geopolitica_v2.png" style="width:100%;" alt="https://eml.wikipedia.org/w/index.php?curid=42464"></img>
       

@@ -167,7 +167,7 @@ nav ul {
   /*flex-direction: column;*/
   margin: 0.15em auto;
   /*max-width: 500px; /* e per i celly?!*/
-  width: 500px;
+  width: 400px; /* with 5 element was 500px */
 
   min-height: 20px;
   align-items: center;
@@ -491,13 +491,59 @@ h3 {
   display: inline-block;
   /*font-weight: bold;*/
   background: linear-gradient(30deg, 
-  #ffffff, #ffffff,#ffffff,#ffffff,#ffffff,#ffffff, rgba(208,204,177,1),#ffffff, #ffffff,#ffffff,#ffffff,#ffffff,#ffffff
+  #ffffff, #ffffff,#ffffff,#ffffff,#ffffff,#ffffff, 
+  rgb(230, 200, 0),rgb(230, 200, 0),
+  #ffffff, #ffffff,#ffffff,#ffffff,#ffffff,#ffffff
     );
   background-size: 300%; /* Makes gradient stretch across text */
   -webkit-background-clip: text;
   color: transparent;
   animation: rainbow-text 2s linear infinite; /* Adjust speed as needed */
 }
+
+
+/* Rainbow text gradient animation */
+@keyframes shining-text {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.shadow-text1 {
+  display: inline-block;
+  background: linear-gradient(90deg, 
+   #fff, #fff,#fff,#fff,#fff,
+    rgb(230, 200, 0), rgb(230, 200, 0), rgb(230, 200, 0),
+    #fff, #fff,#fff,#fff,#fff
+  );
+  background-size: 300%;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: shining-text 3s linear infinite;
+}
+
+.shadow-text1:hover {
+  display: inline-block;
+  background: linear-gradient(90deg, 
+    rgb(249, 234, 136), rgb(249, 234, 136),rgb(249, 234, 136),rgb(249, 234, 136),rgb(249, 234, 136),
+    rgb(230, 200, 0), rgb(230, 200, 0), rgb(230, 200, 0),
+    rgb(249, 234, 136), rgb(249, 234, 136),rgb(249, 234, 136),rgb(249, 234, 136),rgb(249, 234, 136)
+  );
+  background-size: 300%;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: shining-text 3s linear infinite;
+}
+
+.nav_hover:hover {
+  font-weight: bold;
+}
+
+
+
+
+
+
 
 
 /* Rainbow text gradient animation */
@@ -928,7 +974,7 @@ iframe {
 
 .download-button:hover {
   background-color: #777; /* Change to your preferred hover color */
-  transform: scale(1.05); /* Slight zoom effect on hover */
+  transform: scale(1.20); /* Slight zoom effect on hover */
   z-index: 100;
 }
 
@@ -1062,7 +1108,7 @@ iframe {
 @media only screen and (max-width: 425px) {
   
   nav ul {
-    width: 90%;
+    width: 80%;
     /*max-width: 341px;*/
 
     margin: 0.15em auto;
@@ -1075,7 +1121,7 @@ iframe {
   }
 
   header {
-    font-size: 0.7em;
+    font-size: 0.8em;
     padding-bottom: 0em;
     padding-top: 2.8em;
   }
@@ -1085,8 +1131,8 @@ iframe {
 @media only screen and (max-width: 550px) and (min-width: 426px) {
   
   nav ul {
-    width: 90%;
-    max-width: 500px;
+    width: 80%;
+    max-width: 350px;
     margin: 0.15em auto;
     padding: 0.2em;
     padding-top: 0.2em;
@@ -1097,7 +1143,7 @@ iframe {
   }
 
   header {
-    font-size: 0.85em;
+    font-size: 0.9em;
     padding-bottom: 0em;
     padding-top: 2.8em;
   }
@@ -1193,8 +1239,8 @@ iframe {
 
   
   nav ul {
-    width: 90%;
-    max-width: 500px;
+    width: 80%;
+    max-width: 400px;
   }
 
 

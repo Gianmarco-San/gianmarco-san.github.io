@@ -137,19 +137,22 @@
         <img class='logo' src="docs/DALL·E-work in progress.webp" style='max-width: 100px; height: 100px;'/>
         <div><h4><br>I'm always baking something new. <em>J</em></h4>
 
+        <!--
         🎉 <b>
           <span class="funny-fancy">
             <span>H</span><span>a</span><span>p</span><span>p</span><span>y</span>
             <span>N</span><span>e</span><span>w</span>
             <span>Y</span><span>e</span><span>a</span><span>r</span><span>!</span>
         </span>
-        </b> 🎉
-        <br><br>I'm currently using this first space as an <b>info display for what's coming</b>. As of Jan 8th, 2025:
+        </b> 🎉 
+        -->
+        
+        I'm currently using this first space as an <b>info display for what's coming</b>. As of Jan 8th, 2025:
         <ul style="list-style-type: circle; padding-left: 1em;">
           <li>More contents, projects and details on this website</li>
-          <li>I'm diving a little deeper into german and exploring some frontiers technical skills</li>
-          <li>In a few days/weeks, I'll start scraping opportunities to pursue my next career step</li>
-          <i>Contact me for collaboration and info!</i>
+          <!-- <li>I'm diving a little deeper into german and exploring some frontiers technical skills</li> -->
+          <li>In a few weeks, I'll start considering opportunities to pursue my next career step</li>
+          <br><i>Contact me for collaboration and info!</i>
         </ul>
       </div>
       
@@ -167,9 +170,7 @@
       </div>
 
         <div class="timeline-text-image">
-          <div class="timeline-text">
-            <p>I built my personal webplace where I share projects, news, and more.</p>
-          </div>
+          <div class="timeline-text">I built my personal webplace where I share projects, news, and more.</div>
           <!-- <img src="docs/Jweb.png" alt="My Website" class="timeline-image"> -->
         </div>
 
@@ -432,7 +433,8 @@
       </div>
     </div>
 
-      
+        <br>Scroll down the Timeline for more projects.
+
         <br class="show-on-small">
         <br>
         Further material:
@@ -514,39 +516,13 @@
 
         </div>
 
+
         <div class="timeline-text-image" style="place-items: center;">
           <div class="timeline-text" style="text-align: end;">
             
             First attempt to images-recogntion with MultiLayerPerceptron (MLP), as a baseline.
-            <br><br>This simple MLP with decreasing size of fully connected hidden layers is the best trade-off between complexity and performace found in test.
-            <br><br>Learning rate varies over the epochs, starting with 0.1 and gradually decreasing to about 0.001 at epoch 20
-          </div>
-          <img src="docs/train-loss-MLP.png" alt="CM_animals" class="timeline-image">
-        </div>
-
-
-        <div class="timeline-text-image" style="place-items: center;">
-
-          <img src="docs/CM_animals.png" alt="CM_animals" class="timeline-image show-on-big" style="width: 40%;">
-
-          <div class="timeline-text">
-            The resulting confusion matrix is shown, with accuracy on test set equal to 53.4%.
-            <br><br>The most misclassified by the model is Cat (accuracy of 33.3%) along with Dog and similarly, Deer with Bird.
-            <br><br>While the best classified is Automobile with 66.4%.
-            <br><br>Finally, there is an imperfect simmetry among classes, e.g. Cat vs Dog and Dog vs Cat.
-          </div>
-
-          <img src="docs/CM_animals.png" alt="CM_animals" class="timeline-image show-on-middle" style="width: 60%;">
-          <img src="docs/CM_animals.png" alt="CM_animals" class="timeline-image show-on-small" style="width: 80%;">          
-
-        </div>
-
-
-        <div class="timeline-text-image" style="place-items: center;">
-          <div class="timeline-text" style="text-align: end;">
-            
-            Second model with convolutionalNerualNetwork (CNN) with two convolutional layers and a max pooling.
-            <br><br>The learning rate varies in the same way as MLP.
+            <br><br>Second model with convolutionalNerualNetwork (CNN) with two convolutional layers and a max pooling.
+            <br><br>Learning rate varies over the epochs, starting with 0.1 and gradually decreasing to about 0.001 at epoch 20.
           </div>
           <img src="docs/train-loss-CNN.png" alt="CM_animals" class="timeline-image">
         </div>
@@ -559,6 +535,7 @@
           <div class="timeline-text">
             Despite a longer training time, the CNN model performed much better than the MLP with a accuracy of 70,4% vs 53,7% on Test set.
             <br><br>Both models have similar tendency to predict worse some classes, such as Cat.
+            <br><br>Images are related to CNN.
           </div>
           
           <img src="docs/conf-mat.png" alt="CM_animals" class="timeline-image show-on-middle" style="width: 60%;">
@@ -1099,61 +1076,10 @@
 </body>
 
 
-<!-- HERE JS SCRIPTS -->
+<!--   ###   HERE JS SCRIPTS   ###   -->
 
+<script>  // To make the automatic scrolling when clicked ref to ancor poits smooth
 
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const nav = document.querySelector("nav");
-    const navLinks = document.querySelectorAll("nav a");
-    const sections = document.querySelectorAll("section");
-
-    // Function to get the height of the nav, with an additional offset
-    function getNavHeight() {
-      return nav.offsetHeight + 20; // Add 10 pixels for the offset
-    }
-
-    // Smooth scroll for links with offset for fixed nav bar
-    navLinks.forEach(link => {
-      link.addEventListener("click", (e) => {
-        e.preventDefault();
-        const targetId = link.getAttribute("href").substring(1);
-        const targetElement = document.getElementById(targetId);
-        const navHeight = getNavHeight(); // Get the dynamic height of the nav
-
-        window.scrollTo({
-          top: targetElement.offsetTop - navHeight,
-          behavior: "smooth"
-        });
-      });
-    });
-
-    // Active link update on scroll
-    window.addEventListener("scroll", () => {
-      const navHeight = getNavHeight(); // Consistently use the updated height
-      let currentSection = "";
-
-      sections.forEach(section => {
-        const sectionTop = section.offsetTop - navHeight;
-        const sectionHeight = section.offsetHeight;
-
-        if (pageYOffset >= sectionTop && pageYOffset < sectionTop + sectionHeight) {
-          currentSection = section.getAttribute("id");
-        }
-      });
-
-      navLinks.forEach(link => {
-        link.classList.remove("selected");
-        if (link.getAttribute("href").substring(1) === currentSection) {
-          link.classList.add("selected");
-        }
-      });
-    });
-  });
-</script>
-
-
-<script>
   document.addEventListener("DOMContentLoaded", () => {
     const nav = document.querySelector("nav");
     const navLinks = document.querySelectorAll("nav a");
@@ -1214,7 +1140,7 @@
 </script>
 
 
-<script>
+<script> // to make the download of CV into a new blank and visual effect
 
 document.addEventListener("DOMContentLoaded", () => {
   const downloadBtn = document.getElementById("cv-download");
@@ -1260,7 +1186,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </script>
 
-<script>
+
+<script> // to download the CV via nav-bar without effects
 
 document.addEventListener("DOMContentLoaded", () => {
     const downloadBtn = document.getElementById("cv-download1");
@@ -1281,49 +1208,51 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-<script>
-// To run carousel, stop when hovering, 
+<script> // To run carousel, stop when hovering, 
 
 document.addEventListener("DOMContentLoaded", () => {
-  const carouselWrapper = document.querySelector(".carousel-wrapper");
+  const carouselWrappers = document.querySelectorAll(".carousel-wrapper");
 
-  let isHovered = false;
+  carouselWrappers.forEach((carouselWrapper) => {
+    let isHovered = false;
 
-  // Start the auto-scroll when not hovering
-  const startAutoScroll = () => {
-    carouselWrapper.style.animationPlayState = "running";
-  };
+    // Start the auto-scroll when not hovering
+    const startAutoScroll = () => {
+      carouselWrapper.style.animationPlayState = "running";
+    };
 
-  // Stop auto-scroll on hover
-  const stopAutoScroll = () => {
-    carouselWrapper.style.animationPlayState = "paused";
-  };
+    // Stop auto-scroll on hover
+    const stopAutoScroll = () => {
+      carouselWrapper.style.animationPlayState = "paused";
+    };
 
-  // Enable natural scroll with mouse/trackpad
-  carouselWrapper.addEventListener("mouseenter", () => {
-    stopAutoScroll();
-    isHovered = true;
-  });
+    // Enable natural scroll with mouse/trackpad
+    carouselWrapper.addEventListener("mouseenter", () => {
+      stopAutoScroll();
+      isHovered = true;
+    });
 
-  carouselWrapper.addEventListener("mouseleave", () => {
+    carouselWrapper.addEventListener("mouseleave", () => {
+      startAutoScroll();
+      isHovered = false;
+    });
+
+    // Restart the loop if reached the end
+    carouselWrapper.addEventListener("animationiteration", () => {
+      if (!isHovered) {
+        carouselWrapper.style.transform = "translateX(0)";
+      }
+    });
+
+    // Initial auto-scroll start
     startAutoScroll();
-    isHovered = false;
   });
-
-  // Restart the loop if reached the end
-  carouselWrapper.addEventListener("animationiteration", () => {
-    if (!isHovered) {
-      carouselWrapper.style.transform = "translateX(0)";
-    }
-  });
-
-  // Initial auto-scroll start
-  startAutoScroll();
 });
+
 </script>
 
 
-<script>
+<script>  // to zoom images when clicking on them
   document.addEventListener("DOMContentLoaded", () => {
     // Select all images with the 'timeline-image' class
     const timelineImages = document.querySelectorAll('.timeline-image');
@@ -1354,7 +1283,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   </script>
   
-
+ <!--
   <script>  
     document.addEventListener("DOMContentLoaded", () => {
       const track = document.querySelector(".text-carousel-track");
@@ -1367,6 +1296,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   </script>
-  
+  -->
 
 </html>

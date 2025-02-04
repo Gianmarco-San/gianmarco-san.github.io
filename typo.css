@@ -662,7 +662,7 @@ h4 {
 /* Styles for each letter with hover animation */
 .funny-fancy:hover span{
   display: inline-block;
-  animation: mirror-flip 0.5s ease-in-out;
+  animation: mirror-flip 0.4s ease-in-out;
   transform-origin: center;
   animation-delay: 2s; 
 }
@@ -1013,17 +1013,7 @@ iframe {
 
 /* When hovering over the section, apply animation to the download button */
 #cv:hover .download-button {
-  
   transform: scale(1.4); /* Zoom effect */
-  
-  /*
-  background: linear-gradient(45deg, 
-#ADD8E6, #87CEEB, #48D1CC, #9ffcff, #20B2AA,  rgb(255, 255, 70), lightgray, gray, #20B2AA, #9ffcff, #48D1CC, #87CEEB, #ADD8E6
-    );
-  background-size: 300%;
-  -webkit-background-clip: text;
-  color: transparent;
-  animation: rainbow-text 3s linear infinite; */
 }
 
 
@@ -1112,9 +1102,9 @@ iframe {
     /*max-width: 341px;*/
 
     margin: 0.15em auto;
-    padding: 0.3em;
-    padding-top: 0.1em;
-    padding-bottom: 0.1em;
+    padding: 0.2em;
+    padding-top: 0.15em;
+    padding-bottom: 0.15em;
     margin-top: 1.0em;
     border-radius: 2.0em;
     border: 1px solid rgba(255, 255, 255, 0.7)
@@ -1135,8 +1125,8 @@ iframe {
     max-width: 350px;
     margin: 0.15em auto;
     padding: 0.2em;
-    padding-top: 0.2em;
-    padding-bottom: 0.2em;
+    padding-top: 0.25em;
+    padding-bottom: 0.23em;
     margin-top: 1.0em;
     border-radius: 2.0em;
     border: 1px solid rgba(255, 255, 255, 0.7)

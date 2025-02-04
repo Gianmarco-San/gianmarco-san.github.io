@@ -27,12 +27,10 @@
     <nav>
     <ul>
 
-      <li><a href='#home'>Welcome</a></li>  <!-- Start! -->
-      <li><a href='#portfolio'>Timeline</a></li> <!-- Projects -->
-      <!-- <li><a href='#cv'>Resume</a></li> -->
-      <!-- <li><a href='#mistery'>|</a></li>   Vault or Mistery-->
+      <li><a href='#home'>Welcome</a></li>
+      <li><a href='#portfolio'>Timeline</a></li>
       <li><a href='#about'>Keep in Touch</a></li> |
-      <li><a href="Gianmarco_Santoro_CV.pdf" target="_blank" rel="noopener noreferrer" id="cv-download1" class="nav_hover">
+      <li><a href="Gianmarco_Santoro_CV.pdf" target="_blank" rel="noopener noreferrer" id="cv-download1" class="nav_hover" title="Download my Resume 📝">
         <span class="shadow-text1">CV</span></a></li>
       
     </ul>
@@ -50,8 +48,6 @@
         <div class='hero'>
 
             <h1 style="font-family: 'Baskervville', sans-serif;"><span class="color-match">Hi</span>! I'm Gianmarco.</h1>
-            <!--<h1 style="font-family: 'Baskervville', sans-serif;"><span class="lightblue">Hi</span>! <span class="wave">👋🏻</span><br>I'm Gianmarco.</h1> -->
-  
 
             <div class="carousel_title">
               <div class="show-on-big">
@@ -872,9 +868,9 @@
 
   <section id="mistery">
 
-    <h3>
-      A few Useful, Interesting, Inspiring Websites, People & Products
-    </h3>
+    <!-- <h3>A few Useful, Interesting, Inspiring Websites, People & Products</h3> -->
+
+    <h2 style="text-align: center; margin: 1em;">A few Useful, Interesting, Inspiring Websites, People & Products</h2>
     
     <div id="carousel">
       <div class="carousel-container">
@@ -918,9 +914,13 @@
           <div class="carousel-item">
             <iframe src="https://www.lovefrom.com/"></iframe>
             <span class="carousel-description">®<k style="font-family: 'Baskervville', sans-serif;">LoveFrom,</k> <em>Sir Jony Ive</em> ™</span>
-          </div>          
+          </div>   
+             
+
     
           <!-- Duplicate items again for seamless loop -->
+
+
           <div class="carousel-item">
             <a href="https://internetingishard.netlify.app/" target="_blank">
                 <img src="docs/internnetting.png" alt="Internetting is Hard Website">
@@ -1008,9 +1008,6 @@
       
         <!-- <br><br><br><br><br><br><br><br> -->
 
-        <br><br><br><br>
-
-        <a href="Gianmarco_Santoro_CV.pdf" id="cv-download" target="_blank" class="download-button">Download CV</a>
       
         <br><br><br><br>
         
@@ -1047,6 +1044,10 @@
                 <img src="docs/imdb_logo.png" alt="IMDb Logo" class="social-icon"></a>
             </div>
           </div>
+
+          <br><br><br><br>
+
+        <a href="Gianmarco_Santoro_CV.pdf" id="cv-download" target="_blank" class="download-button">Download CV</a>
           
         <br><br><br><br><br><br><br><br>
       
@@ -1066,13 +1067,7 @@
     <br>Website and Content © 2024 - '25 by <em>Gianmarco Santoro</em>.
 
     
-    <div class="show-on-small">
-      <br><br><em>To Freedom & Opportunity.</em>
-      <br><br><em>To my Friends. To Ary+. </em>
-      <br><br><em>“It’s never too late”</em>
-    </div>
-
-    <div class="show-on-middle">
+    <div class="show-on-small" class="show-on-middle">
       <br><br><em>To Freedom & Opportunity.</em>
       <br><br><em>To my Friends. To Ary+. </em>
       <br><br><em>“It’s never too late”</em>
@@ -1080,7 +1075,7 @@
 
 
     <br><br>
-    <br><br><a href='#home'><img class='logo' src='docs/J-favicon_gray.png' style='max-width: 40px; max-height: 40px; border-radius: 50%;'/></a>
+    <br><br><a href='#home' id="logo-link"><img class='logo' src='docs/J-favicon_gray.png' style='max-width: 40px; max-height: 40px; border-radius: 50%;'/></a>
 
 
     <div class="show-on-big">
@@ -1142,6 +1137,67 @@
         const sectionTop = section.offsetTop - navHeight;
         const sectionHeight = section.offsetHeight;
 
+        if (pageYOffset >= sectionTop && pageYOffset < sectionTop + sectionHeight) {
+          currentSection = section.getAttribute("id");
+        }
+      });
+
+      navLinks.forEach(link => {
+        link.classList.remove("selected");
+        if (link.getAttribute("href").substring(1) === currentSection) {
+          link.classList.add("selected");
+        }
+      });
+    });
+  });
+</script>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const nav = document.querySelector("nav");
+    const navLinks = document.querySelectorAll("nav a");
+    const sections = document.querySelectorAll("section");
+    const logoLink = document.getElementById("logo-link"); // Select the logo link
+
+    function getNavHeight() {
+      return nav.offsetHeight + 20;
+    }
+
+    function smoothScroll(link) {
+      const targetId = link.getAttribute("href").substring(1);
+      const targetElement = document.getElementById(targetId);
+      if (targetElement) {
+        const navHeight = getNavHeight();
+        window.scrollTo({
+          top: targetElement.offsetTop - navHeight,
+          behavior: "smooth"
+        });
+      }
+    }
+
+    // Apply smooth scrolling to nav links
+    navLinks.forEach(link => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        smoothScroll(link);
+      });
+    });
+
+    // Apply smooth scrolling to logo link
+    logoLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      smoothScroll(logoLink);
+    });
+
+    // Active link update on scroll
+    window.addEventListener("scroll", () => {
+      const navHeight = getNavHeight();
+      let currentSection = "";
+
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop - navHeight;
+        const sectionHeight = section.offsetHeight;
         if (pageYOffset >= sectionTop && pageYOffset < sectionTop + sectionHeight) {
           currentSection = section.getAttribute("id");
         }

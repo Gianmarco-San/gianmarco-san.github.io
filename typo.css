@@ -777,11 +777,11 @@ h4 {
 .carousel-item {
   min-width: 33em;
   min-height: 23em;
-
   margin: 10px;
   border-radius: 20px;
   transition: transform 0.3s ease;
 }
+
 
 /* Hover Effect */
 .carousel-item:hover {
@@ -1192,9 +1192,7 @@ iframe {
     font-weight: 300;
     /*font-size: 0.9em;*/
     line-height: 1.5em;
-    
   }
-
 
   .timeline-text-image {
     flex-direction: column; /* Arrange items vertically */
@@ -1221,6 +1219,27 @@ iframe {
     padding: 4em 1em;
     margin: 2em auto;
     width: 80%;
+  }
+
+  .carousel-item {
+    min-width: 17.2em;
+    min-height: 12em;
+    margin: 10px;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+  }
+  
+  .carousel-item img {
+    width: 17.2em;
+    height: 12em;
+  
+    object-fit: fill; 
+    border: none;
+    border-radius: 10px;
+  }
+
+  .carousel-description {
+    font-size: 0.75em;
   }
 
 }
@@ -1275,6 +1294,27 @@ iframe {
 
   .show-on-middle {
     display: block;
+  }
+
+  .carousel-item {
+    min-width: 25.8em;
+    min-height: 18em;
+    margin: 10px;
+    border-radius: 20px;
+    transition: transform 0.3s ease;
+  }
+  
+  .carousel-item img {
+    width: 25.8em;
+    height: 18em;
+  
+    object-fit: fill; 
+    border: none;
+    border-radius: 20px;
+  }
+
+  .carousel-description {
+    font-size: 0.75em;
   }
 
 }

@@ -50,71 +50,28 @@
             <h1 style="font-family: 'Baskervville', sans-serif;"><span class="color-match">Hi</span>! I'm Gianmarco.</h1>
 
             <div class="carousel_title">
-              <div class="show-on-big">
-                <h2 style="font-weight: 500; font-size: 1.65em;" id="carousel-text">Data Scientist - AI</h2>
-              </div>
-
-              <div class="show-on-small">
-                <h2 style="font-weight: 500; font-size: 1.6em;" id="carousel-text1">Data Scientist - AI</h2>
-              </div>
-
-              <div class="show-on-middle">
-                <h2 style="font-weight: 500; font-size: 1.4em;" id="carousel-text2">Data Scientist - AI</h2>
-              </div>
+              <h2 class="carousel-text show-on-big" style="font-weight: 500; font-size: 1.65em;">Data Scientist - AI</h2>
+              <h2 class="carousel-text show-on-small" style="font-weight: 500; font-size: 1.6em;">Data Scientist - AI</h2>
+              <h2 class="carousel-text show-on-middle" style="font-weight: 500; font-size: 1.4em;">Data Scientist - AI</h2>
             </div>
             
             <script>
               const texts = [
-              "Data Scientist - AI",
-              "Mechanical Engineer - Automation",
-              //"Creative Learner - Future",
+                "Data Scientist - AI",
+                "Mechanical Engineer - Automation",
+                //"Creative Learner - Future"
               ];
-          
-              let currentIndex = 0;
-              function changeText() {
-                const carouselText = document.getElementById("carousel-text");
-                currentIndex = (currentIndex + 1) % texts.length; // Loop back to the first text
-                carouselText.innerHTML = texts[currentIndex];
-              }
-              // Change text every 3 seconds
-              setInterval(changeText, 3000);
-            </script>
             
-            <!--FOR SMALL-->
-            <script>
-              const texts1 = [
-              "Data Scientist - AI",
-              "Mechanical Engineer - Automation",
-              //"Creative Learner - Future",
-              ];
-
-              let currentIndex1 = 0;
-              function changeText1() {
-                const carouselText1 = document.getElementById("carousel-text1");
-                currentIndex1 = (currentIndex1 + 1) % texts1.length; // Loop back to the first text
-                carouselText1.innerHTML = texts1[currentIndex1];
+              let currentIndex = 1;
+              function changeText() {
+                document.querySelectorAll(".carousel-text").forEach(el => {
+                  el.innerHTML = texts[currentIndex];
+                });
+                currentIndex = (currentIndex + 1) % texts.length;
               }
-              // Change text every 3 seconds
-              setInterval(changeText1, 3000);
-            </script>
-
-            <!--FOR MIDDLE-->
-            <script>
-              const texts2 = [
-              "Data Scientist - AI",
-              "Mechanical Engineer - Automation",
-              //"Creative Learner - Future",
-              ];
-
-              let currentIndex2 = 0;
-              function changeText2() {
-                const carouselText2 = document.getElementById("carousel-text2");
-                currentIndex2 = (currentIndex2 + 1) % texts2.length; // Loop back to the first text
-                carouselText2.innerHTML = texts2[currentIndex2];
-              }
-              // Change text every 3 seconds
-              setInterval(changeText2, 3000);
-            </script>
+            
+              setInterval(changeText, 3000);
+            </script>            
 
 
       </div>
@@ -434,7 +391,7 @@
     </div>
 
         <br>Scroll down the Timeline for more projects.
-
+        <br>
         <br class="show-on-small">
         <br>
         Further material:
@@ -450,6 +407,7 @@
           <li>Python</li>
           <li>R & RStudio</li>
           <li>NumPy</li>
+          <li>PyTorch</li>
           <li>Matplotlib</li>
           <li>Seaborn</li>
           <li>Pandas</li>

@@ -297,6 +297,20 @@
             </a>
           </div>
 
+          <div class="carousel-item">
+            <a href="https://github.com/Gianmarco-San/Estimation-of-PM10-Levels.git" target="_blank">
+              <img src="docs/PM10.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
+              <span class="carousel-description">Estimation of PM10 levels</span>
+            </a>
+          </div>
+
+          <div class="carousel-item">
+            <a href="https://github.com/Gianmarco-San/Bayesian-Inference_Causal-ML.git" target="_blank">
+              <img src="docs/causal.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
+              <span class="carousel-description">Causal Inference of Depression</span>
+            </a>
+          </div>
+
     
           <!-- Duplicate items again for seamless loop -->
 
@@ -319,6 +333,21 @@
             <a href="https://github.com/Gianmarco-San/Policy-Evaluation-Impact-Analysis.git" target="_blank">
               <img src="docs/vote.jpeg" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
               <span class="carousel-description">Policy-Impact Analysis</span>
+            </a>
+          </div>
+
+
+          <div class="carousel-item">
+            <a href="https://github.com/Gianmarco-San/Estimation-of-PM10-Levels.git" target="_blank">
+              <img src="docs/PM10.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
+              <span class="carousel-description">Estimation of PM10 levels</span>
+            </a>
+          </div>
+
+          <div class="carousel-item">
+            <a href="https://github.com/Gianmarco-San/Bayesian-Inference_Causal-ML.git" target="_blank">
+              <img src="docs/causal.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
+              <span class="carousel-description">Causal Inference of Depression</span>
             </a>
           </div>
 
@@ -1022,22 +1051,29 @@
         <br><br><br><br>
         
         
-        <p class="gradient-text">gianmarcosantoro23@gmail.com</p>
-
-        <style>
-          .gradient-text {
-            
-            transition: font-weight 0.05s ease-in-out;
-          }
+        <p class="gradient-text tooltip" onclick="copyToClipboard(this)">
+          gianmarcosantoro23@gmail.com
+          <span class="tooltip-text">Click to Copy</span>
+        </p>
         
-          .gradient-text:hover {
-            font-weight: bold;
-            transform: scale(1.1);
+        <script>  // scritp to copy email and manage related messages
+          function copyToClipboard(element) {
+            const email = element.childNodes[0].nodeValue.trim(); // Get only the text before the span
+            navigator.clipboard.writeText(email).then(() => {
+              const tooltip = element.querySelector(".tooltip-text");
+              tooltip.textContent = "Copied! ✅"; // Show success message
+        
+              setTimeout(() => {
+                tooltip.textContent = "Click to Copy"; // Reset after 2s
+              }, 2000);
+            }).catch(err => console.error("Copy failed:", err));
           }
-        </style>
+        </script>
+        
+        
           
        
-          <br>
+          <br><br>
           
           <div class="social-links">
             <div class="footer-social-icons">

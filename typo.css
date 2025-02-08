@@ -1059,6 +1059,7 @@ iframe {
 .links:active,
 .links:visited:active {
   color: #54A5C4;
+  /*font-weight: bold;*/
   text-decoration: underline;
 }
 
@@ -1095,6 +1096,7 @@ iframe {
   display: none;
 }
 
+
 @media only screen and (max-width: 425px) {
   
   nav ul {
@@ -1114,6 +1116,15 @@ iframe {
     font-size: 0.8em;
     padding-bottom: 0em;
     padding-top: 2.8em;
+  }
+
+  .show-on-small {
+    display: block;
+  }
+
+  
+  .timeline {
+    padding-left: 0.5em;
   }
 }
 
@@ -1145,11 +1156,6 @@ iframe {
 }
 
 
-@media only screen and (max-width: 425px) {
-  .show-on-small {
-    display: block;
-  }
-}
 
 @media only screen and (max-width: 661px) and (min-width: 426px) {
   .show-on-middle {

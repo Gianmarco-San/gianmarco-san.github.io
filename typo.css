@@ -1263,6 +1263,10 @@ iframe {
   nav ul {
     width: 80%;
     max-width: 400px;
+
+    padding: 0.2em;  /* test */
+    padding-top: 0.32em;  /* test */
+    padding-bottom: 0.35em; /* test */
   }
 
 

@@ -1264,9 +1264,9 @@ iframe {
     width: 80%;
     max-width: 400px;
 
-    padding: 0.2em;  /* test */
-    padding-top: 0.32em;  /* test */
-    padding-bottom: 0.3em; /* test */
+    padding: 0.2em;
+    padding-top: 0.32em;
+    padding-bottom: 0.35em; 
   }
 
 

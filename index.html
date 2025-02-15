@@ -166,7 +166,7 @@
           <img class='logo' src='docs/logo-micc.webp' style='max-width: 150px;' alt="MICC Logo"/></a>
           <h4><br>DeepFake Detection Exploiting Self-Attention Maps</h4>
         </div>
-
+    
         <div class="timeline-text-image">
           <div class="timeline-text" style="text-align: end; padding-left: 0.0em; padding-right: 0.5em;">
             <br class="show-on-big">
@@ -174,77 +174,87 @@
               <a style="text-align: start;">
                 <ul style="padding-left: 2em;">
                 <li>Extracting Self-Attention heatmaps</li> 
-                <li>Training a convolutional autoencoder</li></ul></a>
-            
+                <li>Training a convolutional autoencoder</li>
+              </ul></a>
           </div>
           <img src="docs/Deepfake.webp" alt="Method flow" class="timeline-image show-on-big" style="width: 58%;">
           <img src="docs/Deepfake.webp" alt="Method flow" class="timeline-image show-on-middle show-on-small">
         </div>
-
-
-        <div class="timeline-text-image" style="place-items: center;">
-          <img src="docs/transformer.webp" alt="Vision Trasformer" class="timeline-image show-on-big" style="width: 60%;">
-          <div class="timeline-text">
-            <p> The Vision Transformer (ViT), pre-trained on face recognition - starting from <a href="https://github.com/zhongyy/Face-Transformer.git" target="_blank" class="links">Face-Transformer</a> -, captures facial features and extracts visual attention maps. <br> Images are split into multiple patches as input-tokens to the transformer encoder.</p>
+    
+        <!-- FINISHED HERE WHEN NOT extended ♤  ⌄ ▼ ⌃ ▲  -->
+    
+        <button class="toggle-btn" onclick="toggleContent(this)">  
+          <img src="docs/down_ari.svg" style="height: 0.7em; width: auto;"> Show More 
+        </button> 
+    
+        <div class="hidden-content">
+          <div class="timeline-text-image" style="place-items: center;">
+            <img src="docs/transformer.webp" alt="Vision Transformer" class="timeline-image show-on-big" style="width: 60%;">
+            <div class="timeline-text">
+              <p>The Vision Transformer (ViT), pre-trained on face recognition - starting from 
+                <a href="https://github.com/zhongyy/Face-Transformer.git" target="_blank" class="links">Face-Transformer</a> -, 
+                captures facial features and extracts visual attention maps. <br> Images are split into multiple patches as input-tokens to the transformer encoder.
+              </p>
+            </div>
+            <img src="docs/transformer.webp" alt="Vision Transformer" class="timeline-image show-on-small show-on-middle">
           </div>
-          <img src="docs/transformer.webp" alt="Vision Trasformer" class="timeline-image show-on-small show-on-middle">
-        </div>
-
-        <div class="timeline-text-image" style="place-items: center;">
-          <div class="timeline-text" style="text-align: end;">
-            <p>These are used to train the convolutional autoencoder - starting from the one developed in <a href="https://github.com/lcultrera/WildCapture" target="_blank" class="links">WildCapture</a> - only on real images, enhancing out-of-distribution (OOD) detection by expecting higher reconstruction errors for manipulated images.</p>
+    
+          <div class="timeline-text-image" style="place-items: center;">
+            <div class="timeline-text" style="text-align: end;">
+              <p>These are used to train the convolutional autoencoder - starting from the one developed in 
+                <a href="https://github.com/lcultrera/WildCapture" target="_blank" class="links">WildCapture</a> - only on real images, 
+                enhancing out-of-distribution (OOD) detection by expecting higher reconstruction errors for manipulated images.
+              </p>
+            </div>
+            <img src="docs/autoencoder.webp" alt="Method flow" class="timeline-image">
           </div>
-          <img src="docs/autoencoder.webp" alt="Method flow" class="timeline-image">
-        </div>
-
-        
-        
-        
-        <div class="timeline-text-image" style="place-items: center;">
-          
-          <img src="docs/DF_auroc.webp" alt="Auc-roc mean value among all forgeries tested" class="timeline-image show-on-big">
-          <div class="timeline-text">
-            <p>Tested on 5 different forgeries, the method shows an AUROC mean value of 0.60, demonstrating potential for transfer learning and generalizability among potential new forgeries.</p>
+    
+          <div class="timeline-text-image" style="place-items: center;">
+            <img src="docs/DF_auroc.webp" alt="Auc-roc mean value among all forgeries tested" class="timeline-image show-on-big">
+            <div class="timeline-text">
+              <p>Tested on 5 different forgeries, the method shows an AUROC mean value of 0.60, demonstrating potential for transfer learning and generalizability among potential new forgeries.</p>
+            </div>
+            <img src="docs/DF_auroc.webp" alt="Auc-roc mean value among all forgeries tested" class="timeline-image show-on-small show-on-middle">
           </div>
-          <img src="docs/DF_auroc.webp" alt="Auc-roc mean value among all forgeries tested" class="timeline-image show-on-small show-on-middle">
-          
+    
+          <div class="show-on-small"><br></div>
+          <br>
+          Further material:
+          <ul class="horiz-ul">
+            <li><a href="docs/DeepFake_Thesis_G.Santoro.pdf" target="_blank" class="links">Thesis.pdf</a></li>
+            <li><a href="docs/DeepFake_G.Santoro.pdf" target="_blank" class="links">Presentation.pdf</a></li>
+            <li>GitHub Repo - I'll publish ASAP</li>
+          </ul>
+    
+          <br>
+          The Team:
+          <ul class="horiz-ul">          
+            <li><a>Luca: Tutor, operative</a></li>
+            <li><a>Lorenzo: Supervisor, strategic</a></li>
+          </ul>
+        
+        
         </div>
-
-        <div class="show-on-small"><br></div>
-        <br>
-        Further material:
-        <ul class="horiz-ul">
-          <li><a href="docs/DeepFake_Thesis_G.Santoro.pdf" target="_blank" class="links">Thesis.pdf</a></li>
-          <li><a href="docs/DeepFake_G.Santoro.pdf" target="_blank" class="links">Presentation.pdf</a></li>
-          <li>GitHub Repo - I'll publish ASAP</li>
-        </ul>
-
-        <br>
-        The Team:
-        <ul class="horiz-ul">          
-          <li><a>Luca: Tutor, operative</a></li>
-          <li><a>Lorenzo: Supervisor, strategic</a></li>
-        </ul>
         
         <br>
-        ——
-        <ul class="horiz-ul">
-          <li>Python</li>
-          <li>PyTorch</li>
-          <li>GitHub</li>
-          <li>SSH</li>
-          <li>CUDA</li>
-          <li>os</li>
-          <li>cv2</li>
-          <li>NumPy</li>
-          <li><a href="https://paperswithcode.com/dataset/faceforensics-1" target="_blank" class="links"><i>FF++</i> Dataset</a></li>
-        </ul>
-      
+          ——
+          <ul class="horiz-ul">
+            <li>Python</li>
+            <li>PyTorch</li>
+            <li>GitHub</li>
+            <li>SSH</li>
+            <li>CUDA</li>
+            <li>os</li>
+            <li>cv2</li>
+            <li><a href="https://paperswithcode.com/dataset/faceforensics-1" target="_blank" class="links"><i>FF++</i> Dataset</a></li>
+          </ul>
+
+        
       </div>
     </div>
 
 
-
+    
     <div class="timeline-date show-on-small">&#x25CF 2024 April - 2023 February</div>  
     <div class="show-on-small"><br><br></div>
     <div class="timeline-item">
@@ -267,22 +277,12 @@
 
             Inter-university 2nd level Master offered by University of Florence and IMT Lucca.
             <br>Grade: 110/110 cum laude
-            <br>
-            <br>Some topics:
-
-            <br><a style="text-align: start;">
-              <ul style="padding-left: 2em;">
-              <li>Math & Stat: Stat-Inference/learning, Optimization, Algorithms & Programming, Numerical calculus, Linear algebra, Probability & Stochastic processes.</li> 
-              <li>Complex Systems: Text Mining & NLP, Graph Theory, Geo-Spatial Data (GIS), Network analysis, Complex sys.</li>
-              <li>Decision Theory: Eco-business analytics, Bayesian & Causal inference, Policy impact analysis.</li>
-              <li>(Un)Supervised Learning: Machine Learning, Deep Learning, Reinforcement Learning.</li>
-            </ul></a>
             
           </div>
         </div>
 
 
-    <br><h3>Some further projects during the Master - Click for related material // to GitHub Repos</h3>
+    <br><h3 style="margin-bottom: 1em;">Further projects during the Master - Click for related material // to GitHub Repos</h3>
     
     <div id="carousel">
       <div class="carousel-container">
@@ -369,95 +369,121 @@
       </div>
     </div>     
 
-    <br><h3>Paper Reviews - Click to related PDFs</h3>
+    <!-- FINISHED HERE WHEN NOT extended ♤ -->
     
-    <div id="carousel">
-      <div class="carousel-container">
-        <div class="carousel-wrapper">
+    <button class="toggle-btn" onclick="toggleContent(this)">  
+      <img src="docs/down_ari.svg" style="height: 0.7em; width: auto;"> Show More 
+    </button> 
+
+    <div class="hidden-content">
+
+      <br><h3 style="margin-bottom: 1em;">Paper Reviews - Click to related PDFs</h3>
+      
+      <div id="carousel">
+        <div class="carousel-container">
+          <div class="carousel-wrapper">
 
 
-          <div class="carousel-item">
-            <a href="docs/Exp_Eco_Santoro.pdf" target="_blank">
-              <img src="docs/carshare.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Nudge Responsible Carsharing</span>
-            </a>
+            <div class="carousel-item">
+              <a href="docs/Exp_Eco_Santoro.pdf" target="_blank">
+                <img src="docs/carshare.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
+                <span class="carousel-description">Nudge Responsible Carsharing</span>
+              </a>
+            </div>
+
+            <div class="carousel-item">
+              <a href="docs/Network_Santoro.pdf" target="_blank">
+                <img src="docs/taxo.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
+                <span class="carousel-description">Products Taxonomy & Economy</span>
+              </a>
+            </div>
+
+            <div class="carousel-item">
+              <a href="docs/NLP_Santoro.pdf" target="_blank">
+                <img src="docs/ROD.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
+                <span class="carousel-description">Reading Order Detection</span>
+              </a>
+            </div>
+
+            <div class="carousel-item">
+              <a href="docs/Complex_Sys_Santoro.pdf" target="_blank">
+                <img src="docs/stability.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
+                <span class="carousel-description">Stability & Bifurcation in Rotors</span>
+              </a>
+            </div>
+
+            <div class="carousel-item">
+              <a href="docs/AdvML_Santoro.pdf" target="_blank">
+                <img src="docs/neo.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
+                <span class="carousel-description">Robot Imitation Process</span>
+              </a>
+            </div>
+
+            <div class="carousel-item">
+              <a href="docs/Health_Analytics.pdf" target="_blank">
+                <img src="docs/lepro.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
+                <span class="carousel-description">AI Leprosy Diagnosys</span>
+              </a>
+            </div>
+
+            <div class="carousel-item">
+              <a href="docs/StatLearn_Santoro.pdf" target="_blank">
+                <img src="docs/stat-learn.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
+                <span class="carousel-description">Drones Swarm MRF optimized</span>
+              </a>
+            </div>
+
+            <!-- Duplicate items again for seamless loop -->
+          
+
           </div>
-
-          <div class="carousel-item">
-            <a href="docs/Network_Santoro.pdf" target="_blank">
-              <img src="docs/taxo.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Products Taxonomy & Economy</span>
-            </a>
-          </div>
-
-          <div class="carousel-item">
-            <a href="docs/NLP_Santoro.pdf" target="_blank">
-              <img src="docs/ROD.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Reading Order Detection</span>
-            </a>
-          </div>
-
-          <div class="carousel-item">
-            <a href="docs/Complex_Sys_Santoro.pdf" target="_blank">
-              <img src="docs/stability.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Stability & Bifurcation in Rotors</span>
-            </a>
-          </div>
-
-          <div class="carousel-item">
-            <a href="docs/AdvML_Santoro.pdf" target="_blank">
-              <img src="docs/neo.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Robot Imitation Process</span>
-            </a>
-          </div>
-
-          <div class="carousel-item">
-            <a href="docs/Health_Analytics.pdf" target="_blank">
-              <img src="docs/lepro.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">AI Leprosy Diagnosys</span>
-            </a>
-          </div>
-
-          <div class="carousel-item">
-            <a href="docs/StatLearn_Santoro.pdf" target="_blank">
-              <img src="docs/stat-learn.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Drones Swarm MRF optimized</span>
-            </a>
-          </div>
-
-          <!-- Duplicate items again for seamless loop -->
-         
-
         </div>
       </div>
-    </div>
 
-        <br>Scroll down the Timeline for more projects.
-        <br>
-        <br class="show-on-small">
-        <br>
-        Further material:
-        <ul class="horiz-ul">
-          <li><a href="https://github.com/Gianmarco-San" target="_blank" class="links">GitHub Repo</a></li>
-        </ul>
+          <br>Scroll down the Timeline for more projects.
+          <br>
+          <div class="timeline-text-image">
+            <div class="timeline-text">
+              <br class="show-on-big">
+              Topics:
 
-        </ul>
+              <br><a style="text-align: start;">
+                <ul style="padding-left: 2em;">
+                <li>Math & Stat: Stat-Inference/learning, Optimization, Algorithms & Programming, Numerical calculus, Linear algebra, Probability & Stochastic processes.</li> 
+                <li>Complex Systems: Text Mining & NLP, Graph Theory, Geo-Spatial Data (GIS), Network analysis, Complex sys.</li>
+                <li>Decision Theory: Eco-business analytics, Bayesian & Causal inference, Policy impact analysis.</li>
+                <li>(Un)Supervised Learning: Machine Learning, Deep Learning, Reinforcement Learning.</li>
+              </ul></a>
+              
+            </div>
+          </div>
+          <br>
+          <br>
+          Further material:
+          <ul class="horiz-ul">
+            <li><a href="https://github.com/Gianmarco-San" target="_blank" class="links">GitHub Repo</a></li>
+          </ul>
+
+          </ul>
+          
+        </div>
+
+
+          <br>
+          ——
+          <ul class="horiz-ul">
+            <li>Python</li>
+            <li>R & RStudio</li>
+            <li>NumPy</li>
+            <li>PyTorch</li>
+            <li>Matplotlib</li>
+            <li>Seaborn</li>
+            <li>Pandas</li>
+            <li>Pydot</li>
+            <li>Scikit-learn</li>
+          </ul>
+      
         
-        <br>
-        ——
-        <ul class="horiz-ul">
-          <li>Python</li>
-          <li>R & RStudio</li>
-          <li>NumPy</li>
-          <li>PyTorch</li>
-          <li>Matplotlib</li>
-          <li>Seaborn</li>
-          <li>Pandas</li>
-          <li>Pydot</li>
-          <li>Scikit-learn</li>
-        </ul>
-      
-      
     </div>
   </div>
 
@@ -495,7 +521,13 @@
 
         </div>
 
+        <!-- FINISHED HERE WHEN NOT extended ♤ -->
         
+        <button class="toggle-btn" onclick="toggleContent(this)">  
+          <img src="docs/down_ari.svg" style="height: 0.7em; width: auto;"> Show More 
+        </button> 
+
+        <div class="hidden-content">
 
 
       <div class="timeline-text-image" style="place-items: center;">
@@ -523,6 +555,8 @@
         <li><a href="docs/Geo_G.Santoro.pdf" target="_blank" class="links">RMarkdown</a></li>
       </ul>
       
+        </div>
+
       <br>
       ——
       <ul class="horiz-ul">
@@ -576,6 +610,14 @@
             <img src="docs/horse.webp" alt="CM_animals" class="timeline-image show-on-small" style="width: 70%;">
 
           </div>
+
+                  <!-- FINISHED HERE WHEN NOT extended ♤ -->
+        
+        <button class="toggle-btn" onclick="toggleContent(this)">  
+          <img src="docs/down_ari.svg" style="height: 0.7em; width: auto;"> Show More 
+        </button> 
+
+        <div class="hidden-content">
 
 
         <div class="timeline-text-image" style="place-items: center;">
@@ -631,6 +673,8 @@
           <li><a href="https://github.com/Gianmarco-San/Images_Classifier.git" target="_blank" class="links">GitHub Repo</a></li>
         </ul>
         
+        </div>
+
         <br>
         ——
         <ul class="horiz-ul">
@@ -678,6 +722,14 @@
           <img src="docs/weight.webp" alt="Method flow" class="timeline-image show-on-big" style="width: 50%;">
           <img src="docs/weight.webp" alt="Method flow" class="timeline-image show-on-small show-on-middle" style="width: 60%;">
         </div>
+
+                <!-- FINISHED HERE WHEN NOT extended ♤ -->
+        
+                <button class="toggle-btn" onclick="toggleContent(this)">  
+                  <img src="docs/down_ari.svg" style="height: 0.7em; width: auto;"> Show More 
+                </button> 
+        
+                <div class="hidden-content">
 
 
         <div class="timeline-text-image" style="place-items: center;">
@@ -731,6 +783,8 @@
         </ul>
 
         </ul>
+
+                </div>
         
         <br>
         ——
@@ -781,6 +835,13 @@
           <img src="docs/edu_num.webp" alt="Method flow" class="timeline-image show-on-small" style="width: 80%;">
         </div>
 
+        <!-- FINISHED HERE WHEN NOT extended ♤ -->
+        
+        <button class="toggle-btn" onclick="toggleContent(this)">  
+          <img src="docs/down_ari.svg" style="height: 0.7em; width: auto;"> Show More 
+        </button> 
+
+        <div class="hidden-content">
 
         <div class="timeline-text-image" style="place-items: center;">
           <img src="docs/sex.webp" alt="Vision Trasformer" class="timeline-image show-on-big" style="width: 40%;">
@@ -830,6 +891,8 @@
         </ul>
 
         </ul>
+
+        </div>
         
         <br>
         ——
@@ -871,11 +934,26 @@
           <a style="text-align: start;">
             <ul style="padding-left: 1em;">
             <li>I built a Python-based feature, as part of a of major tool to automate several processes, allowing one-click PLC mapping and alarm selection, reducing manual configuration time and minimizing errors during the Control Department’s work.</li>
-            <li>I developed a sensor-to-cloud temperature control system optimizing energy efficiency and safety in the factory through real-time data processing. As a project example, you can find some details below.
+            <li>I developed a sensor-to-cloud temperature control system optimizing energy efficiency and safety in the factory through real-time data processing. <em>You can find some details below</em>.
             </li>
             <li>I built and maintained services, such as periodic reports via proprietary cloud-based web API.</li>
             </ul></a>
 
+          </div>
+        </div>
+
+        <br>
+        <!-- FINISHED HERE WHEN NOT extended ♤ -->
+                
+        <button class="toggle-btn" onclick="toggleContent(this)">  
+          <img src="docs/down_ari.svg" style="height: 0.7em; width: auto;"> Show More 
+        </button> 
+
+        <div class="hidden-content">
+
+            
+        <div class="timeline-text-image">
+          <div class="timeline-text">
             <br>Other tasks included:
             <ul style="padding-left: 1em;">
             <li>Cloud and M2M system troubleshooting with customers facing difficulties.</li>
@@ -888,6 +966,9 @@
             <br>
           </div>
         </div>
+
+       
+          
 
           <div class="timeline-text-image">
             <div class="timeline-text" style="text-align: end;">
@@ -940,6 +1021,8 @@
           <li>Sara</li>
         </ul>
 
+      </div>
+
         <br>
         ——
         <ul class="horiz-ul">
@@ -987,6 +1070,14 @@
             <img src="docs/ener-magaz.webp" alt="Gearbox" class="timeline-image show-on-big" style="width: 60%;">
             <img src="docs/ener-magaz.webp" alt="Gearbox" class="timeline-image show-on-small show-on-middle">
           </div>
+
+          <!-- FINISHED HERE WHEN NOT extended ♤ -->
+                
+        <button class="toggle-btn" onclick="toggleContent(this)">  
+          <img src="docs/down_ari.svg" style="height: 0.7em; width: auto;"> Show More 
+        </button> 
+
+        <div class="hidden-content">
 
           <br class="show-on-small show-on-middle">
 
@@ -1048,6 +1139,8 @@
           <li>Giulia</li>
         </ul>
 
+        </div>
+
         <br>
         ——
         <ul class="horiz-ul">
@@ -1090,24 +1183,11 @@
               <li>Master from the <a class="links" target="_blank" href="https://didattica.polito.it/pls/portal30/sviluppo.offerta_formativa_2019.vis?p_a_acc=2025&p_sdu=32&p_cds=37#137-272751">Polytechnic University of Turin</a>: Automation path.</li>
             </ul></a>
             
-            <br>Some topics:
-
-            <br><a style="text-align: start;">
-              <ul style="padding-left: 2em;">
-
-              <li>Manufacturing: Integrated Sys, Materials and Processes.</li> 
-              <li>Fluid Machinery & Dynamics, Advanced Engineering Thermodynamics, Numerical Modelling.</li>
-              <li>Mechatronics, Fluid Automation, Mechanics of Automatic Machines, Mechanical Sys Automation.</li>
-              <li>Business Economics, Industrial & Mechanical Plants, Structural Diagnostics, Reliability of Machines.</li>
-              <li>Dynamics of Mechanical Sys, Machine & Functional Design, Electrotechnics.</li>
-                
-            </ul></a>
-            
           </div>
         </div>
 
 
-    <br><h3>Some further projects during the Academic Years - Click for related material</h3>
+    <br><h3 style="margin-bottom: 1em;">Further projects during the Academic Years - Click for related material</h3>
     
     <div id="carousel">
       <div class="carousel-container">
@@ -1245,7 +1325,31 @@
 
 
         <br>Scroll down the Timeline for more projects.
-        <br>
+        <br><br>
+
+        <!-- FINISHED HERE WHEN NOT extended ♤ -->
+                
+        <button class="toggle-btn" onclick="toggleContent(this)">  
+          <img src="docs/down_ari.svg" style="height: 0.7em; width: auto;"> Show More 
+        </button> 
+
+        <div class="hidden-content">
+
+          <br class="show-on-small show-on-middle">
+
+        <br>Topics:
+
+            <br><a style="text-align: start;">
+              <ul style="padding-left: 2em;">
+
+              <li>Manufacturing: Integrated Sys, Materials and Processes.</li> 
+              <li>Fluid Machinery & Dynamics, Advanced Engineering Thermodynamics, Numerical Modelling.</li>
+              <li>Mechatronics, Fluid Automation, Mechanics of Automatic Machines, Mechanical Sys Automation.</li>
+              <li>Business Economics, Industrial & Mechanical Plants, Structural Diagnostics, Reliability of Machines.</li>
+              <li>Dynamics of Mechanical Sys, Machine & Functional Design, Electrotechnics.</li>
+                
+            </ul></a>
+
         <br class="show-on-small">
         
         <!-- <br>
@@ -1254,6 +1358,8 @@
           <li><a href="https://github.com/Gianmarco-San" target="_blank" class="links">GitHub Repo</a></li>
         </ul> -->
 
+
+      </div>
         
         
         <br>
@@ -1298,6 +1404,15 @@
             </div>
             <img src="docs/tube.webp" alt="Gearbox" class="timeline-image">
           </div>
+
+          <!-- FINISHED HERE WHEN NOT extended ♤ -->
+                
+        <button class="toggle-btn" onclick="toggleContent(this)">  
+          <img src="docs/down_ari.svg" style="height: 0.7em; width: auto;"> Show More 
+        </button> 
+
+        <div class="hidden-content">
+
 
           <div class="show-on-small show-on-middle"><br></div>
 
@@ -1352,6 +1467,8 @@
           <li><a href="https://linkedin.com/in/luca-pirini-casadei-54a7001a6" class="links" target="_blank">Luca</a></li>
         </ul>
 
+        </div>
+
         <br>
         ——
         <ul class="horiz-ul">
@@ -1391,6 +1508,15 @@
             </div>
             <img src="docs/home-sys.webp" alt="Gearbox" class="timeline-image">
           </div>
+
+          <!-- FINISHED HERE WHEN NOT extended ♤ -->
+                
+        <button class="toggle-btn" onclick="toggleContent(this)">  
+          <img src="docs/down_ari.svg" style="height: 0.7em; width: auto;"> Show More 
+        </button> 
+
+        <div class="hidden-content">
+
 
           <div class="show-on-small show-on-middle"><br></div>
 
@@ -1447,6 +1573,8 @@
           <li><a>Luigi</a></li>
         </ul>
 
+        </div>
+
         <br>
         ——
         <ul class="horiz-ul">
@@ -1477,13 +1605,22 @@
           <div class="timeline-text-image">
             <div class="timeline-text" style="text-align: end;">
               <br class="show-on-big">
-              The goal was to design a two-stage parallel-axis pendular gearbox.<br><br>Shafts and gears were dimensioned based on key design specifications, starting with a conservative approach and refining iteratively to minimize oversizing.
+              The goal was to design a two-stage parallel-axis pendular gearbox.
+              <br><br>Shafts and gears were dimensioned based on key design specifications, starting with a conservative approach and refining iteratively to minimize oversizing.
               <br>
             </div>
             <img src="docs/3D_Comp.webp" alt="Gearbox" class="timeline-image show-on-big" style="width: 30%;">
             <img src="docs/3D_Comp.webp" alt="Gearbox" class="timeline-image show-on-middle" style="width: 60%;">
             <img src="docs/3D_Comp.webp" alt="Gearbox" class="timeline-image show-on-small" style="width: 80%;">
           </div>
+
+          <!-- FINISHED HERE WHEN NOT extended ♤ -->
+                
+        <button class="toggle-btn" onclick="toggleContent(this)">  
+          <img src="docs/down_ari.svg" style="height: 0.7em; width: auto;"> Show More 
+        </button> 
+
+        <div class="hidden-content">
 
           <div class="show-on-small"><br></div>
           <div class="show-on-middle"><br></div>
@@ -1521,6 +1658,7 @@
           <li><a href="https://linkedin.com/in/luca-pirini-casadei-54a7001a6" class="links" target="_blank">Luca</a></li>
         </ul>
 
+        </div>
         <br>
         ——
         <ul class="horiz-ul">
@@ -1562,6 +1700,14 @@
           </div>
           <br>
           <img src="docs/chip-process.webp" alt="Gearbox" class="timeline-image" style="width: 100%;">
+
+          <!-- FINISHED HERE WHEN NOT extended ♤ -->
+                
+        <button class="toggle-btn" onclick="toggleContent(this)">  
+          <img src="docs/down_ari.svg" style="height: 0.7em; width: auto;"> Show More 
+        </button> 
+
+        <div class="hidden-content">
 
           <br class="show-on-small show-on-middle">
 
@@ -1615,7 +1761,7 @@
         
         <div class="show-on-small"><br></div>
         <br>
-        For much more:
+        For more:
         <ul class="horiz-ul">
           <li><a href="docs/chip_extrusion_thesis.pdf" target="_blank" class="links">Chip Extrusion Thesis.pdf</a></li>
         </ul>
@@ -1629,6 +1775,8 @@
           <li>Oliver²</li>
           <li>Christoph</li>
         </ul>
+
+        </div>
 
         <br>
         ——
@@ -1899,6 +2047,20 @@
 
 
 <!--   ###   HERE JS SCRIPTS   ###   -->
+
+<script>  // This script is to hide/show contents in timeline-item
+  function toggleContent(button) {
+      var content = button.nextElementSibling;
+      if (content.style.display === "none" || content.style.display === "") {
+          content.style.display = "block";
+          button.innerHTML = '<img src="docs/up_ari.svg" style="height: 0.7em; width: auto;"> Show Less';
+      } else {
+          content.style.display = "none";
+          button.innerHTML = '<img src="docs/down_ari.svg" style="height: 0.7em; width: auto;"> Show More';
+      }
+  }
+</script>
+
 
 <script>  // To make the automatic scrolling when clicked ref to ancor poits smooth
 

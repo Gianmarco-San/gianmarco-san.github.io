@@ -1404,7 +1404,8 @@ iframe {
 
 
 .toggle-btn {
-  background-color: #fafafa; /* #54575A; fafafa */
+  background-color: #fafafa; /*  #54575A; ora è #f4f4f4, ERA: #fafafa, PER DIFFERENZIARLO DALLO SFONDO E DARE PIù IDEA DI PULSANTE */
+  /*background: radial-gradient(circle, #fafafa, #dcdcdc); */
   color: #5e6063;
   padding: 8px 12px;
   border: 1px solid #5e6063;
@@ -1415,6 +1416,7 @@ iframe {
 }
 .toggle-btn:hover {
   background-color: #fff;
+  /*background: #fff;*/
   color: #54575A;
   border: 1px solid #54575A;
 }

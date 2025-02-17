@@ -973,7 +973,7 @@ iframe {
 }
 
 .download-button:hover {
-  background-color: #777; /* Change to your preferred hover color */
+  /*background-color: #777; /*#000; also in black is nice*/
   transform: scale(1.20); /* Slight zoom effect on hover */
   z-index: 100;
 }

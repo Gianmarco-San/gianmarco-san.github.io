@@ -124,7 +124,7 @@ h5, h6 {
 
 header {
   text-align: center;
-  color: #FFF;
+  color: #FFF; 
   padding-bottom: 0em;
   padding-top: 2.8em;
   background-color: rgba(84, 87, 90, 1);
@@ -886,7 +886,7 @@ iframe {
   max-width: 100%;
   margin: 0 auto;
   padding: 2em;
-  background: linear-gradient(to top, #54575A, #EEEEEE);
+  background: linear-gradient(to top, #54575A, #EEEEEE); 
   
   text-align: center;
 }
@@ -936,7 +936,7 @@ iframe {
   max-width: 100%;
   margin: 0 auto;
   padding: 2em;
-  background: #54575A;
+  background: #54575A; 
   
   text-align: center;
 }
@@ -946,7 +946,7 @@ iframe {
   max-width: 1000px;
   margin: 0 auto;
   padding: 2em;
-  color: #EEEEEE;
+  color: #EEEEEE; 
 }
 
 

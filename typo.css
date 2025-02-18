@@ -15,6 +15,7 @@
 }
 
 
+
 @font-face {
   font-family: 'Roboto';
   src: url('docs/fonts/Roboto-Bold-webfont.woff') format('woff');
@@ -22,6 +23,7 @@
   font-weight: 700;
 }
   */
+  
 
 
 
@@ -29,15 +31,38 @@
   font-family: 'Baskervville';
   src: url('docs/fonts/Baskervville-Regular.ttf') format('truetype');
   font-style: normal;
-  font-weight: 300;
+  
 }
 
-
+/*
 @font-face {
   font-family: 'Baskervville';
   src: url('docs/fonts/Baskervville-Italic.ttf') format('truetype');
   font-style: italic;
-  font-weight: 300;
+  font-weight: 100 900;
+}*/
+
+/*
+@font-face {
+  font-family: 'Inter';
+  src: url('docs/fonts/Inter.ttc') format('truetype');
+  font-weight: 100 900;
+}*/
+
+
+@font-face {
+  font-family: 'Inter';
+  src: url('docs/fonts/InterVariable-Italic.ttf') format('truetype');
+  font-style: italic;
+  font-weight: 100 900;
+}
+
+
+@font-face {
+  font-family: 'Inter';
+  src: url('docs/fonts/InterVariable.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 100 900;
 }
 
 
@@ -62,7 +87,7 @@
 
 
 body {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Inter'; /*'Roboto', sans-serif;*/
   font-weight: 300;
   font-size: 1.0em; /*18px;*/
   line-height: 1.5em;
@@ -165,7 +190,7 @@ nav ul {
   justify-content: space-between;
   /*flex-wrap: wrap;*/
   /*flex-direction: column;*/
-  width: 400px; /* with 5 element was 500px */
+  width: 380px; /* with 5 element was 500px */
 
   min-height: 20px;
   align-items: center;
@@ -189,6 +214,7 @@ nav ul {
 nav li {
   list-style-type: none;
   /*width: 100%;*/
+  font-weight: 400;
   padding-top: .1em;
   padding-bottom: .1em;
   /*border-top: 1px solid #A8A8A8;  /* che è ?? */
@@ -236,7 +262,8 @@ nav a {
 
 nav a.selected {
   background-color: rgba(255, 255, 255, 0.2);
-  font-weight: 400;
+  font-weight: 700;
+  /*font-style: italic;*/
 
   /*color: rgb(215, 203, 124); /* #A5C5E9; */
   /*border-bottom: 2px solid rgb(215, 203, 124);  /*border-bottom: 2px solid #007bff; */
@@ -274,6 +301,8 @@ nav a.selected {
   font-size: 1.9em ; /*23px; */
   text-align: center;
   font-weight: bold;
+}
+
   
   /*
   font-style: italic;
@@ -282,17 +311,18 @@ nav a.selected {
   left: -50px;
   */
 
+  /*
   opacity: 0;
-  transform: translateY(-50%); /* Slide up initially */
+  transform: translateY(-50%); /* Slide up initially *//*
   animation: slideFadeIn 3s ease-in-out infinite;
 }
 
 @keyframes slideFadeIn {
-  0% { opacity: 0; transform: translateY(-40%); } /* Off-screen above */
-  10% { opacity: 1; transform: translateY(0); } /* Slide down and fade in */
-  90% { opacity: 1; transform: translateY(0); } /* Stay visible */
-  100% { opacity: 0; transform: translateY(40%); } /* Slide down and fade out */
-}
+  0% { opacity: 0; transform: translateY(-40%); }
+  10% { opacity: 1; transform: translateY(0); } 
+  90% { opacity: 1; transform: translateY(0); } 
+  100% { opacity: 0; transform: translateY(40%); } 
+}*/
 
 
 .heroCap h3 {
@@ -311,11 +341,11 @@ nav a.selected {
 
 .hero {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
 
   flex-direction: column;
 
-  align-items: flex-start;
+  align-items: center;
 
   /* padding: 5em; */
   background-color: rgba(168, 168, 168, 0.0); /* #A8A8A8;*/
@@ -592,6 +622,7 @@ h4 {
 
 
 .timeline-date {
+  font-family: 'Roboto', sans-serif;
   position: absolute;
   left: -1.0em; /* Adjust to position the date */
   font-weight: bold;
@@ -1151,7 +1182,7 @@ iframe {
 
   nav ul {
     width: 80%;
-    max-width: 350px;
+    max-width: 380px;
     margin: 0.15em auto;
     padding: 0.2em;
     padding-top: 0.33em;
@@ -1172,6 +1203,7 @@ iframe {
     
   .heroCapPic {
     flex-direction: column; /* Arrange items vertically */
+    color: #5D6063;
   }
 
   .heroCap {
@@ -1262,7 +1294,7 @@ iframe {
   
   nav ul {
     width: 80%;
-    max-width: 400px;
+    max-width: 380px;
 
     padding: 0.2em;
     padding-top: 0.32em;

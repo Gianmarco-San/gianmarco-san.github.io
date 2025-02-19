@@ -1,54 +1,8 @@
-/*
-@font-face {
-  font-family: 'Roboto';
-  src: url('docs/fonts/Roboto-Light-webfont.woff') format('woff');
-  font-style: normal;
-  font-weight: 300;
-}
-
-
-@font-face {
-  font-family: 'Roboto';
-  src: url('docs/fonts/Roboto-LightItalic-webfont.woff') format('woff');
-  font-style: italic;
-  font-weight: 300;
-}
-
-
-
-@font-face {
-  font-family: 'Roboto';
-  src: url('docs/fonts/Roboto-Bold-webfont.woff') format('woff');
-  font-style: normal;
-  font-weight: 700;
-}
-  */
-  
-
-
-
 @font-face {
   font-family: 'Baskervville';
   src: url('docs/fonts/Baskervville-Regular.ttf') format('truetype');
   font-style: normal;
-  
 }
-
-/*
-@font-face {
-  font-family: 'Baskervville';
-  src: url('docs/fonts/Baskervville-Italic.ttf') format('truetype');
-  font-style: italic;
-  font-weight: 100 900;
-}*/
-
-/*
-@font-face {
-  font-family: 'Inter';
-  src: url('docs/fonts/Inter.ttc') format('truetype');
-  font-weight: 100 900;
-}*/
-
 
 @font-face {
   font-family: 'Inter';
@@ -56,7 +10,6 @@
   font-style: italic;
   font-weight: 100 900;
 }
-
 
 @font-face {
   font-family: 'Inter';
@@ -66,12 +19,12 @@
 }
 
 
-
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
 
 .logo {
   border-radius: 10px;
@@ -85,32 +38,14 @@
   }
 
 
-
 body {
   font-family: 'Inter'; /*'Roboto', sans-serif;*/
   font-weight: 300;
   font-size: 1.0em; /*18px;*/
   line-height: 1.5em;
   color: #5D6063;
-  background-color: #EEEEEE; /* Light gray */
-  
+  background-color: #EEEEEE; /* Light gray */  
 }
-
-
-em {
-  font-style: italic;
-}
-
-
-strong {
-  font-weight: bold; /* or 700 */
-}
-
-
-em, strong {
-  font-synthesis: none; /* works only with Firefox --> in my case worked also in Chrome */
-}
-
 
 h1 {
   line-height: 1.8em;
@@ -140,13 +75,6 @@ h4 {
 }
 
 
-h5, h6 {
-  line-height: 1.3em;
-  font-size: 18px;
-  font-weight: normal;
-  font-style: normal;
-}
-
 header {
   text-align: center;
   color: #FFF; 
@@ -155,14 +83,6 @@ header {
   background-color: rgba(84, 87, 90, 1);
 }
 
-
-.custom-separator-header {
-  width: 100%; /* Makes the line 50% of the screen width */
-  margin: 0 auto; /* Centers the line */
-  border: none; /* Removes the default border */
-  border-bottom: 1px solid rgba(0, 0, 0, 0.5); /* Creates a thin line */
-  z-index: 1100;
-}
 
 .custom-separator {
   width: 100%; /* Makes the line 50% of the screen width */
@@ -173,17 +93,13 @@ header {
 }
 
 
-
 nav {
   position: fixed;
   top: 0;
   width: 100%;
   z-index: 1000;
   height: 2.8em;
-  
 }
-
-
 
 nav ul {
   display: flex;
@@ -207,10 +123,6 @@ nav ul {
   border: 1px solid rgba(255, 255, 255, 0.7)
 }  
 
-
-
-
-
 nav li {
   list-style-type: none;
   /*width: 100%;*/
@@ -224,16 +136,6 @@ nav li:nth-of-type(1),
 nav li:nth-of-type(2) {
   border-top: none;
 }
-/*
-nav li:nth-of-type(2n) {
-  border-left: 1px solid #A8A8A8; /* all of these were #888F95 
-}*/
-
-/*
-nav li.selected {
-  color: #9DC6EC;
-}
-*/
 
 nav a:link,
 nav a:visited {
@@ -253,18 +155,10 @@ nav a:visited:active {
   /*text-decoration: underline;*/
 }
 
-
-
-nav a {
-  text-decoration: none;
-  color: #333;
-}
-
 nav a.selected {
   background-color: rgba(255, 255, 255, 0.2);
   font-weight: 700;
   /*font-style: italic;*/
-
   /*color: rgb(215, 203, 124); /* #A5C5E9; */
   /*border-bottom: 2px solid rgb(215, 203, 124);  /*border-bottom: 2px solid #007bff; */
 }
@@ -272,38 +166,26 @@ nav a.selected {
 
 .heroCapPic{
   display: flex;
-  
-
   justify-content: center; /* space-around; */
   align-items: center;
-
   gap: 2em; /* Adjusts the space between items */
-
   padding: 5em;
   background: linear-gradient(to bottom, #54575A, #EEEEEE); /* #A8A8A8; /* era--> #5D6063; magari per la dark mode?*/
 }
 
-
 .heroCap {
   display: flex;
-
   justify-content: flex-end;
   flex-direction: column;
-  
-  
   padding: 2em;
   background-color: rgba(168, 168, 168, 0.0); /* last is % transparency */   /* #A8A8A8;*/
 }
-
-
 
 .heroCap h2 {
   font-size: 1.9em ; /*23px; */
   text-align: center;
   font-weight: bold;
-}
-
-  
+}  
   /*
   font-style: italic;
   color: #222222;
@@ -324,7 +206,6 @@ nav a.selected {
   100% { opacity: 0; transform: translateY(40%); } 
 }*/
 
-
 .heroCap h3 {
   text-align: right;
   /*
@@ -332,7 +213,6 @@ nav a.selected {
   left: -50px;
   */
 }
-
 
 
 .color-match {

@@ -240,8 +240,8 @@ nav a.selected {
 
 
 .pic-container {
-  width: 24em; /*15em; /* 300px anche gigante senza indicazioni ha del potenziale*/
-  height: 32em; /*20em; /* 400px */
+  width: 15em; /*15em; /* 300px anche gigante senza indicazioni ha del potenziale*/
+  height: 20em; /*20em; /* 400px */
   overflow: hidden; /* Hide the overflow of the image */
   border-radius: 15px; /* Optional: Rounded corners */
   position: relative; /* Position relative for absolute positioning of img */
@@ -257,7 +257,7 @@ nav a.selected {
 }
 
 .pic:hover {
-  transform: scale(1.2) translateX(-5%) translateY(4%); /* Transformed state */
+  transform: scale(1.1) translateX(-6%) translateY(3%); /* Transformed state */
 }
 
 
@@ -1100,8 +1100,8 @@ iframe {
   }
 
   .pic-container {
-    width: 25em; 
-    height: 30em; 
+    width: 24em; 
+    height: 32em; 
     overflow: hidden; /* Hide the overflow of the image */
     border-radius: 15px; /* Optional: Rounded corners */
     position: relative; /* Position relative for absolute positioning of img */
@@ -1193,16 +1193,6 @@ iframe {
     padding-right: 0em;
   }
 
-  .pic-container {
-    width: 24em; /*15em; /* 300px anche gigante senza indicazioni ha del potenziale*/
-    height: 26em; /*20em; /* 400px */
-  }
-
-  .pic {
-    width: 120%; /* Set width to auto to maintain original aspect ratio */
-    height: auto; /* Set height to fill the container */
-    transform: scale(1) translateX(-7%) translateY(0); /* Default state */
-  }
 
   .timeline-text-image {
     flex-direction: column; /* Arrange items vertically */
@@ -1248,6 +1238,30 @@ iframe {
 
 }
 
+
+@media only screen and (max-width: 700px) and (min-width: 662px) {
+
+  .pic-container {
+    width: 20em; /*15em; /* 300px anche gigante senza indicazioni ha del potenziale*/
+    height: 20em; /*20em; /* 400px */
+  }
+}
+
+@media only screen and (max-width: 739px) and (min-width: 701px) {
+
+  .pic-container {
+    width: 18.2em; /*15em; /* 300px anche gigante senza indicazioni ha del potenziale*/
+    height: 20em; /*20em; /* 400px */
+  }
+}
+
+@media only screen and (max-width: 785px) and (min-width: 740px) {
+
+  .pic-container {
+    width: 17em; /*15em; /* 300px anche gigante senza indicazioni ha del potenziale*/
+    height: 20em; /*20em; /* 400px */
+  }
+}
 
 @media only screen and (min-width: 961px) {
   .show-on-big {

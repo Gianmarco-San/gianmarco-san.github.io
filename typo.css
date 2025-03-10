@@ -243,9 +243,9 @@ nav a.selected {
   width: 15em; /*15em; /* 300px anche gigante senza indicazioni ha del potenziale*/
   height: 20em; /*20em; /* 400px */
   overflow: hidden; /* Hide the overflow of the image */
-  border-radius: 15px; /* Optional: Rounded corners */
+  border-radius: 15px; /*15px; /* Optional: Rounded corners */
   position: relative; /* Position relative for absolute positioning of img */
- 
+  border: 1px solid rgba(255, 255, 255, 0.7);
 }
 
 
@@ -275,7 +275,7 @@ nav a.selected {
   position: absolute;
   bottom: 0.2em; /* Position it at the bottom */
   right:5%;
-  transform: translateX(-0%);
+  transform: translateX(0%);
   /*background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
   color: rgba(200,200,170,1); /* White text color */
   padding: 0.5em;
@@ -1103,9 +1103,9 @@ iframe {
     width: 24em; 
     height: 32em; 
     overflow: hidden; /* Hide the overflow of the image */
-    border-radius: 15px; /* Optional: Rounded corners */
     position: relative; /* Position relative for absolute positioning of img */
   }
+
 
 
   body {

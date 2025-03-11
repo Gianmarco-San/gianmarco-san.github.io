@@ -245,7 +245,8 @@ nav a.selected {
   overflow: hidden; /* Hide the overflow of the image */
   border-radius: 15px; /*15px; /* Optional: Rounded corners */
   position: relative; /* Position relative for absolute positioning of img */
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  border: 5px solid rgba(255, 255, 255, 1);
+  transition: border 0.2s ease;
 }
 
 
@@ -264,7 +265,8 @@ nav a.selected {
 
 /* Image adapts to expanded container */
 .pic-container:hover {
-  box-shadow: 0 0 0px rgba(0, 0, 0, 1); /* Enhanced shadow on hover era 20px */ 
+  border: 6px solid rgba(255, 255, 255, 0.7);
+  /*box-shadow: 0 0 0px rgba(0, 0, 0, 1); /* Enhanced shadow on hover era 20px */ 
 }
 
 

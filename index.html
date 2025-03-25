@@ -2147,7 +2147,7 @@
       var content = button.nextElementSibling;
       if (content.style.display === "none" || content.style.display === "") {
           content.style.display = "block";
-          button.innerHTML = '<img src="docs/up_ari.svg" style="height: 0.7em; width: auto; margin-bottom: 0em; padding-right: 0.17em"> Show Less';
+          button.innerHTML = '<img src="docs/down_ari.svg" style="height: 0.7em; width: auto; margin-bottom: 0em; padding-right: 0.17em; transform: rotate(180deg);"> Show Less';
       } else {
           content.style.display = "none";
           button.innerHTML = '<img src="docs/down_ari.svg" style="height: 0.7em; width: auto; margin-bottom: 0em;"> Show More';

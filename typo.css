@@ -241,7 +241,7 @@ nav a.selected {
 
 .pic-container {
   width: 15em; /*15em; /* 300px anche gigante senza indicazioni ha del potenziale*/
-  height: 20em; /*20em; /* 400px */
+  height: 18em; /*20em; /* 400px */
   overflow: hidden; /* Hide the overflow of the image */
   border-radius: 15px; /*15px; /* Optional: Rounded corners */
   position: relative; /* Position relative for absolute positioning of img */
@@ -277,9 +277,9 @@ nav a.selected {
   position: absolute;
   bottom: 0.2em; /* Position it at the bottom */
   right:5%;
-  transform: translateX(0%);
+  transform: translateX(-30%);
   /*background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
-  color: rgba(200,200,170,1); /* White text color */
+  color: rgba(255,255,255,1); /* rgba(200,200,170,1); White text color */
   padding: 0.5em;
   /*border-radius: 5px;*/
   opacity: 0; /* Hidden by default */
@@ -1103,7 +1103,7 @@ iframe {
 
   .pic-container {
     width: 24em; 
-    height: 32em; 
+    height: 30em; 
     overflow: hidden; /* Hide the overflow of the image */
     position: relative; /* Position relative for absolute positioning of img */
   }
@@ -1245,7 +1245,7 @@ iframe {
 
   .pic-container {
     width: 20em; /*15em; /* 300px anche gigante senza indicazioni ha del potenziale*/
-    height: 20em; /*20em; /* 400px */
+    height: 18em; /*20em; /* 400px */
   }
 }
 
@@ -1253,7 +1253,7 @@ iframe {
 
   .pic-container {
     width: 18.2em; /*15em; /* 300px anche gigante senza indicazioni ha del potenziale*/
-    height: 20em; /*20em; /* 400px */
+    height: 18em; /*20em; /* 400px */
   }
 }
 
@@ -1261,7 +1261,7 @@ iframe {
 
   .pic-container {
     width: 17em; /*15em; /* 300px anche gigante senza indicazioni ha del potenziale*/
-    height: 20em; /*20em; /* 400px */
+    height: 18em; /*20em; /* 400px */
   }
 }
 
@@ -1336,7 +1336,7 @@ iframe {
   /*background: radial-gradient(circle, #fafafa, #dcdcdc); */
   color: #5e6063;
   padding: 8px 12px;
-  border: 1px solid #5e6063;
+  border: 1px solid #acacac; /* #5e6063;*/
   cursor: pointer;
   font-size: 1em;
   margin-top: 10px;

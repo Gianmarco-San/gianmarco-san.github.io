@@ -875,8 +875,8 @@ iframe {
 
 .download-button {
   display: inline-block;
-  padding: 10px 20px;
-  background-color: #54575A; /* Same as your nav background */
+  /*padding: 10px 20px; */
+  background-color: #54575A; /* Same as nav background */
   color: #ffffff;
   text-decoration: none;
   border-radius: 5px;
@@ -911,7 +911,6 @@ iframe {
 }
 
 
-
 /* Add a pulse animation for gold shades 
 @keyframes pulseGold {
   0%, 100% {
@@ -919,34 +918,28 @@ iframe {
   }
 }*/
 
-/* Style the download button */
-.download-button {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-/* When hovering over the section, apply animation to the download button */
-#cv:hover .download-button {
-  transform: scale(1.4); /* Zoom effect */
-}
-
 
 .social-icon {
   display: inline-block;
   width: 2em; /* Adjust size as desired */
   height: 2em;
-  margin: 0 0.5em; /* Space between icons */
-  color: #54575A; /* Default icon color */
+  margin: 0em 0em 0em 0em; /* Space between icons */
+  background-color: #54575A; /* Same as nav background */
+  color: #ffffff;
+  /*color: #54575A; /* Default icon color 
   background-color: #ffffff; /* Optional: icon background color */
   border-radius: 15%; /* Makes the icons circular */
   text-align: center;
-  line-height: 1em; /* Centers the icon vertically */
+  /*line-height: 1em; /* Centers the icon vertically */
   font-size: 1.5em; /* Icon size */
   transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
   text-decoration: none; /* Removes underline for links */
+  position: relative; /* Needed for the bubble effect */
+  overflow: hidden; /* Prevents bubble from spilling out */
 }
 
 .social-icon:hover {
-  color: #FFD700; /* Change icon color on hover (e.g., gold) */
+  /*color: #FFD700; /* Change icon color on hover (e.g., gold) */
   /*background-color: #54575A; /* Background color on hover */
   transform: scale(1.2); /* Slightly enlarge icon on hover */
 }
@@ -1298,7 +1291,7 @@ iframe {
 
 .gradient-text:hover {
   font-weight: bold;
-  transform: scale(1.1);
+  /*transform: scale(1.1);*/
 }
 
 /* Tooltip styling */
@@ -1315,10 +1308,11 @@ iframe {
   transform: translateX(-50%);
   opacity: 0;
   transition: opacity 0.2s ease-in-out;
-  font-size: 0.8em;
+  font-size: 0.9em;
   white-space: nowrap;
 
 }
+
 
 .gradient-text:hover .tooltip-text {
   visibility: visible;

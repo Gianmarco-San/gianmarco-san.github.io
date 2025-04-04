@@ -2157,59 +2157,42 @@
 
     <!-- Footer Section -->
     <footer class="custom-footer1">
-      <footer class="footer-content1">
+      <footer class="footer-content1">        
       
-        <!-- <br><br><br><br><br><br><br><br> -->
-
-      
-        <br><br><br><br>
-        
-        
-        <p class="gradient-text tooltip" onclick="copyToClipboard(this)">
-          gianmarcosantoro23@gmail.com
-          <span class="tooltip-text">Click to Copy</span>
-        </p>
-        
-        <script>  // scritp to copy email and manage related messages
-          function copyToClipboard(element) {
-            const email = element.childNodes[0].nodeValue.trim(); // Get only the text before the span
-            navigator.clipboard.writeText(email).then(() => {
-              const tooltip = element.querySelector(".tooltip-text");
-              tooltip.textContent = "Copied! ✅"; // Show success message
-        
-              setTimeout(() => {
-                tooltip.textContent = "Click to Copy"; // Reset after 2s
-              }, 2000);
-            }).catch(err => console.error("Copy failed:", err));
-          }
-        </script>
-        
-        
-          
-       
-          <br><br>
+        <br><br><br><br><br>
           
           <div class="social-links">
-            <div class="footer-social-icons">
+            <div class="footer-social-icons" style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 2em;">
+
+              <a class="gradient-text tooltip">
+              <p href="Gianmarco_Santoro_CV.pdf" style="font-weight: 400; font-size: 1.2; line-height: 2.0em;" id="cv-download" target="_blank" class="social-icon">
+                CV
+              </p><span class="tooltip-text">Download my Resume <img src="docs/download_icon.png" style="height: 1.0em;"></span>
+              </a>
               
-              <a href="https://www.linkedin.com/in/gianmarco-ai-engineer" target="_blank" rel="noopener noreferrer">
-              <img src="docs/linkedin_logo.webp" alt="LinkedIn Logo" class="social-icon"></a>
-              | 
+              
+              <a class="gradient-text tooltip" onclick="copyToClipboard(this)">
+                <img src="docs/mail_icon.png" alt="Mail Logo" class="social-icon">
+                <span class="tooltip-text">Click to Copy Mail <img src="docs/copy-icon.png" style="height: 1.0em;"></span>
+              </a>
+              
               
               <a href="https://www.github.com/Gianmarco-San" target="_blank" rel="noopener noreferrer">
                 <img src="docs/github_logo.webp" alt="GitHub Logo" class="social-icon" style="border-radius: 50%;"></a>
-              | 
               
-              <a href="https://www.imdb.com/user/ur124794700/ratings/?ref_=ext_shr_lnk" target="_blank" rel="noopener noreferrer">
-                <img src="docs/imdb_logo.webp" alt="IMDb Logo" class="social-icon"></a>
+
+              <a href="https://www.linkedin.com/in/gianmarco-ai-engineer" target="_blank" rel="noopener noreferrer">
+                <img src="docs/linkedin_logo.webp" alt="LinkedIn Logo" class="social-icon"></a>
+                
+              
+              <a class="gradient-text tooltip" href="https://www.imdb.com/user/ur124794700/ratings/?ref_=ext_shr_lnk" target="_blank" rel="noopener noreferrer">
+                <img src="docs/imdb_logo.webp" alt="IMDb Logo" class="social-icon">
+                <span class="tooltip-text">Check my Movies Ratings ⭐️</span>
+              </a>
             </div>
           </div>
 
-          <br><br><br><br>
-
-        <a href="Gianmarco_Santoro_CV.pdf" id="cv-download" target="_blank" class="download-button">Download CV</a>
-          
-        <br><br><br><br><br><br><br><br>        
+          <br><br><br><br><br>
       
 
     </footer>
@@ -2250,6 +2233,9 @@
     
     </a>
   </div>
+
+</footer>
+</footer>
   
   
     
@@ -2260,6 +2246,24 @@
 
 
 <!--   ###   HERE JS SCRIPTS   ###   -->
+
+
+<script>  // script to copy email and manage related messages
+  function copyToClipboard(element) {
+    const email = "gianmarcosantoro23@gmail.com"; // Define the email explicitly
+    navigator.clipboard.writeText(email).then(() => {
+      const tooltip = element.querySelector(".tooltip-text");
+      tooltip.textContent = "Copied! ✅"; // Show success message
+
+      setTimeout(() => {
+        tooltip.innerHTML = 'Click to Copy Mail  <img src="docs/copy-icon.png" style="height: 1.0em;">'; // Reset after 2s
+      }, 2000);
+    }).catch(err => console.error("Copy failed:", err));
+  }
+</script>
+
+
+
 
 <script>  // This script is to hide/show contents in timeline-item
   function toggleContent(button) {

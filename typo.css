@@ -924,7 +924,7 @@ iframe {
   width: 2em; /* Adjust size as desired */
   height: 2em;
   margin: 0em 0em 0em 0em; /* Space between icons */
-  background-color: #54575A; /* Same as nav background */
+  background-color:#706c76; /* #00000000 /* #717374; /* #54575A; /* Same as nav background */
   color: #ffffff;
   /*color: #54575A; /* Default icon color 
   background-color: #ffffff; /* Optional: icon background color */
@@ -936,12 +936,17 @@ iframe {
   text-decoration: none; /* Removes underline for links */
   position: relative; /* Needed for the bubble effect */
   overflow: hidden; /* Prevents bubble from spilling out */
+  vertical-align: middle;
+  /*border: 1px solid #fff;*/
 }
 
 .social-icon:hover {
   /*color: #FFD700; /* Change icon color on hover (e.g., gold) */
   /*background-color: #54575A; /* Background color on hover */
   transform: scale(1.2); /* Slightly enlarge icon on hover */
+  /*background-color: rgba(255, 255, 255, 0.2); /* #1d1d1f;*/
+  /*border-color: #1d1d1f;*/
+  /*border: 1px solid #1d1d1f;*/
 }
 
 

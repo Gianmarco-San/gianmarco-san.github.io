@@ -241,7 +241,7 @@ nav a.selected {
 
 .pic-container {
   width: 15em; /*15em; /* 300px anche gigante senza indicazioni ha del potenziale*/
-  height: 18em; /*20em; /* 400px */
+  height: 17.8em; /*20em; /* 400px */
   overflow: hidden; /* Hide the overflow of the image */
   border-radius: 15px; /*15px; /* Optional: Rounded corners */
   position: relative; /* Position relative for absolute positioning of img */
@@ -277,7 +277,7 @@ nav a.selected {
   position: absolute;
   bottom: 0.2em; /* Position it at the bottom */
   right:5%;
-  transform: translateX(-30%);
+  transform: translateX(-40%);
   /*background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
   color: rgba(255,255,255,1); /* rgba(200,200,170,1); White text color */
   padding: 0.5em;
@@ -1100,8 +1100,8 @@ iframe {
   }
 
   .pic-container {
-    width: 24em; 
-    height: 30em; 
+    width: 16.8em; 
+    height: 21.0em; 
     overflow: hidden; /* Hide the overflow of the image */
     position: relative; /* Position relative for absolute positioning of img */
   }

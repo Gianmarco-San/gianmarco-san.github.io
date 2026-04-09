@@ -1,0 +1,17 @@
+# Claude / AI tooling
+.claude/
+CLAUDE.md
+
+# system files
+.DS_Store
+
+# IDE / Editor
+.vscode/
+.idea/
+
+# Environment variables
+.env
+.env.local
+
+# Folders
+tools_docs/

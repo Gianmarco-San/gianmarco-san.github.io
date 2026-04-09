@@ -1,0 +1,1984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gianmarco | Tools</title>
+  <link rel="stylesheet" href="typo.css">
+  <link rel="icon" href="docs/J-favicon_tech.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @view-transition { navigation: auto; }
+    @keyframes vt-fade-in  { from { opacity: 0; transform: translateY(6px); } }
+    @keyframes vt-fade-out { to   { opacity: 0; transform: translateY(-4px); } }
+    ::view-transition-old(root) { animation: 180ms ease vt-fade-out; }
+    ::view-transition-new(root) { animation: 260ms ease vt-fade-in;  }
+
+    /* ── Layout ──────────────────────────────── */
+    .tools-page { max-width: 1100px; margin: 0 auto; padding: 5.5em 1.2em 4em; }
+    .tools-layout { display: flex; gap: 2.2em; align-items: flex-start; }
+
+    /* ── Sidebar ─────────────────────────────── */
+    .tools-sidebar {
+      width: 200px; flex-shrink: 0; position: sticky; top: 5em;
+    }
+    .tools-sidebar h3 {
+      font-size: 0.72em; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: #777; margin-bottom: 0.8em;
+    }
+    .tool-nav-item {
+      display: flex; align-items: center; gap: 0.6em;
+      padding: 0.5em 0.75em; border-radius: 8px; cursor: pointer;
+      font-size: 0.88em; color: #5D6063; transition: background 0.15s, color 0.15s;
+      border: none; background: none; width: 100%; text-align: left;
+    }
+    .tool-nav-item:hover { background: #eee; }
+    .tool-nav-item.active { background: #54575A; color: #fff; }
+    .tool-nav-item .tool-icon { font-size: 1.1em; width: 1.4em; text-align: center; }
+
+    /* ── Main content ────────────────────────── */
+    .tools-content { flex: 1; min-width: 0; }
+    .tool-panel { display: none; }
+    .tool-panel.active { display: block; }
+
+    /* ── Tool card wrapper ───────────────────── */
+    .tool-card {
+      background: #fafafa; border-radius: 16px;
+      box-shadow: 0 0 1px rgba(0,0,0,0.4), 0 2px 12px rgba(0,0,0,0.05);
+      padding: 2em 2.2em 2.4em; margin-bottom: 1.6em;
+    }
+    .tool-header { margin-bottom: 1.4em; }
+    .tool-header h2 { font-size: 1.15em; font-weight: 700; color: #222; margin: 0 0 0.2em; }
+    .tool-meta { font-size: 0.73em; color: #bbb; }
+
+    /* ── Form elements ───────────────────────── */
+    .tool-row { display: flex; flex-wrap: wrap; gap: 1em; margin-bottom: 1em; }
+    .tool-field { display: flex; flex-direction: column; gap: 0.3em; flex: 1; min-width: 130px; }
+    .tool-field label { font-size: 0.78em; color: #888; font-weight: 500; }
+    .tool-field input, .tool-field select {
+      background: #fff; border: 1px solid #d8d8d8; border-radius: 8px;
+      padding: 0.5em 0.8em; font-size: 0.9em; font-family: 'Inter', sans-serif;
+      color: #333; outline: none; transition: border-color 0.15s;
+    }
+    .tool-field input:focus, .tool-field select:focus { border-color: #5D6063; }
+    .tool-toggle {
+      display: flex; background: #eee; border-radius: 8px;
+      padding: 3px; gap: 2px; width: fit-content;
+    }
+    .tool-toggle button {
+      padding: 0.35em 0.9em; border-radius: 6px; border: none;
+      background: none; cursor: pointer; font-size: 0.82em;
+      font-family: 'Inter', sans-serif; color: #777; transition: background 0.15s, color 0.15s;
+    }
+    .tool-toggle button.active { background: #fff; color: #333; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+    /* ── Output areas ────────────────────────── */
+    .tool-result {
+      background: #fff; border: 1px solid #e8e8e8; border-radius: 10px;
+      padding: 1.2em 1.4em; margin-top: 1.2em;
+    }
+    .result-big { font-size: 2.2em; font-weight: 700; color: #222; line-height: 1.1; }
+    .result-label { font-size: 0.76em; color: #aaa; margin-top: 0.2em; }
+    .result-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.8em; }
+    .result-cell { background: #f4f4f4; border-radius: 8px; padding: 0.7em 0.9em; }
+    .result-cell .rc-val { font-size: 1.05em; font-weight: 600; color: #333; word-break: break-all; overflow-wrap: anywhere; }
+    .result-cell .rc-lbl { font-size: 0.72em; color: #999; margin-top: 0.15em; }
+
+    /* ── Table ───────────────────────────────── */
+    .tool-table { width: 100%; border-collapse: collapse; font-size: 0.84em; margin-top: 1em; }
+    .tool-table th { text-align: left; padding: 0.5em 0.7em; color: #aaa; font-weight: 500; font-size: 0.9em; border-bottom: 1px solid #eee; }
+    .tool-table td { padding: 0.55em 0.7em; color: #444; border-bottom: 1px solid #f0f0f0; }
+    .tool-table tr.fire-year td { background: #f0fdf4; font-weight: 600; color: #166534; }
+    .tool-table tr:last-child td { border-bottom: none; }
+
+    /* ── Color preview ───────────────────────── */
+    .color-preview {
+      width: 100%; height: 80px; border-radius: 10px; border: 1px solid #e0e0e0;
+      margin: 1em 0 0.5em; transition: background 0.1s;
+    }
+    .contrast-badge {
+      display: inline-block; padding: 0.2em 0.6em; border-radius: 5px;
+      font-size: 0.78em; font-weight: 600; margin-right: 0.4em;
+    }
+    .contrast-pass { background: #dcfce7; color: #166534; }
+    .contrast-fail { background: #fee2e2; color: #991b1b; }
+
+    /* ── Weather ─────────────────────────────── */
+    #tw-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1em;
+    }
+    @media (max-width: 700px) { #tw-grid { grid-template-columns: 1fr; } }
+    .tw-slot {
+      background: #f7f7f7; border-radius: 12px; padding: 1em 1.1em;
+      border: 1px solid #ebebeb; display: flex; flex-direction: column; gap: 0.15em;
+    }
+    .tw-sel {
+      width: 100%; background: #fff; border: 1px solid #d8d8d8; border-radius: 8px;
+      padding: 0.38em 0.6em; font-size: 0.84em; color: #333; outline: none;
+      cursor: pointer; margin-bottom: 0.35em; font-family: 'Inter', sans-serif;
+    }
+    .tw-main  { display: flex; align-items: baseline; gap: 0.25em; margin: 0.1em 0; }
+    .tw-emoji { font-size: 2em; line-height: 1; }
+    .tw-temp  { font-size: 2.2em; font-weight: 700; color: #222; }
+    .tw-city  { font-size: 0.8em; color: #aaa; }
+    .tw-desc  { font-size: 0.88em; font-weight: 500; color: #444; margin-top: 0.2em; }
+    .tw-extra, .tw-uvaqi { font-size: 0.78em; color: #999; line-height: 1.6; }
+
+    /* ── Currency ────────────────────────────── */
+    .currency-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.7em; margin-top: 1em; }
+    .currency-cell { background: #f4f4f4; border-radius: 8px; padding: 0.8em 1em; }
+    .currency-cell .cc-code { font-size: 0.72em; color: #aaa; font-weight: 600; letter-spacing: 0.05em; }
+    .currency-cell .cc-val { font-size: 1.1em; font-weight: 600; color: #333; margin-top: 0.1em; }
+
+    /* ── Salary breakdown bar ────────────────── */
+    .salary-bar { height: 12px; border-radius: 6px; overflow: hidden; display: flex; margin: 0.8em 0; }
+    .salary-bar-net  { background: #54575A; }
+    .salary-bar-tax  { background: #d0d0d0; }
+    .salary-bar-ss   { background: #e8e8e8; }
+    .salary-legend { display: flex; gap: 1.2em; flex-wrap: wrap; font-size: 0.76em; color: #888; }
+    .salary-legend span::before {
+      content: '●'; margin-right: 0.3em;
+    }
+    .salary-legend .l-net::before  { color: #54575A; }
+    .salary-legend .l-tax::before  { color: #d0d0d0; }
+    .salary-legend .l-ss::before   { color: #c0c0c0; }
+
+    /* ── Note / disclaimer ───────────────────── */
+    .tool-note {
+      font-size: 0.76em; color: #bbb; line-height: 1.5;
+      margin-top: 1em; padding-top: 0.8em; border-top: 1px solid #f0f0f0;
+    }
+
+    /* ── Mobile ──────────────────────────────── */
+    @media (max-width: 700px) {
+      .tools-layout { flex-direction: column; }
+      .tools-sidebar { width: 100%; position: static; display: flex; flex-wrap: wrap; gap: 0.4em; }
+      .tools-sidebar h3 { width: 100%; }
+      .tool-nav-item { width: auto; }
+      .tool-card { padding: 1.4em 1.2em; margin-left: 0.3em; margin-right: 0.3em; }
+    }
+  </style>
+</head>
+
+<body>
+  <header style="background: transparent; padding: 0;">
+    <nav>
+      <ul>
+        <li><a href="index.html">Welcome<span class="nav-tooltip">Back to Home ↑</span></a></li>
+        <li><a href="timeline.html">Timeline<span class="nav-tooltip">Experiences in Details <img src="docs/new-tab-icon.png" style="height:1.0em; vertical-align:baseline;"></span></a></li>
+        <li><a href="tools.html" class="selected">Tools<span class="nav-tooltip">Calculators & Utilities <img src="docs/new-tab-icon.png" style="height:1.0em; vertical-align:baseline;"></span></a></li>
+        <!--<li><a href="index.html#about">Keep in Touch</a></li>-->
+        <span style="color: white;"> |</span>
+        <li><a href="Gianmarco_Santoro_CV.pdf" target="_blank" rel="noopener noreferrer" id="cv-download1" class="nav_hover">
+          <span class="shadow-text1">CV</span><span class="nav-tooltip">Download my Resume <img src="docs/download_icon.png" style="height:1.0em; vertical-align:baseline;"></span></a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="tools-page">
+    <div class="tools-layout">
+
+      <!-- ── Sidebar ─────────────────────── -->
+      <aside class="tools-sidebar">
+        <h3>Tools</h3>
+        <p style="font-size:0.72em; color:#888; margin: -0.4em 0 0.8em; line-height:1.3; text-align:center;">⚠️ Work in progress,<br>don't fully trust.</p>
+        <button class="tool-nav-item active" data-tool="running">
+          <span class="tool-icon">🏃</span> Running Pace
+        </button>
+        <button class="tool-nav-item" data-tool="fire">
+          <span class="tool-icon">🔥</span> FIRE Calculator
+        </button>
+        <button class="tool-nav-item" data-tool="salary">
+          <span class="tool-icon">💼</span> Net Salary
+        </button>
+        <button class="tool-nav-item" data-tool="currency">
+          <span class="tool-icon">💱</span> Currency
+        </button>
+        <button class="tool-nav-item" data-tool="weather">
+          <span class="tool-icon">🌤</span> Weather
+        </button>
+        <button class="tool-nav-item" data-tool="color">
+          <span class="tool-icon">🎨</span> Color Tools
+        </button>
+        <button class="tool-nav-item" data-tool="col">
+          <span class="tool-icon">🏙️</span> Cost of Living
+        </button>
+      </aside>
+
+      <!-- ── Tool panels ─────────────────── -->
+      <main class="tools-content">
+
+        <!-- ════════════════════════════════
+             RUNNING TOOLS
+             ════════════════════════════════ -->
+        <div class="tool-panel active" id="tool-running">
+
+          <!-- Pace / Speed / Split — bi-directional -->
+          <div class="tool-card">
+            <div class="tool-header">
+              <h2>Pace · Speed · Split</h2>
+              <div class="tool-meta">v2.0 · Mar 2026 — all fields editable &amp; bi-directional</div>
+            </div>
+            <div class="tool-row" style="align-items:flex-end;">
+              <div class="tool-field">
+                <label>Pace (min:sec / km)</label>
+                <input type="text" id="run-pace-km" value="5:00" placeholder="5:00" style="font-family:monospace;" onclick="this.select()">
+              </div>
+              <div class="tool-field">
+                <label>Speed (km/h)</label>
+                <input type="number" id="run-speed-kmh" min="0.5" max="50" step="0.01" value="12.00" onclick="this.select()">
+              </div>
+              <div class="tool-field">
+                <label>Pace (min:sec / mile)</label>
+                <input type="text" id="run-pace-mi" value="8:03" placeholder="8:03" style="font-family:monospace;" onclick="this.select()">
+              </div>
+            </div>
+            <div class="tool-row" style="align-items:flex-end;margin-top:0.2em;">
+              <div class="tool-field">
+                <label>Split distance</label>
+                <select id="run-split-dist"></select>
+              </div>
+              <div class="tool-field">
+                <label>Split time (editable)</label>
+                <input type="text" id="run-split-time" value="25:00" placeholder="mm:ss or h:mm:ss" style="font-family:monospace;" onclick="this.select()">
+              </div>
+            </div>
+            <div class="tool-result" style="margin-top:1em;">
+              <div style="font-size:0.8em;color:#aaa;margin-bottom:0.6em;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">All splits</div>
+              <div class="result-grid" id="run-splits"></div>
+            </div>
+            <div class="tool-note">Edit any field — all others update automatically (pace fields update on Enter / focus-out). 1 mile = 1.60934 km.</div>
+          </div>
+
+          <!-- VO2max Estimator -->
+          <div class="tool-card">
+            <div class="tool-header">
+              <h2>VO₂max Estimator</h2>
+              <div class="tool-meta">Jack Daniels &amp; Gilbert (1979) formula · based on race performance</div>
+            </div>
+            <div class="tool-row" style="align-items:flex-end;">
+              <div class="tool-field">
+                <label>Gender</label>
+                <select id="run-vo2-gender">
+                  <option value="M">Male</option>
+                  <option value="F">Female</option>
+                </select>
+              </div>
+              <div class="tool-field">
+                <label>Distance</label>
+                <select id="run-vo2-dist">
+                  <option value="1.5">1500 m</option>
+                  <option value="1.60934">1 mile</option>
+                  <option value="3">3 km</option>
+                  <option value="5" selected>5 km</option>
+                  <option value="10">10 km</option>
+                  <option value="21.0975">½ marathon</option>
+                  <option value="42.195">Marathon</option>
+                </select>
+              </div>
+              <div class="tool-field">
+                <label>Race time (mm:ss or h:mm:ss)</label>
+                <input type="text" id="run-vo2-time" value="25:00" placeholder="25:00" style="font-family:monospace;" onclick="this.select()">
+              </div>
+            </div>
+            <button id="run-vo2-calc" style="margin-top:0.5em;padding:0.5em 1.4em;background:#54575A;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:0.88em;">Calculate VO₂max</button>
+            <div class="tool-result" id="run-vo2-result" style="display:none;margin-top:1em;"></div>
+            <div class="tool-note">%VO₂max = 0.8 + 0.1894·e<sup>−0.012778·t</sup> + 0.2990·e<sup>−0.1933·t</sup> (t in min) · VO₂ = −4.60 + 0.1823·v + 0.000104·v² (v in m/min) · VO₂max = VO₂ / %VO₂max. Classifications are indicative age-adjusted norms.</div>
+          </div>
+
+          <!-- Race Time Predictor -->
+          <div class="tool-card">
+            <div class="tool-header">
+              <h2>Race Time Predictor</h2>
+              <div class="tool-meta">Riegel formula (1977) — enter a Personal Best, predict all distances</div>
+            </div>
+            <div class="tool-row" style="align-items:flex-end;">
+              <div class="tool-field">
+                <label>Your PB distance</label>
+                <select id="run-pred-dist">
+                  <option value="1.5">1500 m</option>
+                  <option value="1.60934">1 mile</option>
+                  <option value="3">3 km</option>
+                  <option value="5" selected>5 km</option>
+                  <option value="10">10 km</option>
+                  <option value="21.0975">½ marathon</option>
+                  <option value="42.195">Marathon</option>
+                </select>
+              </div>
+              <div class="tool-field">
+                <label>Personal Best time</label>
+                <input type="text" id="run-pred-time" value="25:00" placeholder="25:00" style="font-family:monospace;" onclick="this.select()">
+              </div>
+            </div>
+            <button id="run-pred-calc" style="margin-top:0.5em;padding:0.5em 1.4em;background:#54575A;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:0.88em;">Predict times</button>
+            <div style="overflow-x:auto;margin-top:1em;">
+              <table class="tool-table" id="run-pred-table" style="display:none;">
+                <thead><tr><th>Distance</th><th>Predicted time</th><th>Predicted pace /km</th></tr></thead>
+                <tbody id="run-pred-tbody"></tbody>
+              </table>
+            </div>
+            <div class="tool-note">Formula: T₂ = T₁ × (D₂/D₁)<sup>1.06</sup>. The exponent 1.06 models increasing fatigue over longer distances. Most accurate for distances within ~3× of the reference; less reliable when comparing sprints to marathons. Reference distance row is highlighted.</div>
+          </div>
+
+          <!-- Weekly Mileage Guide -->
+          <div class="tool-card">
+            <div class="tool-header">
+              <h2>Weekly Mileage → Expected Race Times</h2>
+              <div class="tool-meta">Rough guide for recreational runners</div>
+            </div>
+            <div style="overflow-x:auto;">
+              <table class="tool-table">
+                <thead>
+                  <tr><th>km/week</th><th>mi/week</th><th>5 km</th><th>10 km</th><th>½ marathon</th><th>Marathon</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>20–30</td><td>12–19</td><td>27:00–32:00</td><td>57:00–68:00</td><td>2:05–2:25</td><td>4:30–5:10</td></tr>
+                  <tr><td>30–50</td><td>19–31</td><td>23:00–27:00</td><td>49:00–57:00</td><td>1:46–2:05</td><td>3:45–4:30</td></tr>
+                  <tr><td>50–70</td><td>31–43</td><td>20:00–23:00</td><td>42:00–49:00</td><td>1:32–1:46</td><td>3:15–3:45</td></tr>
+                  <tr><td>70–100</td><td>43–62</td><td>17:00–20:00</td><td>36:00–42:00</td><td>1:18–1:32</td><td>2:45–3:15</td></tr>
+                  <tr><td>100–130</td><td>62–81</td><td>15:00–17:00</td><td>31:00–36:00</td><td>1:08–1:18</td><td>2:20–2:45</td></tr>
+                  <tr><td>&gt;130</td><td>&gt;81</td><td>&lt;15:00</td><td>&lt;31:00</td><td>&lt;1:08</td><td>&lt;2:20</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="tool-note">Rough estimates for recreational male runners training consistently. Women typically add ~10–12%. Actual times depend on training quality, genetics, age, race conditions, and tapering.</div>
+          </div>
+
+        </div>
+
+        <!-- ════════════════════════════════
+             FIRE CALCULATOR
+             ════════════════════════════════ -->
+        <div class="tool-panel" id="tool-fire">
+          <div class="tool-card">
+            <div class="tool-header">
+              <h2>FIRE &amp; Investment Calculator</h2>
+              <div class="tool-meta">v1.1 · Mar 2026 — based on Swiss reference scenario</div>
+            </div>
+
+            <div class="tool-row">
+              <div class="tool-field">
+                <label>Gross salary / yr</label>
+                <input type="number" id="fire-salary" value="100000" step="1000">
+              </div>
+              <div class="tool-field">
+                <label>Salary growth / yr (%)</label>
+                <input type="number" id="fire-salary-growth" value="5" step="0.5" min="0" max="30">
+              </div>
+              <div class="tool-field">
+                <label>Tax + SS rate (%)</label>
+                <input type="number" id="fire-tax" value="20" step="0.5" min="0" max="60">
+              </div>
+            </div>
+            <div class="tool-row">
+              <div class="tool-field">
+                <label>Cost of living / yr</label>
+                <input type="number" id="fire-col" value="45000" step="500">
+              </div>
+              <div class="tool-field">
+                <label>Health insurance / yr</label>
+                <input type="number" id="fire-health" value="4800" step="100">
+              </div>
+              <div class="tool-field">
+                <label>Inflation (%)</label>
+                <input type="number" id="fire-inflation" value="2" step="0.1" min="0" max="15">
+              </div>
+            </div>
+            <div class="tool-row">
+              <div class="tool-field">
+                <label>Investment return (%)</label>
+                <input type="number" id="fire-return" value="7" step="0.5" min="0" max="30">
+              </div>
+              <div class="tool-field">
+                <label>Capital gains tax (%)</label>
+                <input type="number" id="fire-cgt" value="26" step="0.5" min="0" max="50">
+              </div>
+              <div class="tool-field">
+                <label>Investment tax / yr (%)</label>
+                <input type="number" id="fire-inv-tax" value="0.2" step="0.1" min="0">
+              </div>
+            </div>
+            <div class="tool-row">
+              <div class="tool-field">
+                <label>Safety buffer (%)</label>
+                <input type="number" id="fire-safety" value="30" step="5" min="0" max="100">
+              </div>
+              <div class="tool-field">
+                <label>One-off investment</label>
+                <input type="number" id="fire-oneoff" value="0" step="1000">
+              </div>
+              <div class="tool-field">
+                <label>Projection (years)</label>
+                <input type="number" id="fire-years" value="20" min="1" max="50">
+              </div>
+            </div>
+            <div class="tool-row">
+              <div class="tool-field">
+                <label>Mode</label>
+                <select id="fire-mode">
+                  <option value="single">Single</option>
+                  <option value="couple">Couple (shared costs)</option>
+                </select>
+              </div>
+              <div class="tool-field">
+                <label>Currency</label>
+                <select id="fire-currency">
+                  <option value="CHF">CHF</option>
+                  <option value="EUR">EUR</option>
+                  <option value="USD">USD</option>
+                  <option value="GBP">GBP</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="tool-result" id="fire-summary" style="display:none;">
+              <div style="display:flex;gap:2em;flex-wrap:wrap;">
+                <div>
+                  <div class="result-big" id="fire-year-display">—</div>
+                  <div class="result-label">Year you reach FIRE 🔥</div>
+                </div>
+                <div>
+                  <div class="result-big" id="fire-portfolio-display">—</div>
+                  <div class="result-label">Portfolio at FIRE year</div>
+                </div>
+                <div>
+                  <div class="result-big" id="fire-passive-display">—</div>
+                  <div class="result-label">Annual passive income</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="overflow-x:auto;margin-top:1em;">
+              <table class="tool-table" id="fire-table">
+                <thead>
+                  <tr>
+                    <th>Year</th><th>Salary</th><th>Net</th>
+                    <th>Savings</th><th>Portfolio</th>
+                    <th>Passive / yr</th><th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="fire-tbody"></tbody>
+              </table>
+            </div>
+            <div class="tool-note">Returns based on compound annual growth. Taxes applied on passive income at capital gains rate. Safety buffer adds surplus to required living cost. Not financial advice.</div>
+          </div>
+        </div>
+
+        <!-- ════════════════════════════════
+             NET SALARY CALCULATOR
+             ════════════════════════════════ -->
+        <div class="tool-panel" id="tool-salary">
+          <div class="tool-card">
+            <div class="tool-header">
+              <h2>Net Salary Calculator</h2>
+              <div class="tool-meta">v1.0 · Mar 2026 — approximations, not financial/tax advice</div>
+            </div>
+
+            <div class="tool-row">
+              <div class="tool-field">
+                <label>Gross salary / yr</label>
+                <input type="number" id="sal-gross" value="80000" step="1000">
+              </div>
+              <div class="tool-field">
+                <label>Country</label>
+                <select id="sal-country">
+                  <option value="IT">🇮🇹 Italy</option>
+                  <option value="CH" selected>🇨🇭 Switzerland</option>
+                  <option value="DE">🇩🇪 Germany</option>
+                  <option value="FR">🇫🇷 France</option>
+                  <option value="GB">🇬🇧 United Kingdom</option>
+                  <option value="IE">🇮🇪 Ireland</option>
+                  <option value="NL">🇳🇱 Netherlands</option>
+                  <option value="BE">🇧🇪 Belgium</option>
+                  <option value="SE">🇸🇪 Sweden</option>
+                  <option value="NO">🇳🇴 Norway</option>
+                  <option value="DK">🇩🇰 Denmark</option>
+                  <option value="US">🇺🇸 United States</option>
+                  <option value="JP">🇯🇵 Japan</option>
+                  <option value="KR">🇰🇷 South Korea</option>
+                </select>
+              </div>
+              <div class="tool-field" id="sal-region-field" style="display:none;">
+                <label id="sal-region-label">Canton / Region</label>
+                <select id="sal-region"></select>
+              </div>
+            </div>
+            <div class="tool-row">
+              <div class="tool-field">
+                <label>Status</label>
+                <select id="sal-status">
+                  <option value="single">Single</option>
+                  <option value="married">Married / Civil partner</option>
+                </select>
+              </div>
+              <div class="tool-field">
+                <label>Employment type</label>
+                <select id="sal-emptype">
+                  <option value="employee">Employee</option>
+                  <option value="self">Self-employed / Freelance</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="tool-result">
+              <div style="display:flex;gap:2em;flex-wrap:wrap;">
+                <div>
+                  <div class="result-big" id="sal-net">—</div>
+                  <div class="result-label">Net / year</div>
+                </div>
+                <div>
+                  <div class="result-big" id="sal-net-month">—</div>
+                  <div class="result-label">Net / month</div>
+                </div>
+                <div>
+                  <div class="result-big" id="sal-eff-rate">—</div>
+                  <div class="result-label">Effective tax + SS rate</div>
+                </div>
+              </div>
+              <div class="salary-bar" id="sal-bar" style="margin-top:1.2em;"></div>
+              <div class="salary-legend">
+                <span class="l-net">Net take-home</span>
+                <span class="l-tax">Income tax</span>
+                <span class="l-ss">Social security</span>
+              </div>
+              <div style="overflow-x:auto;margin-top:1em;">
+                <table class="tool-table" id="sal-table">
+                  <thead><tr><th>Component</th><th>Amount / yr</th><th>%</th></tr></thead>
+                  <tbody id="sal-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="tool-note" id="sal-note">Figures are approximations. Tax brackets updated for 2024/2025 where available. Does not account for individual deductions, bonuses, or specific circumstances. Switzerland: cantonal/municipal rates vary; major cantons included. US: federal + FICA only.</div>
+          </div>
+        </div>
+
+        <!-- ════════════════════════════════
+             CURRENCY CONVERTER
+             ════════════════════════════════ -->
+        <div class="tool-panel" id="tool-currency">
+          <div class="tool-card">
+            <div class="tool-header">
+              <h2>Currency Converter</h2>
+              <div class="tool-meta">v1.0 · Rates: ECB via frankfurter.app · updated daily</div>
+            </div>
+            <div class="tool-row">
+              <div class="tool-field">
+                <label>Amount</label>
+                <input type="number" id="cur-amount" value="1000" step="1" min="0">
+              </div>
+              <div class="tool-field">
+                <label>From</label>
+                <select id="cur-from">
+                  <option value="EUR">EUR — Euro</option>
+                  <option value="USD">USD — US Dollar</option>
+                  <option value="CHF" selected>CHF — Swiss Franc</option>
+                  <option value="GBP">GBP — British Pound</option>
+                  <option value="JPY">JPY — Japanese Yen</option>
+                  <option value="SEK">SEK — Swedish Krona</option>
+                  <option value="NOK">NOK — Norwegian Krone</option>
+                  <option value="DKK">DKK — Danish Krone</option>
+                  <option value="CAD">CAD — Canadian Dollar</option>
+                  <option value="AUD">AUD — Australian Dollar</option>
+                  <option value="CNY">CNY — Chinese Yuan</option>
+                  <option value="KRW">KRW — South Korean Won</option>
+                  <option value="PLN">PLN — Polish Zloty</option>
+                </select>
+              </div>
+            </div>
+            <div id="cur-loading" style="color:#aaa;font-size:0.88em;margin-top:0.8em;">Loading rates…</div>
+            <div class="currency-grid" id="cur-grid" style="display:none;"></div>
+            <div class="tool-note" id="cur-updated"></div>
+          </div>
+        </div>
+
+        <!-- ════════════════════════════════
+             WEATHER
+             ════════════════════════════════ -->
+        <div class="tool-panel" id="tool-weather">
+          <div class="tool-card">
+            <div class="tool-header">
+              <h2>Weather</h2>
+              <div class="tool-meta">Open-Meteo API · UV & AQI included · auto-refresh 30 min</div>
+            </div>
+            <div id="tw-grid">
+              <div class="tw-slot">
+                <select class="tw-sel" id="tw-sel-0" data-slot="0"></select>
+                <div class="tw-main"><span class="tw-emoji" id="tw-emoji-0">⏳</span><span class="tw-temp" id="tw-temp-0">—</span></div>
+                <div class="tw-city"  id="tw-city-0">Zürich 🇨🇭</div>
+                <div class="tw-desc"  id="tw-desc-0">Loading…</div>
+                <div class="tw-extra" id="tw-extra-0"></div>
+                <div class="tw-uvaqi" id="tw-uvaqi-0"></div>
+              </div>
+              <div class="tw-slot">
+                <select class="tw-sel" id="tw-sel-1" data-slot="1"></select>
+                <div class="tw-main"><span class="tw-emoji" id="tw-emoji-1">⏳</span><span class="tw-temp" id="tw-temp-1">—</span></div>
+                <div class="tw-city"  id="tw-city-1">Cesenatico 🇮🇹</div>
+                <div class="tw-desc"  id="tw-desc-1">Loading…</div>
+                <div class="tw-extra" id="tw-extra-1"></div>
+                <div class="tw-uvaqi" id="tw-uvaqi-1"></div>
+              </div>
+              <div class="tw-slot">
+                <select class="tw-sel" id="tw-sel-2" data-slot="2"></select>
+                <div class="tw-main"><span class="tw-emoji" id="tw-emoji-2">⏳</span><span class="tw-temp" id="tw-temp-2">—</span></div>
+                <div class="tw-city"  id="tw-city-2">Sapporo 🇯🇵</div>
+                <div class="tw-desc"  id="tw-desc-2">Loading…</div>
+                <div class="tw-extra" id="tw-extra-2"></div>
+                <div class="tw-uvaqi" id="tw-uvaqi-2"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════════════════════════════════
+             COLOR TOOLS
+             ════════════════════════════════ -->
+        <div class="tool-panel" id="tool-color">
+          <div class="tool-card">
+            <div class="tool-header">
+              <h2>Color Tools</h2>
+              <div class="tool-meta">v1.0 · Mar 2026 — RGB ↔ HEX ↔ HSL + WCAG contrast</div>
+            </div>
+            <div class="tool-row">
+              <div class="tool-field">
+                <label>HEX</label>
+                <input type="text" id="col-hex" value="#54575A" maxlength="7" style="font-family:monospace;" onclick="this.select()" placeholder="#rrggbb" autocomplete="off" spellcheck="false">
+              </div>
+              <div class="tool-field">
+                <label>R (0–255)</label>
+                <input type="number" id="col-r" min="0" max="255" value="84" onclick="this.select()">
+              </div>
+              <div class="tool-field">
+                <label>G (0–255)</label>
+                <input type="number" id="col-g" min="0" max="255" value="87" onclick="this.select()">
+              </div>
+              <div class="tool-field">
+                <label>B (0–255)</label>
+                <input type="number" id="col-b" min="0" max="255" value="90" onclick="this.select()">
+              </div>
+              <div class="tool-field" style="flex-basis:100%;">
+                <label>RGB paste</label>
+                <input type="text" id="col-rgb-in" placeholder="rgb(84, 87, 90) or 84,87,90" autocomplete="off" spellcheck="false" style="font-family:monospace;">
+              </div>
+            </div>
+            <div class="color-preview" id="col-preview"></div>
+            <div class="tool-result">
+              <div style="font-size:0.74em;color:#bbb;margin-bottom:0.5em;">Click any value to copy</div>
+              <div class="result-grid">
+                <div class="result-cell col-copyable" title="Click to copy" style="cursor:pointer;"><div class="rc-val" id="col-out-hex">—</div><div class="rc-lbl">HEX</div></div>
+                <div class="result-cell col-copyable" title="Click to copy" style="cursor:pointer;"><div class="rc-val" id="col-out-hsl">—</div><div class="rc-lbl">HSL</div></div>
+                <div class="result-cell col-copyable" title="Click to copy" style="cursor:pointer;"><div class="rc-val" id="col-out-rgb">—</div><div class="rc-lbl">RGB</div></div>
+                <div class="result-cell col-copyable" title="Click to copy" style="cursor:pointer;"><div class="rc-val" id="col-out-lum">—</div><div class="rc-lbl">Luminance</div></div>
+              </div>
+              <div style="margin-top:1em;font-size:0.84em;color:#666;">
+                <strong>WCAG Contrast</strong> (vs white / vs black)
+                <div style="margin-top:0.5em;">
+                  <span class="contrast-badge" id="col-vs-white-badge">—</span> vs white: <span id="col-vs-white">—</span>
+                  &nbsp;&nbsp;
+                  <span class="contrast-badge" id="col-vs-black-badge">—</span> vs black: <span id="col-vs-black">—</span>
+                </div>
+                <div style="margin-top:0.6em;display:flex;gap:1.2em;align-items:center;">
+                  <span style="font-size:0.9em;color:#888;">Text preview:</span>
+                  <span id="col-text-on-white" style="padding:0.2em 0.6em;border-radius:4px;background:#fff;border:1px solid #eee;font-weight:600;">Aa</span>
+                  <span id="col-text-on-black" style="padding:0.2em 0.6em;border-radius:4px;background:#000;font-weight:600;color:#fff;">Aa</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════════════════════════════════
+             COST OF LIVING
+             ════════════════════════════════ -->
+        <div class="tool-panel" id="tool-col">
+          <div class="tool-card">
+            <div class="tool-header">
+              <h2>Cost of Living</h2>
+              <div class="tool-meta">v1.0 · Mar 2026 · Monthly estimates · Numbeo &amp; local sources 2024/2025</div>
+            </div>
+            <div class="tool-row" style="align-items:flex-end;flex-wrap:wrap;">
+              <div class="tool-field">
+                <label>City</label>
+                <select id="col-city">
+                  <option value="milan">🇮🇹 Milan</option>
+                  <option value="zurich" selected>🇨🇭 Zürich</option>
+                  <option value="munich">🇩🇪 München</option>
+                  <option value="london">🇬🇧 London</option>
+                  <option value="paris">🇫🇷 Paris</option>
+                  <option value="malaga">🇪🇸 Malaga</option>
+                  <option value="amsterdam">🇳🇱 Amsterdam</option>
+                </select>
+              </div>
+              <div class="tool-field">
+                <label>Rent</label>
+                <div class="tool-toggle" id="col-rent-toggle">
+                  <button class="active" data-rent="center">City centre</button>
+                  <button data-rent="outside">Outside centre</button>
+                </div>
+              </div>
+              <div class="tool-field">
+                <label>Situation</label>
+                <div class="tool-toggle" id="col-mode-toggle">
+                  <button class="active" data-mode="single">Single</button>
+                  <button data-mode="couple">Couple</button>
+                </div>
+              </div>
+            </div>
+            <div class="tool-result" id="col-result" style="margin-top:1em;"></div>
+
+            <details style="margin-top:1.2em;">
+              <summary style="cursor:pointer;font-size:0.85em;color:#888;font-weight:500;padding:0.3em 0;">▸ Compare two cities</summary>
+              <div class="tool-row" style="margin-top:0.8em;">
+                <div class="tool-field">
+                  <label>City A</label>
+                  <select id="col-cmp-a">
+                    <option value="milan">🇮🇹 Milan</option>
+                    <option value="zurich" selected>🇨🇭 Zürich</option>
+                    <option value="munich">🇩🇪 München</option>
+                    <option value="london">🇬🇧 London</option>
+                    <option value="paris">🇫🇷 Paris</option>
+                    <option value="malaga">🇪🇸 Malaga</option>
+                    <option value="amsterdam">🇳🇱 Amsterdam</option>
+                  </select>
+                </div>
+                <div class="tool-field">
+                  <label>City B</label>
+                  <select id="col-cmp-b">
+                    <option value="milan">🇮🇹 Milan</option>
+                    <option value="zurich">🇨🇭 Zürich</option>
+                    <option value="munich">🇩🇪 München</option>
+                    <option value="london" selected>🇬🇧 London</option>
+                    <option value="paris">🇫🇷 Paris</option>
+                    <option value="malaga">🇪🇸 Malaga</option>
+                    <option value="amsterdam">🇳🇱 Amsterdam</option>
+                  </select>
+                </div>
+              </div>
+              <div style="overflow-x:auto;margin-top:0.6em;" id="col-cmp-result"></div>
+            </details>
+
+            <div class="tool-note">Monthly estimates. Significant variation depending on lifestyle, neighbourhood, and individual choices. Zürich costs in CHF (approx. parity to EUR). Data: Numbeo &amp; local sources, 2024/2025.</div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       JAVASCRIPT
+       ══════════════════════════════════════════════ -->
+  <script>
+  // ── Tool navigation + URL params ─────────────────────────
+  (function () {
+    var items = document.querySelectorAll('.tool-nav-item');
+    var panels = document.querySelectorAll('.tool-panel');
+
+    function showTool(id) {
+      items.forEach(function (b) { b.classList.toggle('active', b.dataset.tool === id); });
+      panels.forEach(function (p) { p.classList.toggle('active', p.id === 'tool-' + id); });
+      history.replaceState(null, '', '?tool=' + id);
+    }
+
+    items.forEach(function (b) {
+      b.addEventListener('click', function () { showTool(b.dataset.tool); });
+    });
+
+    var params = new URLSearchParams(window.location.search);
+    var initial = params.get('tool') || 'running';
+    showTool(initial);
+  })();
+  </script>
+
+  <script>
+  // ── Running Tools v2 ─────────────────────────────────────
+  (function () {
+    var KM_PER_MI = 1.60934;
+    var DISTANCES = [
+      { label: '100 m',      km: 0.1      },
+      { label: '200 m',      km: 0.2      },
+      { label: '400 m',      km: 0.4      },
+      { label: '800 m',      km: 0.8      },
+      { label: '1 km',       km: 1.0      },
+      { label: '1500 m',     km: 1.5      },
+      { label: '1 mile',     km: 1.60934  },
+      { label: '3 km',       km: 3.0      },
+      { label: '5 km',       km: 5.0      },
+      { label: '10 km',      km: 10.0     },
+      { label: '15 km',      km: 15.0     },
+      { label: '20 km',      km: 20.0     },
+      { label: '½ marathon', km: 21.0975  },
+      { label: '30 km',      km: 30.0     },
+      { label: 'Marathon',   km: 42.195   }
+    ];
+
+    function fmtPace(secPerKm) {
+      if (!secPerKm || secPerKm <= 0 || !isFinite(secPerKm)) return '—';
+      var m = Math.floor(secPerKm / 60);
+      var s = Math.round(secPerKm % 60);
+      if (s === 60) { s = 0; m++; }
+      return m + ':' + String(s).padStart(2, '0');
+    }
+
+    function fmtTime(totalSec) {
+      if (!totalSec || totalSec <= 0) return '—';
+      var h = Math.floor(totalSec / 3600);
+      var m = Math.floor((totalSec % 3600) / 60);
+      var s = Math.round(totalSec % 60);
+      if (s === 60) { s = 0; m++; }
+      if (m === 60) { m = 0; h++; }
+      if (h > 0) return h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+      return m + ':' + String(s).padStart(2, '0');
+    }
+
+    function parsePace(str) {
+      var parts = (str || '').trim().split(':');
+      if (parts.length !== 2) return null;
+      var m = parseInt(parts[0]), s = parseFloat(parts[1]);
+      if (isNaN(m) || isNaN(s) || m < 0 || s < 0) return null;
+      return m * 60 + s;
+    }
+
+    function parseTime(str) {
+      var parts = (str || '').trim().split(':');
+      if (parts.length === 3) {
+        var h = parseInt(parts[0]), m2 = parseInt(parts[1]), s2 = parseFloat(parts[2]);
+        if (isNaN(h) || isNaN(m2) || isNaN(s2)) return null;
+        return h * 3600 + m2 * 60 + s2;
+      } else if (parts.length === 2) {
+        var m3 = parseInt(parts[0]), s3 = parseFloat(parts[1]);
+        if (isNaN(m3) || isNaN(s3)) return null;
+        return m3 * 60 + s3;
+      }
+      return null;
+    }
+
+    // Populate split distance selector
+    var distSel = document.getElementById('run-split-dist');
+    DISTANCES.forEach(function (d) {
+      var opt = document.createElement('option');
+      opt.value = d.km;
+      opt.textContent = d.label;
+      if (d.km === 5.0) opt.selected = true;
+      distSel.appendChild(opt);
+    });
+
+    var _lock = false;
+    function updateFromSecPerKm(sPerKm, source) {
+      if (_lock || !sPerKm || sPerKm <= 0 || !isFinite(sPerKm)) return;
+      _lock = true;
+      var kmh = 3600 / sPerKm;
+      var sPerMi = sPerKm * KM_PER_MI;
+      var distKm = parseFloat(distSel.value) || 5.0;
+
+      if (source !== 'pace-km') document.getElementById('run-pace-km').value    = fmtPace(sPerKm);
+      if (source !== 'speed')   document.getElementById('run-speed-kmh').value  = kmh.toFixed(2);
+      if (source !== 'pace-mi') document.getElementById('run-pace-mi').value    = fmtPace(sPerMi);
+      if (source !== 'split')   document.getElementById('run-split-time').value = fmtTime(sPerKm * distKm);
+
+      var grid = document.getElementById('run-splits');
+      grid.innerHTML = '';
+      DISTANCES.forEach(function (d) {
+        var cell = document.createElement('div');
+        cell.className = 'result-cell';
+        cell.innerHTML = '<div class="rc-val">' + fmtTime(sPerKm * d.km) + '</div>'
+          + '<div class="rc-lbl">' + d.label + '</div>';
+        grid.appendChild(cell);
+      });
+      _lock = false;
+    }
+
+    document.getElementById('run-pace-km').addEventListener('change', function () {
+      var sec = parsePace(this.value);
+      if (sec && sec > 0) updateFromSecPerKm(sec, 'pace-km');
+    });
+    document.getElementById('run-speed-kmh').addEventListener('input', function () {
+      var kmh = parseFloat(this.value);
+      if (kmh && kmh > 0) updateFromSecPerKm(3600 / kmh, 'speed');
+    });
+    document.getElementById('run-pace-mi').addEventListener('change', function () {
+      var sec = parsePace(this.value);
+      if (sec && sec > 0) updateFromSecPerKm(sec / KM_PER_MI, 'pace-mi');
+    });
+    document.getElementById('run-split-time').addEventListener('change', function () {
+      var totalSec = parseTime(this.value);
+      var distKm = parseFloat(distSel.value) || 5.0;
+      if (totalSec && totalSec > 0 && distKm > 0) updateFromSecPerKm(totalSec / distKm, 'split');
+    });
+    distSel.addEventListener('change', function () {
+      var sec = parsePace(document.getElementById('run-pace-km').value);
+      if (sec && sec > 0) updateFromSecPerKm(sec, 'pace-km');
+    });
+
+    updateFromSecPerKm(300, null); // init 5:00 /km
+
+    // ── VO2max ──────────────────────────────────────────────
+    document.getElementById('run-vo2-calc').addEventListener('click', function () {
+      var distKm  = parseFloat(document.getElementById('run-vo2-dist').value) || 0;
+      var timeSec = parseTime(document.getElementById('run-vo2-time').value);
+      var gender  = document.getElementById('run-vo2-gender').value;
+      var el = document.getElementById('run-vo2-result');
+      if (!distKm || !timeSec || timeSec <= 0) { el.style.display='none'; return; }
+
+      var timeMin = timeSec / 60;
+      var vel     = distKm * 1000 / timeSec * 60; // m/min
+      var pctVO2  = 0.8 + 0.1894393 * Math.exp(-0.012778 * timeMin) + 0.2989558 * Math.exp(-0.1932605 * timeMin);
+      var VO2     = -4.60 + 0.182258 * vel + 0.000104 * vel * vel;
+      var VO2max  = VO2 / pctVO2;
+
+      // Classification norms (ml/kg/min)
+      var norms = gender === 'M'
+        ? [[30,'Poor'],[40,'Below average'],[48,'Average'],[56,'Good'],[65,'Excellent'],[Infinity,'Elite']]
+        : [[24,'Poor'],[31,'Below average'],[38,'Average'],[46,'Good'],[55,'Excellent'],[Infinity,'Elite']];
+      var cls = 'Elite';
+      for (var i = 0; i < norms.length; i++) {
+        if (VO2max < norms[i][0]) { cls = norms[i][1]; break; }
+      }
+
+      el.style.display = '';
+      el.innerHTML = '<div style="display:flex;gap:2em;flex-wrap:wrap;">'
+        + '<div><div class="result-big">' + VO2max.toFixed(1) + '</div><div class="result-label">mL · kg⁻¹ · min⁻¹</div></div>'
+        + '<div><div class="result-big">' + cls + '</div><div class="result-label">Classification (' + (gender==='M'?'male':'female') + ')</div></div>'
+        + '</div>';
+    });
+
+    // ── Race Predictor (Riegel) ──────────────────────────────
+    document.getElementById('run-pred-calc').addEventListener('click', function () {
+      var refKm  = parseFloat(document.getElementById('run-pred-dist').value) || 0;
+      var refSec = parseTime(document.getElementById('run-pred-time').value);
+      if (!refKm || !refSec || refSec <= 0) return;
+
+      var tbody = document.getElementById('run-pred-tbody');
+      tbody.innerHTML = '';
+      DISTANCES.forEach(function (d) {
+        var predSec = refSec * Math.pow(d.km / refKm, 1.06);
+        var tr = document.createElement('tr');
+        if (Math.abs(d.km - refKm) < 0.001) tr.style.fontWeight = '700';
+        tr.innerHTML = '<td>' + d.label + '</td>'
+          + '<td>' + fmtTime(predSec) + '</td>'
+          + '<td>' + fmtPace(predSec / d.km) + '</td>';
+        tbody.appendChild(tr);
+      });
+      document.getElementById('run-pred-table').style.display = '';
+    });
+
+  })();
+  </script>
+
+  <script>
+  // ── FIRE Calculator ───────────────────────────────────────
+  (function () {
+    function fmt(n, cur) {
+      return (cur || '') + Math.round(n).toLocaleString('en-CH');
+    }
+
+    function calc() {
+      var salary       = parseFloat(document.getElementById('fire-salary').value) || 0;
+      var salGrowth    = (parseFloat(document.getElementById('fire-salary-growth').value) || 0) / 100;
+      var taxRate      = (parseFloat(document.getElementById('fire-tax').value) || 0) / 100;
+      var col          = parseFloat(document.getElementById('fire-col').value) || 0;
+      var health       = parseFloat(document.getElementById('fire-health').value) || 0;
+      var inflation    = (parseFloat(document.getElementById('fire-inflation').value) || 0) / 100;
+      var returnRate   = (parseFloat(document.getElementById('fire-return').value) || 0) / 100;
+      var cgt          = (parseFloat(document.getElementById('fire-cgt').value) || 0) / 100;
+      var invTax       = (parseFloat(document.getElementById('fire-inv-tax').value) || 0) / 100;
+      var safety       = (parseFloat(document.getElementById('fire-safety').value) || 0) / 100;
+      var oneoff       = parseFloat(document.getElementById('fire-oneoff').value) || 0;
+      var years        = Math.min(parseInt(document.getElementById('fire-years').value) || 20, 50);
+      var mode         = document.getElementById('fire-mode').value;
+      var cur          = document.getElementById('fire-currency').value + ' ';
+      var colMultiplier = mode === 'couple' ? 1.6 : 1; // couple shares fixed costs ~60% more
+
+      var portfolio = oneoff;
+      var inflFactor = 1;
+      var fireYear = null;
+      var tbody = document.getElementById('fire-tbody');
+      tbody.innerHTML = '';
+
+      for (var y = 0; y < years; y++) {
+        if (y > 0) {
+          salary     *= (1 + salGrowth);
+          inflFactor *= (1 + inflation);
+        }
+        var netIncome   = salary * (1 - taxRate);
+        var livingCost  = (col + health) * colMultiplier * inflFactor;
+        var savings     = netIncome - livingCost;
+        portfolio = portfolio * (1 + returnRate) + savings;
+        var passive     = portfolio * returnRate * (1 - cgt - invTax);
+        var required    = livingCost * (1 + safety);
+        var isFire      = passive >= required && portfolio > 0;
+
+        if (isFire && fireYear === null) fireYear = y + 1;
+
+        var tr = document.createElement('tr');
+        if (isFire) tr.className = 'fire-year';
+        tr.innerHTML = '<td>Y' + (y + 1) + '</td>'
+          + '<td>' + fmt(salary, cur) + '</td>'
+          + '<td>' + fmt(netIncome, cur) + '</td>'
+          + '<td>' + fmt(savings, cur) + '</td>'
+          + '<td>' + fmt(portfolio, cur) + '</td>'
+          + '<td>' + fmt(passive, cur) + '</td>'
+          + '<td>' + (isFire ? '🔥 FIRE' : '💻 keep going') + '</td>';
+        tbody.appendChild(tr);
+      }
+
+      var summary = document.getElementById('fire-summary');
+      if (fireYear) {
+        summary.style.display = '';
+        document.getElementById('fire-year-display').textContent = 'Year ' + fireYear;
+        // re-calculate portfolio at fire year for display
+        var rows = tbody.querySelectorAll('tr');
+        var fireRow = rows[fireYear - 1];
+        if (fireRow) {
+          var cells = fireRow.querySelectorAll('td');
+          document.getElementById('fire-portfolio-display').textContent = cells[4].textContent;
+          document.getElementById('fire-passive-display').textContent = cells[5].textContent;
+        }
+      } else {
+        summary.style.display = 'none';
+      }
+    }
+
+    document.querySelectorAll('#tool-fire input, #tool-fire select').forEach(function (el) {
+      el.addEventListener('input', calc);
+    });
+    calc();
+  })();
+  </script>
+
+  <script>
+  // ── Net Salary Calculator ─────────────────────────────────
+  (function () {
+
+    // Data: { brackets: [[upTo, rate], ...], ss: [[upTo, rate], ...], currency, note }
+    // ss = social security (employee side)
+    // brackets are marginal on taxable income
+    var TAX_DATA = {
+      IT: {
+        currency: 'EUR', label: 'Italy',
+        calc: function (gross, status, emptype) {
+          // INPS employee
+          var inps = Math.min(gross, 47379) * 0.0919 + Math.max(0, gross - 47379) * 0.0000;
+          // IRPEF base (gross - employee INPS is deductible)
+          var base = gross - inps;
+          // IRPEF
+          var irpef = 0;
+          if (base <= 28000)      irpef = base * 0.23;
+          else if (base <= 50000) irpef = 28000 * 0.23 + (base - 28000) * 0.35;
+          else                    irpef = 28000 * 0.23 + 22000 * 0.35 + (base - 50000) * 0.43;
+          // Detrazione lavoro dipendente
+          var det = 0;
+          if (emptype === 'employee') {
+            if (base <= 15000)      det = 1955;
+            else if (base <= 28000) det = 1910 + 1190 * (28000 - base) / 13000;
+            else if (base <= 50000) det = 1910 * (50000 - base) / 22000;
+          }
+          irpef = Math.max(0, irpef - det);
+          // Addizionali
+          var addReg = base * 0.0173;
+          var addCom = base * 0.005;
+          var totalTax = irpef + addReg + addCom;
+          var net = gross - inps - totalTax;
+          return { net: net, tax: totalTax, ss: inps,
+            rows: [
+              ['Gross', gross, '100%'],
+              ['INPS (employee)', -inps, pct(inps,gross)],
+              ['IRPEF', -irpef, pct(irpef,gross)],
+              ['Regional + Municipal addizionale', -(addReg+addCom), pct(addReg+addCom,gross)],
+              ['Net', net, pct(net,gross)]
+            ]
+          };
+        }
+      },
+      CH: {
+        currency: 'CHF', label: 'Switzerland',
+        regions: ['Zürich','Zug','Geneva','Bern','Basel-Stadt','Vaud','Ticino','Lucerne','Aargau','St. Gallen'],
+        calc: function (gross, status, emptype, region) {
+          // Social security (employee)
+          var ahv = gross * 0.053;
+          var alv = Math.min(gross, 148200) * 0.011;
+          var nbuv = gross * 0.013;
+          var bvg = gross * 0.07; // simplified BVG
+          var ss = ahv + alv + nbuv + bvg;
+          // Income tax: federal + cantonal approximate effective rate by income
+          var taxRates = {
+            'Zürich':      [[50000,0.10],[75000,0.14],[100000,0.185],[150000,0.23],[200000,0.265],[300000,0.305]],
+            'Zug':         [[50000,0.07],[75000,0.10],[100000,0.13],[150000,0.165],[200000,0.195],[300000,0.23]],
+            'Geneva':      [[50000,0.17],[75000,0.23],[100000,0.28],[150000,0.34],[200000,0.37],[300000,0.41]],
+            'Bern':        [[50000,0.13],[75000,0.18],[100000,0.22],[150000,0.275],[200000,0.31],[300000,0.36]],
+            'Basel-Stadt': [[50000,0.12],[75000,0.17],[100000,0.215],[150000,0.27],[200000,0.305],[300000,0.35]],
+            'Vaud':        [[50000,0.15],[75000,0.20],[100000,0.255],[150000,0.32],[200000,0.355],[300000,0.39]],
+            'Ticino':      [[50000,0.11],[75000,0.155],[100000,0.20],[150000,0.25],[200000,0.285],[300000,0.325]],
+            'Lucerne':     [[50000,0.10],[75000,0.15],[100000,0.185],[150000,0.23],[200000,0.265],[300000,0.305]],
+            'Aargau':      [[50000,0.10],[75000,0.145],[100000,0.18],[150000,0.225],[200000,0.26],[300000,0.30]],
+            'St. Gallen':  [[50000,0.105],[75000,0.15],[100000,0.185],[150000,0.23],[200000,0.265],[300000,0.305]]
+          };
+          var table = taxRates[region] || taxRates['Zürich'];
+          var incomeTax = gross * interpolate(table, gross);
+          var net = gross - ss - incomeTax;
+          return { net: net, tax: incomeTax, ss: ss,
+            rows: [
+              ['Gross', gross, '100%'],
+              ['AHV/IV/EO', -ahv, pct(ahv,gross)],
+              ['ALV (unemployment)', -alv, pct(alv,gross)],
+              ['NBUV (accident ins.)', -nbuv, pct(nbuv,gross)],
+              ['BVG pension (approx)', -bvg, pct(bvg,gross)],
+              ['Income tax (fed+can+mun approx)', -incomeTax, pct(incomeTax,gross)],
+              ['Net', net, pct(net,gross)]
+            ]
+          };
+        }
+      },
+      DE: {
+        currency: 'EUR', label: 'Germany',
+        calc: function (gross) {
+          // Social security employee: pension 9.3%, health 7.3%+0.85avg, unemployment 1.3%, care 1.7%
+          var ss = gross * (0.093 + 0.0815 + 0.013 + 0.017);
+          // Income tax (progressive, simplified Grundfreibetrag 11604)
+          var taxable = Math.max(0, gross - 11604);
+          var tax = 0;
+          if (taxable <= 0) tax = 0;
+          else if (taxable <= 15999) tax = (979.18 * taxable / 10000 + 1400) * taxable / 10000;
+          else if (taxable <= 62809) tax = (192.59 * (taxable - 16000) / 10000 + 2397) * (taxable - 16000) / 10000 + 950.96;
+          else if (taxable <= 277825) tax = taxable * 0.42 - 9972.98;
+          else                        tax = taxable * 0.45 - 18307.73;
+          // Solidaritätszuschlag (only if tax > 18130/year for single - simplified: applies rarely now)
+          var soli = tax > 18130 ? tax * 0.055 : 0;
+          var totalTax = tax + soli;
+          var net = gross - ss - totalTax;
+          return { net: net, tax: totalTax, ss: ss,
+            rows: [
+              ['Gross', gross, '100%'],
+              ['Social security (employee)', -ss, pct(ss,gross)],
+              ['Income tax (Lohnsteuer)', -tax, pct(tax,gross)],
+              ['Solidaritätszuschlag', -soli, pct(soli,gross)],
+              ['Net', net, pct(net,gross)]
+            ]
+          };
+        }
+      },
+      FR: {
+        currency: 'EUR', label: 'France',
+        calc: function (gross) {
+          // Charges sociales salarié ~22% (CSG+CRDS ~9.7% + retraite ~6.9% + assur ~0.75% + chômage 0% + complém ~3.15%)
+          var ss = gross * 0.22;
+          // Net fiscal = gross * 0.9 (abattement 10%, capped at ~14171)
+          var abat = Math.min(gross * 0.10, 14171);
+          var taxable = Math.max(0, gross - abat - ss * 0.985); // CSG/CRDS partially deductible
+          // IR brackets 2024
+          var tax = 0;
+          if (taxable <= 11294)       tax = 0;
+          else if (taxable <= 28797)  tax = (taxable - 11294) * 0.11;
+          else if (taxable <= 82341)  tax = (28797-11294)*0.11 + (taxable-28797)*0.30;
+          else if (taxable <= 177106) tax = (28797-11294)*0.11 + (82341-28797)*0.30 + (taxable-82341)*0.41;
+          else                        tax = (28797-11294)*0.11 + (82341-28797)*0.30 + (177106-82341)*0.41 + (taxable-177106)*0.45;
+          var net = gross - ss - tax;
+          return { net: net, tax: tax, ss: ss,
+            rows: [
+              ['Gross', gross, '100%'],
+              ['Charges sociales salarié (~22%)', -ss, pct(ss,gross)],
+              ['Impôt sur le revenu', -tax, pct(tax,gross)],
+              ['Net', net, pct(net,gross)]
+            ]
+          };
+        }
+      },
+      GB: {
+        currency: 'GBP', label: 'United Kingdom',
+        calc: function (gross, status) {
+          // Personal allowance (reduces above 100k)
+          var pa = gross > 125140 ? 0 : Math.max(0, 12570 - Math.max(0, gross - 100000) / 2);
+          var taxable = Math.max(0, gross - pa);
+          var tax = 0;
+          if (taxable <= 37700)      tax = taxable * 0.20;
+          else if (taxable <= 125140) tax = 37700*0.20 + (taxable-37700)*0.40;
+          else                        tax = 37700*0.20 + (125140-37700-pa)*0.40 + (taxable-(125140-pa))*0.45;
+          // National Insurance (employee) annual: 8% on 12570-50270, 2% above
+          var ni = 0;
+          if (gross > 12570) {
+            ni += Math.min(gross, 50270) * 0.08 - 12570 * 0.08;
+            if (gross > 50270) ni += (gross - 50270) * 0.02;
+          }
+          var net = gross - tax - ni;
+          return { net: net, tax: tax, ss: ni,
+            rows: [
+              ['Gross', gross, '100%'],
+              ['National Insurance (employee)', -ni, pct(ni,gross)],
+              ['Income Tax', -tax, pct(tax,gross)],
+              ['Net', net, pct(net,gross)]
+            ]
+          };
+        }
+      },
+      IE: {
+        currency: 'EUR', label: 'Ireland',
+        calc: function (gross, status) {
+          var cutoff = status === 'married' ? 51000 : 42000;
+          var tax = 0;
+          if (gross <= cutoff) tax = gross * 0.20;
+          else                  tax = cutoff * 0.20 + (gross - cutoff) * 0.40;
+          // Tax credits
+          tax = Math.max(0, tax - 1875 - (gross > 8000 ? 1875 : 0)); // personal + PAYE credits
+          // USC
+          var usc = 0;
+          if (gross > 13000) {
+            usc += Math.min(gross,12012) * 0.005;
+            usc += Math.max(0, Math.min(gross,22920) - 12012) * 0.02;
+            usc += Math.max(0, Math.min(gross,70044) - 22920) * 0.04;
+            usc += Math.max(0, gross - 70044) * 0.08;
+          }
+          // PRSI 4%
+          var prsi = gross > 18304 ? gross * 0.04 : 0;
+          var ss = usc + prsi;
+          var net = gross - tax - ss;
+          return { net: net, tax: tax, ss: ss,
+            rows: [
+              ['Gross', gross, '100%'],
+              ['Income Tax', -tax, pct(tax,gross)],
+              ['USC', -usc, pct(usc,gross)],
+              ['PRSI', -prsi, pct(prsi,gross)],
+              ['Net', net, pct(net,gross)]
+            ]
+          };
+        }
+      },
+      NL: {
+        currency: 'EUR', label: 'Netherlands',
+        calc: function (gross) {
+          // Box 1: 36.97% up to 73032, 49.5% above
+          var tax = gross <= 73032 ? gross * 0.3697 : 73032 * 0.3697 + (gross - 73032) * 0.495;
+          // Tax credits (arbeidskorting + algemene heffingskorting, simplified)
+          var ahk = gross <= 22660 ? 3374 : Math.max(0, 3374 - (gross - 22660) * 0.0636);
+          var ak  = gross <= 39957 ? 5052 : Math.max(0, 5052 - (gross - 39957) * 0.06095);
+          tax = Math.max(0, tax - ahk - ak);
+          var net = gross - tax;
+          return { net: net, tax: tax, ss: 0,
+            rows: [
+              ['Gross', gross, '100%'],
+              ['Loonheffing (incl. social contributions)', -tax, pct(tax, gross)],
+              ['Net', net, pct(net, gross)]
+            ]
+          };
+        }
+      },
+      BE: {
+        currency: 'EUR', label: 'Belgium',
+        calc: function (gross) {
+          var ss = gross * 0.1307;
+          var taxable = gross - ss - gross * 0.05; // professional expense deduction (5%, capped)
+          // Federal brackets + regional ~7%
+          var fed = 0;
+          if (taxable <= 15200)       fed = taxable * 0.25;
+          else if (taxable <= 26830)  fed = 15200*0.25 + (taxable-15200)*0.40;
+          else if (taxable <= 46440)  fed = 15200*0.25 + (26830-15200)*0.40 + (taxable-26830)*0.45;
+          else                        fed = 15200*0.25 + (26830-15200)*0.40 + (46440-26830)*0.45 + (taxable-46440)*0.50;
+          var reg = fed * 0.07; // average regional centimes
+          var tax = fed + reg;
+          var net = gross - ss - tax;
+          return { net: net, tax: tax, ss: ss,
+            rows: [
+              ['Gross', gross, '100%'],
+              ['Social contributions (13.07%)', -ss, pct(ss,gross)],
+              ['Federal income tax', -fed, pct(fed,gross)],
+              ['Regional taxes (~7% of federal)', -reg, pct(reg,gross)],
+              ['Net', net, pct(net,gross)]
+            ]
+          };
+        }
+      },
+      SE: {
+        currency: 'SEK', label: 'Sweden',
+        calc: function (gross) {
+          var pension = gross * 0.07; // allmän pension (employee)
+          var kommunal = (gross - pension) * 0.32; // ~32% kommunalskatt
+          // Statlig skatt (national): 20% above SEK 598500
+          var statlig = gross > 598500 ? (gross - 598500) * 0.20 : 0;
+          // Jobbskatteavdrag (employment tax credit): ~simplified 15% of gross up to 135k SEK
+          var jsd = Math.min(gross * 0.15, 34000);
+          var tax = Math.max(0, kommunal + statlig - jsd);
+          var net = gross - pension - tax;
+          return { net: net, tax: tax, ss: pension,
+            rows: [
+              ['Gross', gross, '100%'],
+              ['Allmän pension (employee 7%)', -pension, pct(pension,gross)],
+              ['Kommunalskatt (~32%)', -kommunal, pct(kommunal,gross)],
+              ['Statlig skatt (>598k SEK)', -statlig, pct(statlig,gross)],
+              ['Jobbskatteavdrag (credit)', +jsd, pct(jsd,gross)],
+              ['Net', net, pct(net,gross)]
+            ]
+          };
+        }
+      },
+      NO: {
+        currency: 'NOK', label: 'Norway',
+        calc: function (gross) {
+          var trygd = gross * 0.078; // trygdeavgift
+          var pa = 88250;
+          var taxable = Math.max(0, gross - pa);
+          // Flat 22% + trinnskatt
+          var flat = taxable * 0.22;
+          var trinn = 0;
+          if (gross > 208050) trinn += Math.min(gross, 292850) * 0.017 - 208050*0.017;
+          if (gross > 292850) trinn += Math.min(gross, 670000) * 0.040 - 292850*0.040;
+          if (gross > 670000) trinn += Math.min(gross, 937900) * 0.136 - 670000*0.136;
+          if (gross > 937900) trinn += (gross - 937900) * 0.166;
+          var tax = flat + trinn;
+          var net = gross - trygd - tax;
+          return { net: net, tax: tax, ss: trygd,
+            rows: [
+              ['Gross', gross, '100%'],
+              ['Trygdeavgift (7.8%)', -trygd, pct(trygd,gross)],
+              ['Flat income tax (22%)', -flat, pct(flat,gross)],
+              ['Trinnskatt', -trinn, pct(trinn,gross)],
+              ['Net', net, pct(net,gross)]
+            ]
+          };
+        }
+      },
+      DK: {
+        currency: 'DKK', label: 'Denmark',
+        calc: function (gross) {
+          var am = gross * 0.08; // arbejdsmarkedsbidrag
+          var pa = 49700;
+          var taxable = Math.max(0, gross - am - pa);
+          var bundskat = taxable * 0.1206;
+          var kommuneskat = taxable * 0.254; // ~25.4% average
+          var topskat = gross > 568900 ? (gross - 568900) * 0.15 : 0;
+          var tax = bundskat + kommuneskat + topskat;
+          var net = gross - am - tax;
+          return { net: net, tax: tax, ss: am,
+            rows: [
+              ['Gross', gross, '100%'],
+              ['Arbejdsmarkedsbidrag (8%)', -am, pct(am,gross)],
+              ['Bundskat + kommuneskat', -bundskat-kommuneskat, pct(bundskat+kommuneskat,gross)],
+              ['Topskat (>568k DKK)', -topskat, pct(topskat,gross)],
+              ['Net', net, pct(net,gross)]
+            ]
+          };
+        }
+      },
+      US: {
+        currency: 'USD', label: 'United States (federal)',
+        calc: function (gross, status) {
+          var stdDed = status === 'married' ? 29200 : 14600;
+          var taxable = Math.max(0, gross - stdDed);
+          var brackets = status === 'married'
+            ? [[23200,0.10],[94300,0.12],[201050,0.22],[383900,0.24],[487450,0.32],[731200,0.35]]
+            : [[11600,0.10],[47150,0.12],[100525,0.22],[191950,0.24],[243725,0.32],[609350,0.35]];
+          var tax = 0, prev = 0;
+          brackets.forEach(function(b) {
+            if (taxable > prev) { tax += (Math.min(taxable,b[0])-prev)*b[1]; prev = b[0]; }
+          });
+          if (taxable > (status==='married'?731200:609350)) tax += (taxable - (status==='married'?731200:609350)) * 0.37;
+          // FICA
+          var ssTax = Math.min(gross, 168600) * 0.062;
+          var medicare = gross * 0.0145 + (gross > 200000 ? (gross - 200000) * 0.009 : 0);
+          var ss = ssTax + medicare;
+          var net = gross - tax - ss;
+          return { net: net, tax: tax, ss: ss,
+            rows: [
+              ['Gross', gross, '100%'],
+              ['Social Security (6.2%)', -ssTax, pct(ssTax,gross)],
+              ['Medicare (1.45%+)', -medicare, pct(medicare,gross)],
+              ['Federal income tax', -tax, pct(tax,gross)],
+              ['Net (before state tax)', net, pct(net,gross)]
+            ]
+          };
+        }
+      },
+      JP: {
+        currency: 'JPY', label: 'Japan',
+        calc: function (gross) {
+          // Employment income deduction
+          var eid = 0;
+          if (gross <= 1625000) eid = 550000;
+          else if (gross <= 1800000) eid = gross * 0.4 - 100000;
+          else if (gross <= 3600000) eid = gross * 0.3 + 80000;
+          else if (gross <= 6600000) eid = gross * 0.2 + 440000;
+          else if (gross <= 8500000) eid = gross * 0.1 + 1100000;
+          else eid = 1950000;
+          var basicDed = 480000;
+          var taxable = Math.max(0, gross - eid - basicDed);
+          // National income tax
+          var nat = 0;
+          var natBrackets = [[1950000,0.05],[3300000,0.10],[6950000,0.20],[9000000,0.23],[18000000,0.33],[40000000,0.40]];
+          var prev = 0;
+          natBrackets.forEach(function(b) {
+            if (taxable > prev) { nat += (Math.min(taxable,b[0])-prev)*b[1]; prev = b[0]; }
+          });
+          if (taxable > 40000000) nat += (taxable - 40000000) * 0.45;
+          nat *= 1.021; // restoration surtax
+          // Local tax 10% flat
+          var local = taxable * 0.10;
+          // Social insurance ~15% simplified (health ~5%, pension ~9.15%, employment ~0.6%)
+          var ss = gross * 0.148;
+          var tax = nat + local;
+          var net = gross - ss - tax;
+          return { net: net, tax: tax, ss: ss,
+            rows: [
+              ['Gross', gross, '100%'],
+              ['Social insurance (~14.8%)', -ss, pct(ss,gross)],
+              ['National income tax', -nat, pct(nat,gross)],
+              ['Local tax (10%)', -local, pct(local,gross)],
+              ['Net', net, pct(net,gross)]
+            ]
+          };
+        }
+      },
+      KR: {
+        currency: 'KRW', label: 'South Korea',
+        calc: function (gross) {
+          // Employment income deduction
+          var eid = 0;
+          if (gross <= 5000000) eid = gross * 0.70;
+          else if (gross <= 15000000) eid = 3500000 + (gross-5000000)*0.40;
+          else if (gross <= 45000000) eid = 7500000 + (gross-15000000)*0.15;
+          else if (gross <= 100000000) eid = 12000000 + (gross-45000000)*0.05;
+          else eid = 14750000 + (gross-100000000)*0.02;
+          var taxable = Math.max(0, gross - eid - 1500000); // basic deduction
+          var nat = 0;
+          var brackets = [[14000000,0.06],[50000000,0.15],[88000000,0.24],[150000000,0.35],[300000000,0.38],[500000000,0.40],[1000000000,0.42]];
+          var prev = 0;
+          brackets.forEach(function(b) {
+            if (taxable > prev) { nat += (Math.min(taxable,b[0])-prev)*b[1]; prev = b[0]; }
+          });
+          if (taxable > 1000000000) nat += (taxable-1000000000)*0.45;
+          var local = nat * 0.10;
+          // NPS 4.5%, health 3.545%, employment 0.9%
+          var ss = Math.min(gross, 5530000*12) * 0.045 + gross * (0.03545 + 0.009);
+          var tax = nat + local;
+          var net = gross - ss - tax;
+          return { net: net, tax: tax, ss: ss,
+            rows: [
+              ['Gross', gross, '100%'],
+              ['NPS + Health + Employment ins.', -ss, pct(ss,gross)],
+              ['Income tax (national)', -nat, pct(nat,gross)],
+              ['Local income tax (10%)', -local, pct(local,gross)],
+              ['Net', net, pct(net,gross)]
+            ]
+          };
+        }
+      }
+    };
+
+    // Regions config
+    var REGIONS = {
+      CH: { label: 'Canton', options: ['Zürich','Zug','Geneva','Bern','Basel-Stadt','Vaud','Ticino','Lucerne','Aargau','St. Gallen'] },
+      US: { label: 'State', options: ['Federal only (no state tax)'] }
+    };
+
+    function interpolate(table, x) {
+      if (x <= table[0][0]) return table[0][1];
+      if (x >= table[table.length-1][0]) return table[table.length-1][1];
+      for (var i = 1; i < table.length; i++) {
+        if (x <= table[i][0]) {
+          var t = (x - table[i-1][0]) / (table[i][0] - table[i-1][0]);
+          return table[i-1][1] + t * (table[i][1] - table[i-1][1]);
+        }
+      }
+      return table[table.length-1][1];
+    }
+
+    function pct(n, gross) { return (gross ? (n/gross*100).toFixed(1) : '0.0') + '%'; }
+
+    function fmtCur(n, decimals) {
+      return Math.round(n).toLocaleString('en-CH');
+    }
+
+    function calc() {
+      var gross   = parseFloat(document.getElementById('sal-gross').value) || 0;
+      var country = document.getElementById('sal-country').value;
+      var status  = document.getElementById('sal-status').value;
+      var emptype = document.getElementById('sal-emptype').value;
+      var region  = (document.getElementById('sal-region').value || '');
+
+      var data = TAX_DATA[country];
+      if (!data) return;
+
+      var res;
+      if (country === 'CH') res = data.calc(gross, status, emptype, region || 'Zürich');
+      else                   res = data.calc(gross, status, emptype);
+
+      var cur = data.currency;
+      document.getElementById('sal-net').textContent = cur + ' ' + fmtCur(res.net);
+      document.getElementById('sal-net-month').textContent = cur + ' ' + fmtCur(res.net / 12);
+      var effRate = gross > 0 ? ((res.tax + res.ss) / gross * 100).toFixed(1) + '%' : '—';
+      document.getElementById('sal-eff-rate').textContent = effRate;
+
+      // Bar
+      var bar = document.getElementById('sal-bar');
+      var netPct  = Math.max(0, res.net / gross * 100);
+      var taxPct  = Math.max(0, res.tax / gross * 100);
+      var ssPct   = Math.max(0, res.ss / gross * 100);
+      bar.innerHTML = '<div class="salary-bar-net" style="width:' + netPct + '%"></div>'
+        + '<div class="salary-bar-tax" style="width:' + taxPct + '%"></div>'
+        + '<div class="salary-bar-ss" style="width:' + ssPct + '%"></div>';
+
+      // Table
+      var tbody = document.getElementById('sal-tbody');
+      tbody.innerHTML = '';
+      res.rows.forEach(function (row) {
+        var tr = document.createElement('tr');
+        var sign = row[1] < 0 ? '–' : (row[0] === 'Net' ? '' : '+');
+        var color = row[0] === 'Net' ? '#166534' : (row[1] < 0 ? '#991b1b' : '#555');
+        tr.innerHTML = '<td>' + row[0] + '</td>'
+          + '<td style="color:' + color + ';font-weight:' + (row[0]==='Net'?'700':'400') + ';">'
+          + sign + cur + ' ' + fmtCur(Math.abs(row[1])) + '</td>'
+          + '<td style="color:#aaa;">' + row[2] + '</td>';
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Region selector
+    function updateRegion() {
+      var country = document.getElementById('sal-country').value;
+      var field = document.getElementById('sal-region-field');
+      var sel = document.getElementById('sal-region');
+      var cfg = REGIONS[country];
+      if (cfg) {
+        field.style.display = '';
+        document.getElementById('sal-region-label').textContent = cfg.label;
+        sel.innerHTML = '';
+        cfg.options.forEach(function (o) {
+          var opt = document.createElement('option'); opt.value = o; opt.textContent = o;
+          sel.appendChild(opt);
+        });
+      } else {
+        field.style.display = 'none';
+      }
+    }
+
+    document.getElementById('sal-country').addEventListener('change', function () {
+      updateRegion(); calc();
+    });
+    document.querySelectorAll('#tool-salary input, #tool-salary select').forEach(function (el) {
+      el.addEventListener('input', calc);
+    });
+
+    // expose interpolate for CH
+    window._interpolate = interpolate;
+
+    updateRegion();
+    calc();
+  })();
+  </script>
+
+  <script>
+  // ── Currency Converter ────────────────────────────────────
+  (function () {
+    var rates = null;
+    var TARGET_CURRENCIES = ['EUR','USD','CHF','GBP','JPY','SEK','NOK','DKK','CAD','AUD','CNY','KRW','PLN'];
+    var CURRENCY_SYMBOLS = { EUR:'€', USD:'$', CHF:'Fr', GBP:'£', JPY:'¥', SEK:'kr', NOK:'kr', DKK:'kr', CAD:'$', AUD:'$', CNY:'¥', KRW:'₩', PLN:'zł' };
+
+    function render() {
+      if (!rates) return;
+      var amount = parseFloat(document.getElementById('cur-amount').value) || 0;
+      var from = document.getElementById('cur-from').value;
+      var grid = document.getElementById('cur-grid');
+      grid.innerHTML = '';
+      TARGET_CURRENCIES.forEach(function (code) {
+        if (code === from) return;
+        var rate = rates[from] ? (rates[from][code] || null) : null;
+        if (!rate) return;
+        var val = (amount * rate).toLocaleString('en-CH', { maximumFractionDigits: code === 'JPY' || code === 'KRW' ? 0 : 2 });
+        var cell = document.createElement('div');
+        cell.className = 'currency-cell';
+        var sym = CURRENCY_SYMBOLS[code] ? ' ' + CURRENCY_SYMBOLS[code] : '';
+        cell.innerHTML = '<div class="cc-code">' + code + sym + '</div><div class="cc-val">' + val + '</div>';
+        grid.appendChild(cell);
+      });
+    }
+
+    function loadRates() {
+      var from = document.getElementById('cur-from').value;
+      var to = TARGET_CURRENCIES.filter(function(c){return c!==from;}).join(',');
+      fetch('https://api.frankfurter.app/latest?from=' + from + '&to=' + to)
+        .then(function(r){return r.json();})
+        .then(function(data) {
+          if (!rates) rates = {};
+          rates[from] = data.rates;
+          rates[from][from] = 1;
+          document.getElementById('cur-loading').style.display = 'none';
+          document.getElementById('cur-grid').style.display = '';
+          document.getElementById('cur-updated').textContent = 'Rates as of ' + data.date + ' · ECB via frankfurter.app';
+          render();
+        })
+        .catch(function() {
+          document.getElementById('cur-loading').textContent = 'Could not load rates. Check connection.';
+        });
+    }
+
+    document.getElementById('cur-from').addEventListener('change', function () {
+      document.getElementById('cur-loading').style.display = '';
+      document.getElementById('cur-grid').style.display = 'none';
+      loadRates();
+    });
+    document.getElementById('cur-amount').addEventListener('input', render);
+
+    loadRates();
+  })();
+  </script>
+
+  <script>
+  // ── Weather ───────────────────────────────────────────────
+  (function () {
+    var CITIES = {
+      zurich:     { name:'Zürich',     flag:'🇨🇭', lat: 47.3769, lon:   8.5417 },
+      cesenatico: { name:'Cesenatico', flag:'🇮🇹', lat: 44.2006, lon:  12.3919 },
+      munich:     { name:'München',    flag:'🇩🇪', lat: 48.1351, lon:  11.5820 },
+      paris:      { name:'Paris',      flag:'🇫🇷', lat: 48.8566, lon:   2.3522 },
+      seoul:      { name:'Seoul',      flag:'🇰🇷', lat: 37.5665, lon: 126.9780 },
+      vancouver:  { name:'Vancouver',  flag:'🇨🇦', lat: 49.2827, lon:-123.1207 },
+      copenhagen: { name:'Copenhagen', flag:'🇩🇰', lat: 55.6761, lon:  12.5683 },
+      pittsburgh: { name:'Pittsburgh', flag:'🇺🇸', lat: 40.4406, lon: -79.9959 },
+      seattle:    { name:'Seattle',    flag:'🇺🇸', lat: 47.6062, lon:-122.3321 },
+      boston:     { name:'Boston',     flag:'🇺🇸', lat: 42.3601, lon: -71.0589 },
+      vienna:     { name:'Vienna',     flag:'🇦🇹', lat: 48.2082, lon:  16.3738 },
+      perth:      { name:'Perth',      flag:'🇦🇺', lat:-31.9505, lon: 115.8605 },
+      oslo:       { name:'Oslo',       flag:'🇳🇴', lat: 59.9139, lon:  10.7522 },
+      kobe:       { name:'Kobe',       flag:'🇯🇵', lat: 34.6901, lon: 135.1956 },
+      sapporo:    { name:'Sapporo',    flag:'🇯🇵', lat: 43.0618, lon: 141.3545 },
+    };
+    var WMO = {
+      0:'Clear sky',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',
+      45:'Foggy',48:'Icy fog',51:'Light drizzle',53:'Drizzle',55:'Heavy drizzle',
+      61:'Light rain',63:'Rain',65:'Heavy rain',71:'Light snow',73:'Snow',75:'Heavy snow',
+      77:'Snow grains',80:'Light showers',81:'Showers',82:'Violent showers',
+      85:'Snow showers',86:'Heavy snow showers',95:'Thunderstorm',96:'Thunderstorm + hail',99:'Heavy thunderstorm'
+    };
+    var EMOJI = {
+      0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',
+      51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',
+      71:'🌨️',73:'❄️',75:'❄️',77:'🌨️',80:'🌦️',81:'🌧️',82:'⛈️',
+      85:'🌨️',86:'❄️',95:'⛈️',96:'⛈️',99:'⛈️'
+    };
+
+    var twSlots = ['zurich', 'cesenatico', 'sapporo'];
+
+    function uvLabel(v) {
+      if (v == null) return '—';
+      if (v <= 2)  return v.toFixed(1) + ' Low';
+      if (v <= 5)  return v.toFixed(1) + ' Moderate';
+      if (v <= 7)  return v.toFixed(1) + ' High';
+      if (v <= 10) return v.toFixed(1) + ' Very High';
+      return v.toFixed(1) + ' Extreme';
+    }
+    function aqiLabel(v) {
+      if (typeof v !== 'number') return '—';
+      if (v <= 20)  return v + ' Good 🟢';
+      if (v <= 40)  return v + ' Fair 🟡';
+      if (v <= 60)  return v + ' Moderate 🟠';
+      if (v <= 80)  return v + ' Poor 🔴';
+      if (v <= 100) return v + ' Very Poor 🟣';
+      return v + ' Extreme ⚫';
+    }
+
+    function buildOpts(sel, selectedKey) {
+      sel.innerHTML = Object.entries(CITIES).map(function(e) {
+        var k = e[0], c = e[1];
+        return '<option value="' + k + '"' + (k === selectedKey ? ' selected' : '') + '>' + c.name + ' ' + c.flag + '</option>';
+      }).join('');
+    }
+
+    function fetchSlot(i, cityKey) {
+      var c = CITIES[cityKey];
+      document.getElementById('tw-emoji-' + i).textContent = '⏳';
+      document.getElementById('tw-temp-' + i).textContent  = '—';
+      var wxUrl = 'https://api.open-meteo.com/v1/forecast?latitude=' + c.lat + '&longitude=' + c.lon
+        + '&current_weather=true&hourly=relativehumidity_2m,apparent_temperature,uv_index'
+        + '&timezone=auto&forecast_days=1';
+      var aqUrl = 'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=' + c.lat + '&longitude=' + c.lon
+        + '&hourly=european_aqi&timezone=auto&forecast_days=1';
+      fetch(wxUrl).then(function(r){ return r.json(); }).then(function(d) {
+        var cw   = d.current_weather;
+        var code = cw.weathercode;
+        var hour = new Date().getHours();
+        var now  = new Date();
+        var hhmm = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+        var humidity  = (d.hourly && d.hourly.relativehumidity_2m) ? d.hourly.relativehumidity_2m[hour] : '—';
+        var feelsLike = (d.hourly && d.hourly.apparent_temperature && d.hourly.apparent_temperature[hour] != null)
+          ? Math.round(d.hourly.apparent_temperature[hour]) + '°C' : '—';
+        var uv   = (d.hourly && d.hourly.uv_index) ? d.hourly.uv_index[hour] : null;
+        var wind = Math.round(cw.windspeed) + ' km/h';
+        document.getElementById('tw-emoji-' + i).textContent = EMOJI[code] || '🌡️';
+        document.getElementById('tw-temp-'  + i).textContent = Math.round(cw.temperature) + '°C';
+        document.getElementById('tw-city-'  + i).textContent = c.name + ' ' + c.flag;
+        document.getElementById('tw-desc-'  + i).innerHTML   =
+          '<b>' + (WMO[code] || 'Unknown') + '</b> <span style="font-weight:400;opacity:0.6;font-size:0.9em;">at ' + hhmm + '</span>';
+        document.getElementById('tw-extra-' + i).innerHTML   =
+          'Feels like ' + feelsLike + ' &nbsp;·&nbsp; 💨 ' + wind + ' &nbsp;·&nbsp; 💧 ' + humidity + '%';
+        document.getElementById('tw-uvaqi-' + i).innerHTML   =
+          '☀️ UV ' + uvLabel(uv) + ' &nbsp;·&nbsp; 🌬️ AQI …';
+        fetch(aqUrl).then(function(r){ return r.json(); }).then(function(aq) {
+          var aqi = (aq.hourly && aq.hourly.european_aqi) ? aq.hourly.european_aqi[hour] : null;
+          document.getElementById('tw-uvaqi-' + i).innerHTML =
+            '☀️ UV ' + uvLabel(uv) + ' &nbsp;·&nbsp; 🌬️ AQI ' + aqiLabel(aqi);
+        }).catch(function(){});
+      }).catch(function() {
+        document.getElementById('tw-emoji-' + i).textContent = '⚠️';
+        document.getElementById('tw-desc-'  + i).textContent = 'Could not load';
+      });
+    }
+
+    for (var i = 0; i < 3; i++) {
+      (function(idx) {
+        var sel = document.getElementById('tw-sel-' + idx);
+        buildOpts(sel, twSlots[idx]);
+        sel.addEventListener('change', function() {
+          twSlots[idx] = this.value;
+          fetchSlot(idx, twSlots[idx]);
+        });
+      })(i);
+    }
+
+    twSlots.forEach(function(city, i) { fetchSlot(i, city); });
+    setInterval(function() { twSlots.forEach(function(city, i) { fetchSlot(i, city); }); }, 30 * 60 * 1000);
+  })();
+  </script>
+
+  <script>
+  // ── Color Tools ───────────────────────────────────────────
+  (function () {
+    function clamp(n) { return Math.max(0, Math.min(255, Math.round(n))); }
+
+    function rgbToHex(r,g,b) {
+      return '#' + [r,g,b].map(function(v){ return v.toString(16).padStart(2,'0'); }).join('');
+    }
+
+    function hexToRgb(hex) {
+      hex = hex.replace('#','');
+      if (hex.length===3) hex = hex.split('').map(function(c){return c+c;}).join('');
+      if (hex.length!==6) return null;
+      var n = parseInt(hex,16);
+      return { r:(n>>16)&255, g:(n>>8)&255, b:n&255 };
+    }
+
+    function rgbToHsl(r,g,b) {
+      r/=255; g/=255; b/=255;
+      var max=Math.max(r,g,b), min=Math.min(r,g,b), l=(max+min)/2, s=0, h=0;
+      if (max!==min) {
+        var d=max-min; s=l>0.5?d/(2-max-min):d/(max+min);
+        switch(max){
+          case r: h=(g-b)/d+(g<b?6:0); break;
+          case g: h=(b-r)/d+2; break;
+          case b: h=(r-g)/d+4; break;
+        }
+        h/=6;
+      }
+      return { h:Math.round(h*360), s:Math.round(s*100), l:Math.round(l*100) };
+    }
+
+    function luminance(r,g,b) {
+      var chan = [r,g,b].map(function(c){
+        c/=255; return c<=0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055,2.4);
+      });
+      return 0.2126*chan[0]+0.7152*chan[1]+0.0722*chan[2];
+    }
+
+    function contrastRatio(lum1,lum2) {
+      var lighter=Math.max(lum1,lum2), darker=Math.min(lum1,lum2);
+      return (lighter+0.05)/(darker+0.05);
+    }
+
+    function updateFromRGB(r,g,b) {
+      var hex = rgbToHex(r,g,b);
+      var hsl = rgbToHsl(r,g,b);
+      var lum = luminance(r,g,b);
+      var crWhite = contrastRatio(lum,1);
+      var crBlack = contrastRatio(lum,0);
+
+      document.getElementById('col-hex').value = hex;
+      document.getElementById('col-preview').style.background = hex;
+      document.getElementById('col-out-hex').textContent = hex.toUpperCase();
+      document.getElementById('col-out-hsl').textContent = 'hsl('+hsl.h+','+hsl.s+'%,'+hsl.l+'%)';
+      document.getElementById('col-out-rgb').textContent = 'rgb('+r+','+g+','+b+')';
+      document.getElementById('col-out-lum').textContent = lum.toFixed(4);
+
+      function badge(ratio, id, labelId) {
+        var el = document.getElementById(id);
+        var lbl = document.getElementById(labelId);
+        var r2 = ratio.toFixed(2)+':1';
+        lbl.textContent = r2;
+        var aa = ratio >= 4.5, aaa = ratio >= 7;
+        if (aaa)      { el.className='contrast-badge contrast-pass'; el.textContent='AAA'; }
+        else if (aa)  { el.className='contrast-badge contrast-pass'; el.textContent='AA'; }
+        else          { el.className='contrast-badge contrast-fail'; el.textContent='Fail'; }
+      }
+      badge(crWhite,'col-vs-white-badge','col-vs-white');
+      badge(crBlack,'col-vs-black-badge','col-vs-black');
+
+      document.getElementById('col-text-on-white').style.color = hex;
+      document.getElementById('col-text-on-black').style.color = hex;
+    }
+
+    // HEX input → update RGB (only when valid full 6-char hex, no 3-char shorthand)
+    document.getElementById('col-hex').addEventListener('input', function () {
+      var raw = this.value.trim();
+      var clean = raw.replace('#','');
+      if (clean.length < 6) { this.style.borderColor = ''; return; }
+      if (clean.length === 6) {
+        var rgb = hexToRgb(raw);
+        if (rgb) {
+          this.style.borderColor = '#4ade80';
+          document.getElementById('col-r').value = rgb.r;
+          document.getElementById('col-g').value = rgb.g;
+          document.getElementById('col-b').value = rgb.b;
+          updateFromRGB(rgb.r,rgb.g,rgb.b);
+        } else {
+          this.style.borderColor = '#f87171';
+        }
+      } else {
+        this.style.borderColor = '#f87171';
+      }
+    });
+    document.getElementById('col-hex').addEventListener('blur', function () {
+      this.style.borderColor = '';
+    });
+
+    // RGB paste input → parse rgb(r,g,b) or r,g,b or r g b
+    document.getElementById('col-rgb-in').addEventListener('input', function () {
+      var m = this.value.match(/(\d+)[,\s]+(\d+)[,\s]+(\d+)/);
+      if (!m) { this.style.borderColor = this.value.trim() ? '#f87171' : ''; return; }
+      var r=clamp(+m[1]), g=clamp(+m[2]), b=clamp(+m[3]);
+      this.style.borderColor = '#4ade80';
+      document.getElementById('col-r').value = r;
+      document.getElementById('col-g').value = g;
+      document.getElementById('col-b').value = b;
+      updateFromRGB(r,g,b);
+    });
+    document.getElementById('col-rgb-in').addEventListener('blur', function () {
+      this.style.borderColor = '';
+    });
+
+    // RGB inputs → update HEX
+    ['col-r','col-g','col-b'].forEach(function(id){
+      document.getElementById(id).addEventListener('input', function(){
+        var r=clamp(+document.getElementById('col-r').value);
+        var g=clamp(+document.getElementById('col-g').value);
+        var b=clamp(+document.getElementById('col-b').value);
+        updateFromRGB(r,g,b);
+      });
+    });
+
+    // Copy-on-click for output cells
+    document.querySelectorAll('.col-copyable').forEach(function(cell) {
+      cell.addEventListener('click', function() {
+        var val = cell.querySelector('.rc-val').textContent;
+        if (!val || val === '—') return;
+        navigator.clipboard.writeText(val).then(function() {
+          var orig = cell.querySelector('.rc-lbl').textContent;
+          cell.querySelector('.rc-lbl').textContent = '✓ Copied!';
+          setTimeout(function(){ cell.querySelector('.rc-lbl').textContent = orig; }, 1200);
+        });
+      });
+    });
+
+    // Init
+    updateFromRGB(84,87,90);
+  })();
+  </script>
+
+  <script>
+  // ── Cost of Living ────────────────────────────────────────
+  (function () {
+    var CITIES = {
+      milan:     { name:'Milan',     cur:'EUR', rent_c:1800, rent_o:1200, food:400, transport:100, utilities:150, gym:50, eating_out:300 },
+      zurich:    { name:'Zürich',    cur:'CHF', rent_c:2800, rent_o:2000, food:600, transport:100, utilities:200, gym:80, eating_out:500 },
+      munich:    { name:'München',    cur:'EUR', rent_c:2000, rent_o:1400, food:450, transport:80,  utilities:160, gym:50, eating_out:350 },
+      london:    { name:'London',    cur:'GBP', rent_c:2200, rent_o:1600, food:450, transport:150, utilities:180, gym:60, eating_out:380 },
+      paris:     { name:'Paris',     cur:'EUR', rent_c:1800, rent_o:1300, food:450, transport:90,  utilities:140, gym:50, eating_out:350 },
+      malaga:    { name:'Malaga',    cur:'EUR', rent_c:900,  rent_o:650,  food:300, transport:60,  utilities:100, gym:30, eating_out:200 },
+      amsterdam: { name:'Amsterdam', cur:'EUR', rent_c:2200, rent_o:1600, food:450, transport:100, utilities:150, gym:55, eating_out:380 }
+    };
+    var CATS = [
+      { key:'rent',       label:'🏠 Rent (1BR)',   color:'#54575A' },
+      { key:'food',       label:'🛒 Groceries',    color:'#7a7d80' },
+      { key:'transport',  label:'🚇 Transport',    color:'#a0a3a6' },
+      { key:'utilities',  label:'💡 Utilities',    color:'#b4b7ba' },
+      { key:'gym',        label:'🏋️ Gym/Sport',    color:'#c8cbce' },
+      { key:'eating_out', label:'🍽️ Eating out',   color:'#888b8e' }
+    ];
+
+    var rentMode = 'center', liveMode = 'single';
+
+    function getVals(c) {
+      var rent = rentMode === 'center' ? c.rent_c : c.rent_o;
+      var cp = liveMode === 'couple';
+      return {
+        rent:       rent,
+        food:       c.food       * (cp ? 1.6 : 1),
+        transport:  c.transport  * (cp ? 1.5 : 1),
+        utilities:  c.utilities  * (cp ? 1.3 : 1),
+        gym:        c.gym        * (cp ? 2.0 : 1),
+        eating_out: c.eating_out * (cp ? 1.8 : 1)
+      };
+    }
+
+    function render() {
+      var cityKey = document.getElementById('col-city').value;
+      var c = CITIES[cityKey];
+      if (!c) return;
+      var vals = getVals(c);
+      var total = Object.keys(vals).reduce(function(a,k){return a+vals[k];}, 0);
+
+      var html = '<div style="margin-bottom:1.2em;">'
+        + '<div class="result-big">' + c.cur + '\u00a0' + Math.round(total).toLocaleString('en-CH') + '</div>'
+        + '<div class="result-label">Estimated monthly total · ' + (liveMode === 'couple' ? 'couple' : 'single') + '</div>'
+        + '</div>';
+
+      CATS.forEach(function (cat) {
+        var v = vals[cat.key];
+        var pct = (v / total * 100).toFixed(1);
+        html += '<div style="margin-bottom:0.55em;">'
+          + '<div style="display:flex;justify-content:space-between;font-size:0.82em;color:#666;margin-bottom:0.18em;">'
+          + '<span>' + cat.label + '</span>'
+          + '<span style="font-weight:600;">' + c.cur + '\u00a0' + Math.round(v).toLocaleString('en-CH')
+          + ' <span style="color:#bbb;font-weight:400;">(' + pct + '%)</span></span></div>'
+          + '<div style="height:10px;background:#eee;border-radius:5px;overflow:hidden;">'
+          + '<div style="height:100%;width:' + pct + '%;background:' + cat.color + ';border-radius:5px;transition:width 0.3s;"></div>'
+          + '</div></div>';
+      });
+
+      document.getElementById('col-result').innerHTML = html;
+      renderCompare();
+    }
+
+    function renderCompare() {
+      var a = CITIES[document.getElementById('col-cmp-a').value];
+      var b = CITIES[document.getElementById('col-cmp-b').value];
+      if (!a || !b) return;
+      var va = getVals(a), vb = getVals(b);
+      var ta = Object.keys(va).reduce(function(s,k){return s+va[k];},0);
+      var tb = Object.keys(vb).reduce(function(s,k){return s+vb[k];},0);
+
+      var html = '<table class="tool-table"><thead><tr><th>Category</th><th>' + a.name + ' (' + a.cur + ')</th><th>' + b.name + ' (' + b.cur + ')</th></tr></thead><tbody>';
+      CATS.forEach(function (cat) {
+        html += '<tr><td>' + cat.label + '</td>'
+          + '<td>' + Math.round(va[cat.key]).toLocaleString('en-CH') + '</td>'
+          + '<td>' + Math.round(vb[cat.key]).toLocaleString('en-CH') + '</td></tr>';
+      });
+      html += '<tr style="font-weight:700;"><td>Total</td><td>' + Math.round(ta).toLocaleString('en-CH') + '</td><td>' + Math.round(tb).toLocaleString('en-CH') + '</td></tr>';
+      html += '</tbody></table>';
+      document.getElementById('col-cmp-result').innerHTML = html;
+    }
+
+    document.querySelectorAll('#col-rent-toggle button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('#col-rent-toggle button').forEach(function(b){b.classList.remove('active');});
+        btn.classList.add('active'); rentMode = btn.dataset.rent; render();
+      });
+    });
+    document.querySelectorAll('#col-mode-toggle button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('#col-mode-toggle button').forEach(function(b){b.classList.remove('active');});
+        btn.classList.add('active'); liveMode = btn.dataset.mode; render();
+      });
+    });
+    document.getElementById('col-city').addEventListener('change', render);
+    document.getElementById('col-cmp-a').addEventListener('change', renderCompare);
+    document.getElementById('col-cmp-b').addEventListener('change', renderCompare);
+
+    render();
+  })();
+  </script>
+
+</body>
+</html>

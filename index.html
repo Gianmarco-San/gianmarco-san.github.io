@@ -8,7 +8,8 @@
   <title>Gianmarco | AI Engineer</title>
   
   <link rel='stylesheet' href='typo.css'/>
-  <link rel="icon" href="docs/J-favicon_tech.png">  <!-- docs/J-favicon_gray.png docs/MyDuckR.png -->
+  <link rel="icon" href="docs/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="docs/J-favicon_tech.png">  <!-- fallback for older browsers -->
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- for responsiveness -->
 
@@ -23,20 +24,284 @@
 </head>
 
 <body>
+
+  <!-- Weather Widget -->
+  <div id="weather-widget">
+    <div id="weather-compact">
+      <span id="w-emoji">⏳</span>
+      <span id="w-temp">—</span>
+      <span id="w-city-label">Zürich</span>
+      <span id="w-flag">🇨🇭</span>
+    </div>
+    <div id="weather-details">
+      <div id="w-description">Loading…</div>
+      <div id="w-extra"></div>
+      <div id="w-uv-aqi"></div>
+      <select id="w-city-select"></select>
+    </div>
+  </div>
+
+  <style>
+    #weather-widget {
+      position: fixed;
+      top: 1.0em;
+      left: 1em;
+      z-index: 1001;
+      background: rgba(84, 87, 90, 0.88);
+      color: #f0f0f0;
+      border-radius: 1.2em;
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 0.35em 0.75em;
+      font-size: 0.82em;
+      font-family: 'Inter', sans-serif;
+      cursor: default;
+      backdrop-filter: blur(6px);
+      user-select: none;
+      white-space: nowrap;
+    }
+    #weather-compact {
+      display: flex;
+      align-items: center;
+      gap: 0.35em;
+    }
+    #w-emoji { font-size: 1.1em; }
+    #w-temp  { font-weight: 600; }
+    #w-city-label { opacity: 0.75; font-size: 0.9em; }
+    #w-flag  { font-size: 1em; }
+    #weather-details {
+      display: none;
+      margin-top: 0.5em;
+      font-size: 0.95em;
+      line-height: 1.6;
+    }
+    #weather-widget:hover #weather-details { display: block; }
+    #w-description { font-weight: 500; margin-bottom: 0.2em; }
+    #w-extra  { opacity: 0.8; font-size: 0.9em; }
+    #w-uv-aqi { opacity: 0.8; font-size: 0.9em; margin-bottom: 0.5em; }
+    #w-city-select {
+      background: rgba(255,255,255,0.12);
+      color: #f0f0f0;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 0.6em;
+      padding: 0.2em 0.4em;
+      font-size: 0.9em;
+      width: 100%;
+      cursor: pointer;
+      outline: none;
+    }
+    #w-city-select option { background: #3a3d40; color: #f0f0f0; }
+    @media (max-width: 960px) { #weather-widget { display: none; } }
+  </style>
+
+  <!-- Easter Egg Toggle -->
+  <div id="egg-widget">
+    <img id="egg-img" src="docs/precursor_egg_off_bg.png" alt="easter egg">
+    <label class="egg-toggle">
+      <input type="checkbox" id="egg-toggle-input">
+      <span class="egg-slider"></span>
+    </label>
+    <span class="egg-tooltip">Easter Egg Mode 🥚</span>
+  </div>
+
+  <style>
+    #egg-widget {
+      position: fixed;
+      top: 1.8rem;
+      right: 1em;
+      transform: translateY(-50%);
+      z-index: 1001;
+      background: rgba(84, 87, 90, 0.88);
+      color: #f0f0f0;
+      border-radius: 1.2em;
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 0.35em 0.7em;
+      font-size: 0.82em;
+      font-family: 'Inter', sans-serif;
+      cursor: default;
+      backdrop-filter: blur(6px);
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+    }
+    #egg-img {
+      height: 1.4em;
+      width: auto;
+      display: block;
+    }
+    .egg-toggle {
+      position: relative;
+      width: 2.4em;
+      height: 1.25em;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .egg-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .egg-slider {
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.22);
+      border-radius: 1.25em;
+      transition: background 0.25s;
+    }
+    .egg-slider::before {
+      content: '';
+      position: absolute;
+      width: 0.95em;
+      height: 0.95em;
+      left: 0.15em;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.25s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    }
+    .egg-toggle input:checked + .egg-slider { background: rgba(200,230,140,0.65); }
+    .egg-toggle input:checked + .egg-slider::before { transform: translateY(-50%) translateX(1.15em); }
+    @media (max-width: 960px) {
+      #egg-widget {
+        font-size: 0.75em;
+      }
+    }
+  </style>
+
+  <script>
+    (function() {
+      const CITIES = {
+        zurich:     { name: 'Zürich',     flag: '🇨🇭', lat:  47.3769, lon:   8.5417 },
+        cesenatico: { name: 'Cesenatico', flag: '🇮🇹', lat:  44.2006, lon:  12.3919 },
+        munich:     { name: 'München',    flag: '🇩🇪', lat:  48.1351, lon:  11.5820 },
+        paris:      { name: 'Paris',      flag: '🇫🇷', lat:  48.8566, lon:   2.3522 },
+        seoul:      { name: 'Seoul',      flag: '🇰🇷', lat:  37.5665, lon: 126.9780 },
+        vancouver:  { name: 'Vancouver',  flag: '🇨🇦', lat:  49.2827, lon:-123.1207 },
+        copenhagen: { name: 'Copenhagen', flag: '🇩🇰', lat:  55.6761, lon:  12.5683 },
+        pittsburgh: { name: 'Pittsburgh', flag: '🇺🇸', lat:  40.4406, lon: -79.9959 },
+        seattle:    { name: 'Seattle',    flag: '🇺🇸', lat:  47.6062, lon:-122.3321 },
+        boston:     { name: 'Boston',     flag: '🇺🇸', lat:  42.3601, lon: -71.0589 },
+        vienna:     { name: 'Vienna',     flag: '🇦🇹', lat:  48.2082, lon:  16.3738 },
+        perth:      { name: 'Perth',      flag: '🇦🇺', lat: -31.9505, lon: 115.8605 },
+        oslo:       { name: 'Oslo',       flag: '🇳🇴', lat:  59.9139, lon:  10.7522 },
+        kobe:       { name: 'Kobe',       flag: '🇯🇵', lat:  34.6901, lon: 135.1956 },
+        sapporo:    { name: 'Sapporo',    flag: '🇯🇵', lat:  43.0618, lon: 141.3545 },
+      };
+      const WMO = {
+        0:'Clear sky',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',
+        45:'Foggy',48:'Icy fog',51:'Light drizzle',53:'Drizzle',55:'Heavy drizzle',
+        61:'Light rain',63:'Rain',65:'Heavy rain',71:'Light snow',73:'Snow',75:'Heavy snow',
+        77:'Snow grains',80:'Light showers',81:'Showers',82:'Violent showers',
+        85:'Snow showers',86:'Heavy snow showers',95:'Thunderstorm',96:'Thunderstorm w/ hail',99:'Heavy thunderstorm'
+      };
+      const EMOJI = {
+        0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',
+        61:'🌧️',63:'🌧️',65:'🌧️',71:'🌨️',73:'❄️',75:'❄️',77:'🌨️',
+        80:'🌦️',81:'🌧️',82:'⛈️',85:'🌨️',86:'❄️',95:'⛈️',96:'⛈️',99:'⛈️'
+      };
+      const EMOJI_NIGHT = {
+        0:'🌙',1:'🌙',2:'🌛',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',
+        61:'🌧️',63:'🌧️',65:'🌧️',71:'🌨️',73:'❄️',75:'❄️',77:'🌨️',
+        80:'🌦️',81:'🌧️',82:'⛈️',85:'🌨️',86:'❄️',95:'⛈️',96:'⛈️',99:'⛈️'
+      };
+
+      let currentCity = 'zurich';
+
+      function uvLabel(v) {
+        if (v == null) return '—';
+        if (v <= 2)  return v.toFixed(1) + ' Low';
+        if (v <= 5)  return v.toFixed(1) + ' Moderate';
+        if (v <= 7)  return v.toFixed(1) + ' High';
+        if (v <= 10) return v.toFixed(1) + ' Very High';
+        return v.toFixed(1) + ' Extreme';
+      }
+      function aqiLabel(v) {
+        if (typeof v !== 'number') return '—';
+        if (v <= 20)  return v + ' Good 🟢';
+        if (v <= 40)  return v + ' Fair 🟡';
+        if (v <= 60)  return v + ' Moderate 🟠';
+        if (v <= 80)  return v + ' Poor 🔴';
+        if (v <= 100) return v + ' Very Poor 🟣';
+        return v + ' Extreme ⚫';
+      }
+
+      async function fetchWeather(cityKey) {
+        const c = CITIES[cityKey];
+        const wxUrl = `https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lon}`
+          + `&current_weather=true&hourly=relativehumidity_2m,apparent_temperature,uv_index`
+          + `&timezone=auto&forecast_days=1`;
+        const aqUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${c.lat}&longitude=${c.lon}`
+          + `&hourly=european_aqi&timezone=auto&forecast_days=1`;
+        try {
+          const res = await fetch(wxUrl);
+          const d   = await res.json();
+          const cw  = d.current_weather;
+          const code = cw.weathercode;
+          const hour = new Date().getHours();
+          const now  = new Date();
+          const hhmm = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+          const humidity  = d.hourly?.relativehumidity_2m?.[hour] ?? '—';
+          const feelsLike = d.hourly?.apparent_temperature?.[hour] != null
+            ? Math.round(d.hourly.apparent_temperature[hour]) + '°C' : '—';
+          const uv   = d.hourly?.uv_index?.[hour] ?? null;
+          const wind = Math.round(cw.windspeed) + ' km/h';
+          const temp = Math.round(cw.temperature) + '°C';
+
+          const emojiMap = cw.is_day === 0 ? EMOJI_NIGHT : EMOJI;
+          document.getElementById('w-emoji').textContent      = emojiMap[code] ?? '🌡️';
+          document.getElementById('w-temp').textContent       = temp;
+          document.getElementById('w-city-label').textContent = c.name;
+          document.getElementById('w-flag').textContent       = c.flag;
+          document.getElementById('w-description').innerHTML  =
+            `<b>${WMO[code] ?? 'Unknown'}</b> <span style="font-weight:400;opacity:0.5;font-size:0.88em;">at ${hhmm}</span>`;
+          document.getElementById('w-extra').innerHTML =
+            `Feels like ${feelsLike} &nbsp;·&nbsp; 💨 ${wind} &nbsp;·&nbsp; 💧 ${humidity}%`;
+          document.getElementById('w-uv-aqi').innerHTML =
+            `☀️ UV ${uvLabel(uv)} &nbsp;·&nbsp; 🌬️ AQI …`;
+
+          fetch(aqUrl).then(r => r.json()).then(aq => {
+            const aqi = aq.hourly?.european_aqi?.[hour] ?? null;
+            document.getElementById('w-uv-aqi').innerHTML =
+              `☀️ UV ${uvLabel(uv)} &nbsp;·&nbsp; 🌬️ AQI ${aqiLabel(aqi)}`;
+          }).catch(() => {});
+
+        } catch(e) {
+          document.getElementById('w-emoji').textContent = '⚠️';
+          document.getElementById('w-temp').textContent  = '—';
+          document.getElementById('w-description').textContent = 'Unable to load';
+        }
+      }
+
+      // Build select options
+      const sel = document.getElementById('w-city-select');
+      sel.innerHTML = Object.entries(CITIES).map(([k, c]) =>
+        `<option value="${k}"${k === currentCity ? ' selected' : ''}>${c.name} ${c.flag}</option>`
+      ).join('');
+      sel.addEventListener('change', function() {
+        currentCity = this.value;
+        document.getElementById('w-emoji').textContent = '⏳';
+        document.getElementById('w-temp').textContent  = '—';
+        fetchWeather(currentCity);
+      });
+
+      fetchWeather(currentCity);
+      setInterval(() => fetchWeather(currentCity), 30 * 60 * 1000);
+    })();
+  </script>
+
   <section id="home">
   <header>
 
     <!-- "Yo, why you snooping around my HTML like that? Hunting for some secret cookies or what?" 😏🍪  -->
-  
+
     <nav>
     <ul>
 
-      <li><a href='#home'>Welcome</a></li> <!-- <li><a href='#home'>Welcome to Timeline</a></li> -->
-      <li><a href='#portfolio'>Timeline</a></li>
-      <li><a href='#about'>Keep in Touch</a></li>
+      <li><a href='#home'>Welcome<span class="nav-tooltip">Back to Home ↑</span></a></li>
+      <li><a href='timeline.html'>Timeline<span class="nav-tooltip">Experiences in Details <img src="docs/new-tab-icon.png" style="height:1.0em; vertical-align:baseline;"></span></a></li>
+      <li><a href='tools.html'>Tools<span class="nav-tooltip">Calculators & Utilities <img src="docs/new-tab-icon.png" style="height:1.0em; vertical-align:baseline;"></span></a></li>
+      <!--<li><a href='#about'>Keep in Touch</a></li>-->
       <span style="color: white;"> |</span>
-      <li><a href="Gianmarco_Santoro_CV.pdf" target="_blank" rel="noopener noreferrer" id="cv-download1" class="nav_hover" title="Download my Resume 📝">
-        <span class="shadow-text1">CV</span></a></li>
+      <li><a href="Gianmarco_Santoro_CV.pdf" target="_blank" rel="noopener noreferrer" id="cv-download1" class="nav_hover">
+        <span class="shadow-text1">CV</span><span class="nav-tooltip">Download my Resume <img src="docs/download_icon.png" style="height:1.0em; vertical-align:baseline;"></span></a></li>
       
     </ul>
     </nav>
@@ -44,26 +309,82 @@
 
     <div class='heroCapPic'>
   
+      
       <div class="pic-container">
           <img src="docs/ser-j.png" alt="Description of image" class="pic">
-          <a href="https://www.allered.me/" target="_blank" rel="noopener noreferrer" class="pic-description">Pic by allered.me</a>
+      <!--    <a href="https://www.allered.me/" target="_blank" rel="noopener noreferrer" class="pic-description">Pic by allered.me</a> -->
       </div>
 
       <div class='heroCap'>
         <div class='hero show-on-big' style="align-items: start;">
 
             <h1 style="font-family: 'Inter'; font-style: italic; font-weight: 700;  text-align: start;">Hi, I'm Gianmarco</h1>
-            <h2 class="show-on-big" style="font-style: normal; font-weight: 500; font-size: 1.9em; flex-wrap: wrap; text-align: start;">AI Engineer</h2>
-            <b style=" text-align: left;"><a style="font-size: 1.2em; line-height: 1.2em; text-align: start; display: inline-block; max-width: 45ch; word-wrap: break-word; margin-top: 1.0em;">Master in Data Science · M.Sc. Mechanical Engineering</a>  <!--  Data Science and Mechanical Engineering background.      I'm an AI engineer with a background in Data Science and Mechanical Engineering. I'm focusing on Computer Vision, Robotics, LMMs/LAMs, Generative AI, and related areas. -->
-            </b>
+            <h2 style="font-style: normal; font-weight: 500; font-size: 1.9em; text-align: start; margin: 0;">AI Engineer</h2>
+            <b style="display: block; margin-top: 1.0em; text-align: left;"><a style="font-size: 1.2em; line-height: 1.2em; max-width: 45ch; word-wrap: break-word; font-weight: 500; font-style: italic;">I like merging AI into Physical World</a></b>
+            <b style="display: block; margin-top: 1.0em; text-align: left;"><a style="font-size: 1.1em; line-height: 1.2em; max-width: 45ch; word-wrap: break-word;">Master in Data Science · M.Sc. Mechanical Engineering</a></b>
+
+            <div class="hero-social">
+              <a class="hs-icon" onclick="copyToClipboard(this)">
+                <img src="docs/mail_outline.svg" alt="Mail" data-src-default="docs/mail_outline.svg" data-src-egg="docs/mail_icon.png">
+                <span class="tooltip-text">Copy my Mail <img src="docs/copy-icon.png" style="height:1.0em;"></span>
+              </a>
+              <a class="hs-icon" href="https://www.linkedin.com/in/gianmarco-ai-engineer" target="_blank" rel="noopener noreferrer">
+                <img src="docs/linkedin_outline.svg" alt="LinkedIn" data-src-default="docs/linkedin_outline.svg" data-src-egg="docs/linkedin_logo.webp">
+                <span class="tooltip-text">Visit my Linkedin <img src="docs/new-tab-icon.png" style="height:1.0em;"></span>
+              </a>
+              <a class="hs-icon" href="https://www.github.com/Gianmarco-San" target="_blank" rel="noopener noreferrer">
+                <img src="docs/github_outline.svg" alt="GitHub" data-src-default="docs/github_outline.svg" data-src-egg="docs/github_logo.webp">
+                <span class="tooltip-text">Visit my GitHub <img src="docs/new-tab-icon.png" style="height:1.0em;"></span>
+              </a>
+              <a class="hs-icon" href="https://www.strava.com/athletes/60474304" target="_blank" rel="noopener noreferrer">
+                <img src="docs/strava_outline.svg" alt="Strava" data-src-default="docs/strava_outline.svg" data-src-egg="docs/strava_logo-2.svg">
+                <span class="tooltip-text">Catch up on Strava <img src="docs/new-tab-icon.png" style="height:1.0em;"></span>
+              </a>
+              <a class="hs-icon" href="https://www.imdb.com/user/ur124794700/ratings/?ref_=ext_shr_lnk" target="_blank" rel="noopener noreferrer">
+                <img src="docs/imdb_outline.svg" alt="IMDb" data-src-default="docs/imdb_outline.svg" data-src-egg="docs/imdb_logo.webp">
+                <span class="tooltip-text">Check my Ratings ✩</span>
+              </a>
+              <a class="hs-icon" href="Gianmarco_Santoro_CV.pdf" target="_blank" rel="noopener noreferrer" style="display:none;">
+                <span class="hs-cv">CV</span>
+                <span class="tooltip-text">Download my Resume <img src="docs/download_icon.png" style="height:1.0em;"></span>
+              </a>
+            </div>
         </div>
 
         <div class='hero show-on-small show-on-middle'>
 
-          <h1 style="font-family: 'Inter'; font-style: italic; font-weight: 700;">Hi, I'm Gianmarco</h1>
+          <h1 style="font-family: 'Inter'; font-style: italic; font-weight: 700; line-height: 1.2em;">Hi, I'm Gianmarco</h1>
           <h2 class="show-on-middle" style="font-style: normal; font-weight: 500; font-size: 1.5em; flex-wrap: wrap;">AI Engineer</h2>
           <h2 class="show-on-small" style="font-style: normal; font-weight: 500; font-size: 1.8em; flex-wrap: wrap;">AI Engineer</h2>
-          <a style="font-size: 1.2em; line-height: 1.2em; display: inline-block; max-width: 45ch; word-wrap: break-word; margin-top: 1.0em;">Master in Data Science · M.Sc. Mechanical Engineering</a>  <!-- I'm an AI engineer with a background in Data Science and Mechanical Engineering. I'm focusing on Computer Vision, Robotics, LMMs/LAMs, Generative AI, and related areas. -->
+          <a style="font-size: 1.2em; line-height: 1.2em; display: inline-block; max-width: 45ch; word-wrap: break-word; margin-top: 1.0em; font-weight: 500; font-style: italic;">I like merging AI into Physical World</a>
+          <a style="font-size: 1.1em; line-height: 1.2em; display: inline-block; max-width: 45ch; word-wrap: break-word; margin-top: 1.0em;">Master in Data Science · M.Sc. Mechanical Engineering</a>
+
+          <div class="hero-social">
+            <a class="hs-icon" onclick="copyToClipboard(this)">
+              <img src="docs/mail_outline.svg" alt="Mail" data-src-default="docs/mail_outline.svg" data-src-egg="docs/mail_icon.png">
+              <span class="tooltip-text">Copy my Mail <img src="docs/copy-icon.png" style="height:1.0em;"></span>
+            </a>
+            <a class="hs-icon" href="https://www.linkedin.com/in/gianmarco-ai-engineer" target="_blank" rel="noopener noreferrer">
+              <img src="docs/linkedin_outline.svg" alt="LinkedIn" data-src-default="docs/linkedin_outline.svg" data-src-egg="docs/linkedin_logo.webp">
+              <span class="tooltip-text">Visit my Linkedin <img src="docs/new-tab-icon.png" style="height:1.0em;"></span>
+            </a>
+            <a class="hs-icon" href="https://www.github.com/Gianmarco-San" target="_blank" rel="noopener noreferrer">
+              <img src="docs/github_outline.svg" alt="GitHub" data-src-default="docs/github_outline.svg" data-src-egg="docs/github_logo.webp">
+              <span class="tooltip-text">Visit my GitHub <img src="docs/new-tab-icon.png" style="height:1.0em;"></span>
+            </a>
+            <a class="hs-icon" href="https://www.strava.com/athletes/60474304" target="_blank" rel="noopener noreferrer">
+              <img src="docs/strava_outline.svg" alt="Strava" data-src-default="docs/strava_outline.svg" data-src-egg="docs/strava_logo-2.svg">
+              <span class="tooltip-text">Catch up on Strava <img src="docs/new-tab-icon.png" style="height:1.0em;"></span>
+            </a>
+            <a class="hs-icon" href="https://www.imdb.com/user/ur124794700/ratings/?ref_=ext_shr_lnk" target="_blank" rel="noopener noreferrer">
+              <img src="docs/imdb_outline.svg" alt="IMDb" data-src-default="docs/imdb_outline.svg" data-src-egg="docs/imdb_logo.webp">
+              <span class="tooltip-text">Check my Ratings ✩</span>
+            </a>
+            <a class="hs-icon" href="Gianmarco_Santoro_CV.pdf" target="_blank" rel="noopener noreferrer" style="display:none;">
+              <span class="hs-cv">CV</span>
+              <span class="tooltip-text">Download my Resume <img src="docs/download_icon.png" style="height:1.0em;"></span>
+            </a>
+          </div>
       </div>
         
         <!--
@@ -99,2020 +420,23 @@
 
   </header>
 
-  
-
   <section id="portfolio">
-  <!--
-  <h3>I'm a <span class="rainbow-text">creative</span> engineer, focused on AI.</h3>
-    -->
-
-  <div class="timeline">
-
-
-    <!--
-    <div class="timeline-item">
-      <div class="timeline-date">&#x25CF Now</p>
-        </div>  
-          <div class="timeline-content">
-            <div class="project-header">
-            <img class='logo' src="docs/DALL·E-work in progress.webp" style='max-width: 100px; height: 100px;'/>
-            <div><h4><br>I'm always baking something new. <em>J</em></h4>
-
-            ## QUI INIZIAVA UN COMMENTO
-            🎉 <b>
-              <span class="funny-fancy">
-                <span>H</span><span>a</span><span>p</span><span>p</span><span>y</span>
-                <span>N</span><span>e</span><span>w</span>
-                <span>Y</span><span>e</span><span>a</span><span>r</span><span>!</span>
-            </span>
-            </b> 🎉 
-            ## QUI finiva UN COMMENTO
-            
-            I'm currently using this first space as an <b>info display for what's coming</b>. As of Jan 8th, 2025:
-            <ul style="list-style-type: circle; padding-left: 1em;">
-              <li>More contents, projects and details on this website</li>
-              ## QUI INIZIAVA UN COMMENTO <li>I'm diving a little deeper into german and exploring some frontiers technical skills</li> ## QUI finiva UN COMMENTO
-              <li>In a few weeks, I'll start considering opportunities to pursue my next career step</li>
-              <br><i>Contact me for collaboration and info!</i>
-            </ul>
-          </div>
-      
-      </div>
-   </div>
-  -->
-      
-
-  <div class="timeline-date show-on-small">&#x25CF Now</div>  
-  <div class="show-on-small"><br><br></div>
-    <div class="timeline-item">
-      <div class="timeline-date show-on-middle show-on-big">&#x25CF Now</p></div>  
-      <div class="timeline-content">
-        <div class="project-header">
-        <img class='logo' src='docs/stealth_logo.jpeg' style='max-width: 40px; max-height: 40px; border-radius: 23%;'/> <!-- round: border-radius: 50%; -->
-        <h4><br>Applied AI Advisor (Confidential Startup)</h4>
-      </div>
-
-        <div class="timeline-text-image">
-          <div class="timeline-text">
-            
-          
-            Supporting an early-stage startup which helps companies adopting AI to automate workflows and improve processes.
-
-            <br><br>A case study:
-            <ul style="padding-left: 1em;">
-          <li>Rapid prototyping of lightweight proof-of-concept system to automate CNC programming workflows.<br>Proposed an architecture to extract features from CADs, G-codes and technical sheets to fine-tune a compact LLM (e.g.T5-small) for task-specific code generation.</li>
-          <li>Analysed multiple solutions including GNN/transformer models, and an alternative computer-vision approach (VLMs).</li>
-          </ul>
-          
-          </div>
-        </div>
-        <br>
-        <img src="docs/CNC.png" alt="Method flow" class="timeline-image show-on-big show-on-middle show-on-small" style="max-width: 90%; display: block; margin: 0 auto;">
-            
-        
-
-            <br>
-            ——
-          <ul class="horiz-ul">
-            <li>LLMs</li>
-            <li>CNC</li>
-            <li>CAD/CAM</li>
-            <li>Fine Tuning</li> 
-            <li>Rapid prototyping</li>
-          </ul>
-        
-    </div>
-  </div>  
-
-
-  <div class="timeline-date show-on-small">&#x25CF Now</div>  
-  <div class="show-on-small"><br><br></div>
-    <div class="timeline-item">
-      <div class="timeline-date show-on-middle show-on-big">&#x25CF Now</p></div>  
-      <div class="timeline-content">
-        <div class="project-header">
-        <img class='logo' src='docs/startup.png' style='max-width: 40px; max-height: 40px; border-radius: 23%;'/> <!-- round: border-radius: 50%; -->
-        <h4><br>Side Projects</h4>
-      </div>
-
-        <div class="timeline-text-image">
-          <div class="timeline-text">
-            
-            A brief description of selected projects I have been working on with peers.
-          </div>
-        </div>
-            
-            <br>
-            <button class="toggle-btn" onclick="toggleContent(this)">  
-              Show More <img src="docs/down_ari.svg" style="height: 1.4em; width: 1.4em; margin: -0.2em; margin-left: 0.3em; margin-bottom: -0.4em; padding: 0.3em; border: 1px solid #c4c4c4; border-radius: 25%; "> 
-            </button> 
-
-            <span class="hidden-content">
-            <div class="timeline-text-image">
-              <div class="timeline-text">
-
-            
-            <br>We worked on different Startup projects following Lean Startup Methodology for each MVP: Problem Identification, Value Proposition, Market Research, Javelin-Board and SWOT analysis, basic architecture and UX-UI design.
-            <br><br><em>Hint: finding a similar competitor during Market Analysis validates your idea!</em>
-            <br><br>
-
-            <ul style="padding: 1em;">
-              <li><b>Selected Products Referral Platform</b> - Webplace where to find best in class aesthetic design products from top companies, and more.</li>
-              
-              <ul class="horiz-ul" style="padding-left: 0em; padding-top: 1em;">          
-                <i>Similar competitor:</i>
-                  <li><a href="https://goods.so/" class="links" target="_blank">Goods</a></li>                
-              </ul>
-
-              <ul class="horiz-ul" style="padding-left: 0em; padding-top: 0em;">          
-                <i>The Team:</i>
-                  <li><a href="https://www.allered.me/" class="links" target="_blank">Alessandro</a></li>
-                  <li><a href="https://linkedin.com/in/arianna-galassi" class="links" target="_blank">Arianna</a></li>
-              </ul>
-            
-
-              <ul class="horiz-ul" style="padding-left: 0em; padding-top: 0em;">          
-                <i>Current state:</i>
-                  <li>Ongoing ▶️</li>                
-              </ul>
-            </ul>
-
-
-            <ul style="padding: 1em;">
-              <li><b>Food-based Social Media</b> - App centered around food experiences, recipes, and restaurant reviews-services to inspire people where to live the real best culinary world.</li>
-              
-              <ul class="horiz-ul" style="padding-left: 0em; padding-top: 1em;">          
-                <i>Similar competitor:</i>
-                  <li><a href="https://mapstr.com/" class="links" target="_blank">mapstr</a></li>                
-              </ul>
-
-              <ul class="horiz-ul" style="padding-left: 0em; padding-top: 0em;">          
-                <i>The Team:</i>
-                  <li><a href="https://linkedin.com/in/arianna-galassi" class="links" target="_blank">Arianna</a></li>
-                  <li><a href="https://linkedin.com/in/edoardo-merola" class="links" target="_blank">Edoardo</a></li>
-                  <li><a href="https://linkedin.com/in/elisasantoni-es" class="links" target="_blank">Elisa</a></li>
-                  <li><a href="https://linkedin.com/in/gabriele-ciullo" class="links" target="_blank">Gabriele</a></li>
-              </ul>
-            
-
-              <ul class="horiz-ul" style="padding-left: 0em; padding-top: 0em;">          
-                <i>Current state:</i>
-                  <li>Stand-by ⏸️</li>                
-              </ul>
-            </ul>
-
-
-            <ul style="padding: 1em;">
-              <li><b>Project-Driven Work Community</b> - Platform for creating the best team of professionals to collaborate on projects based on skills, interests, availability and overall fit considering several parameters to enhance efficiency during the sprints.</li>
-              
-              <ul class="horiz-ul" style="padding-left: 0em; padding-top: 1em;">          
-                <i>Similar competitor:</i>
-                  <li><a href="https://wearecosmico.com/en" class="links" target="_blank">Cosmico</a></li>                
-              </ul>
-
-              <ul class="horiz-ul" style="padding-left: 0em; padding-top: 0em;">          
-                <i>The Team:</i>
-                  <li><a href="https://linkedin.com/in/arianna-galassi" class="links" target="_blank">Arianna</a></li>
-                  <li><a href="https://linkedin.com/in/edoardo-merola" class="links" target="_blank">Edoardo</a></li>
-                  <li><a href="https://linkedin.com/in/elisasantoni-es" class="links" target="_blank">Elisa</a></li>
-                  <li><a href="https://linkedin.com/in/gabriele-ciullo" class="links" target="_blank">Gabriele</a></li>
-              </ul>
-            
-
-              <ul class="horiz-ul" style="padding-left: 0em; padding-top: 0em; padding-bottom: 0em;">          
-                <i>Current state:</i>
-                  <li>Pivoting ⚠️</li>                
-              </ul>
-            </ul>          
-            
-          </div>
-        </div>
-      </span>
-
-            <br>
-            ——
-          <ul class="horiz-ul">
-            <li>Figma</li>
-            <li>Mural</li>
-            <li>Notion</li>
-            <li>Canva</li> 
-            <li>G-Forms/Sheets/Docs</li>
-          </ul>
-        
-    </div>
-  </div>  
-
-
-
-  <div class="timeline-date show-on-small">&#x25CF 2024<!-- November--></div>
-  <div class="show-on-small"><br><br></div>
-    <div class="timeline-item">
-      <div class="timeline-date show-on-middle show-on-big">&#x25CF 2024<!--<br><p style="white-space: pre;">   Nov</p>--></div>  
-      <div class="timeline-content">
-        <div class="project-header">
-        <img class='logo' src='docs/J-favicon_tech.png' style='max-width: 40px; max-height: 40px; border-radius: 50%;'/> <!-- docs/MyDuck.png    round: border-radius: 23%; -->
-        <h4><br>My website</h4>
-      </div>
-
-        <div class="timeline-text-image">
-          <div class="timeline-text">I built my personal webplace where I share projects, news, and more.</div>
-          <!-- <img src="docs/Jweb.webp" alt="My Website" class="timeline-image"> -->
-        </div>
-
-            <br>
-            ——
-          <ul class="horiz-ul">
-            <li>HTML</li>
-            <li>CSS</li>
-            <li>JS</li>
-            <li>VScode</li> 
-            <li>GIT & GitHub</li>
-            <li>Chrome, Safari & Arc</li>
-          </ul>
-        
-    </div>
-  </div>  
-    
-    <div class="timeline-date show-on-small">&#x25CF 2024<!-- April--></div>  
-    <div class="show-on-small"><br><br></div>
-    <div class="timeline-item">
-      <div class="timeline-date show-on-middle show-on-big">&#x25CF 2024<!--<br><p style="white-space: pre;">   Apr</p>--></div>  
-      <div class="timeline-content">
-    
-        <div class="project-header">
-          <a href="https://www.micc.unifi.it/" target="_blank" rel="noopener noreferrer" style="display: contents;">
-          <img class='logo' src='docs/logo-micc.webp' style='max-width: 150px;' alt="MICC Logo"/></a>
-          <h4><br>DeepFake Detection Exploiting Self-Attention Maps</h4>
-        </div>
-    
-        <div class="timeline-text-image">
-          <div class="timeline-text show-on-big" style="text-align: end; padding-left: 0.0em; padding-right: 0.5em;">
-            <br class="show-on-big">
-            Worked on 3-step <em>DeepFake</em> detection:
-              <a style="text-align: start;">
-                <ul style="padding-left: 4em;">
-                <li>Extracting Self-Attention heatmaps</li> 
-                <li>Training a convolutional autoencoder</li>
-                <li>Testing real vs fake images reconstruction error</li>
-              </ul></a>
-          </div>
-          <div class="timeline-text show-on-middle show-on-small">
-            Worked on 3-step <em>DeepFake</em> detection:
-              <a style="text-align: start;">
-                <ul style="padding-left: 2em;">
-                <li>Extracting Self-Attention heatmaps</li> 
-                <li>Training a convolutional autoencoder</li>
-                <li>Testing real vs fake images reconstruction error</li>
-              </ul></a>
-          </div>
-          <img src="docs/Deepfake.webp" alt="Method flow" class="timeline-image show-on-big" style="width: 58%;">
-          <img src="docs/Deepfake.webp" alt="Method flow" class="timeline-image show-on-middle show-on-small">
-        </div>
-    
-        <!-- FINISHED HERE WHEN NOT extended ♤  ⌄ ▼ ⌃ ▲  -->
-    
-        <button class="toggle-btn" onclick="toggleContent(this)">  
-          Show More <img src="docs/down_ari.svg" style="height: 1.4em; width: 1.4em; margin: -0.2em; margin-left: 0.3em; margin-bottom: -0.4em; padding: 0.3em; border: 1px solid #c4c4c4; border-radius: 25%; "> 
-        </button> 
-    
-        <div class="hidden-content">
-          <div class="timeline-text-image" style="place-items: center;">
-            <img src="docs/transformer.webp" alt="Vision Transformer" class="timeline-image show-on-big" style="width: 60%;">
-            <div class="timeline-text">
-              <p>The Vision Transformer (ViT), pre-trained on face recognition - starting from 
-                <a href="https://github.com/zhongyy/Face-Transformer.git" target="_blank" class="links">Face-Transformer</a> -, 
-                captures facial features and extracts visual attention maps. <br> Images are split into multiple patches as input-tokens to the transformer encoder.
-              </p>
-            </div>
-            <img src="docs/transformer.webp" alt="Vision Transformer" class="timeline-image show-on-small show-on-middle">
-          </div>
-    
-          <div class="timeline-text-image" style="place-items: center;">
-            <div class="timeline-text" style="text-align: end;">
-              <p>These are used to train the convolutional autoencoder - starting from the one developed in 
-                <a href="https://github.com/lcultrera/WildCapture" target="_blank" class="links">WildCapture</a> - only on real images, 
-                enhancing out-of-distribution (OOD) detection by expecting higher reconstruction errors for manipulated images.
-              </p>
-            </div>
-            <img src="docs/autoencoder.webp" alt="Method flow" class="timeline-image">
-          </div>
-    
-          <div class="timeline-text-image" style="place-items: center;">
-            <img src="docs/DF_auroc.webp" alt="Auc-roc mean value among all forgeries tested" class="timeline-image show-on-big">
-            <div class="timeline-text">
-              <p>Tested on 5 different forgeries, the method shows an AUROC mean value of 0.60, demonstrating potential for transfer learning and generalizability among potential new forgeries.</p>
-            </div>
-            <img src="docs/DF_auroc.webp" alt="Auc-roc mean value among all forgeries tested" class="timeline-image show-on-small show-on-middle">
-          </div>
-    
-          <div class="show-on-small"><br></div>
-          <br>
-          Further material:
-          <ul class="horiz-ul">
-            <li><a href="docs/DeepFake_Thesis_G.Santoro.pdf" target="_blank" class="links">Thesis.pdf</a></li>
-            <li><a href="docs/DeepFake_G.Santoro.pdf" target="_blank" class="links">Presentation.pdf</a></li>
-            <li>GitHub Repo - I'll publish ASAP</li>
-          </ul>
-    
-          <br>
-          The Team:
-          <ul class="horiz-ul">          
-            <li><a>Luca: Researcher, operative</a></li>
-            <li><a>Lorenzo: Supervisor, strategic</a></li>
-          </ul>
-        
-        
-        </div>
-        
-        <br>
-          ——
-          <ul class="horiz-ul">
-            <li>Python</li>
-            <li>PyTorch</li>
-            <li>OpenCV</li>
-            <li>os</li>
-            <li>CUDA</li>
-            <li>SSH</li>
-            <li>GitHub</li>
-            <li><a href="https://paperswithcode.com/dataset/faceforensics-1" target="_blank" class="links"><i>FF++</i> Dataset</a></li>
-          </ul>
-
-        
-      </div>
-    </div>
-
-
-    
-    <div class="timeline-date show-on-small">&#x25CF 2024 - 2023<!--2024 April - 2023 February--></div>  
-    <div class="show-on-small"><br><br></div>
-    <div class="timeline-item">
-      <div class="timeline-date show-on-big show-on-middle">&#x25CF 2024<!--<br><p style="white-space: pre;">   Apr</p>-->
-        <p style="white-space: pre;">   —</p>
-         <p style="white-space: pre;">   2023</p><!--<p style="white-space: pre;">   Feb</p>--></div>
-
-      <div class="timeline-content">
-        <div class="project-header">
-
-          <div style="display: flex; flex-direction: row; justify-content: left; align-items: center; gap: 1em; flex-wrap: nowrap;">
-            <a href="https://www.unifi.it/en" target="_blank" rel="noopener noreferrer" style="flex: 1; max-width: 150px;">
-              <img class='logo' src="docs/UniFi.webp" style="width: 100%; height: auto;">
-            </a>
-            <a href="https://www.imtlucca.it/en" target="_blank" rel="noopener noreferrer" style="flex: 1; max-width: 150px;">
-              <img class='logo' src="docs/IMT.webp" style="width: 100%; height: auto;">
-            </a>
-          </div> 
-
-              
-          <h4><br>2nd Level Master - Data Science & Statistical Learning - Postgraduate</h4>
-        </div>
-
-        <div class="timeline-text-image">
-          <div class="timeline-text">
-            <br class="show-on-big">
-
-            Inter-university 2nd level Master offered by University of Florence and IMT Lucca.
-            <br>Grade: 110/110 cum laude
-            
-          </div>
-        </div>
-
-
-    <br><h3 style="margin-bottom: 1em;">Further projects during the Master - Click for related material // to GitHub Repos</h3>
-    
-    <div id="carousel">
-      <div class="carousel-container">
-        <div class="carousel-wrapper">
-
-          <div class="carousel-item">
-            <a href="docs/Stat_Santoro.pdf" target="_blank">
-              <img src="docs/salary.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Statistical Analysis: Salary</span>
-            </a>
-          </div>
-
-          <div class="carousel-item">
-            <a href="https://github.com/Gianmarco-San/Algorithms_Py_-_R.git" target="_blank">
-              <img src="docs/algo.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Algorithms without libraries</span>
-            </a>
-          </div>
-
-
-          <div class="carousel-item">
-            <a href="https://github.com/Gianmarco-San/Policy-Evaluation-Impact-Analysis.git" target="_blank">
-              <img src="docs/vote.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Policy-Impact Analysis</span>
-            </a>
-          </div>
-
-          <div class="carousel-item">
-            <a href="https://github.com/Gianmarco-San/Estimation-of-PM10-Levels.git" target="_blank">
-              <img src="docs/PM10.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Estimation of PM10 levels</span>
-            </a>
-          </div>
-
-          <div class="carousel-item">
-            <a href="https://github.com/Gianmarco-San/Bayesian-Inference_Causal-ML.git" target="_blank">
-              <img src="docs/causal.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Depression Causal Inference</span>
-            </a>
-          </div>
-
-    
-          <!-- Duplicate items again for seamless loop -->
-
-          <div class="carousel-item">
-            <a href="docs/Stat_Santoro.pdf" target="_blank">
-              <img src="docs/salary.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Statistical Analysis: Salary</span>
-            </a>
-          </div>
-
-          <div class="carousel-item">
-            <a href="https://github.com/Gianmarco-San/Algorithms_Py_-_R.git" target="_blank">
-              <img src="docs/algo.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Algorithms without libraries</span>
-            </a>
-          </div>
-
-
-          <div class="carousel-item">
-            <a href="https://github.com/Gianmarco-San/Policy-Evaluation-Impact-Analysis.git" target="_blank">
-              <img src="docs/vote.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Policy-Impact Analysis</span>
-            </a>
-          </div>
-
-
-          <div class="carousel-item">
-            <a href="https://github.com/Gianmarco-San/Estimation-of-PM10-Levels.git" target="_blank">
-              <img src="docs/PM10.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Estimation of PM10 levels</span>
-            </a>
-          </div>
-
-          <div class="carousel-item">
-            <a href="https://github.com/Gianmarco-San/Bayesian-Inference_Causal-ML.git" target="_blank">
-              <img src="docs/causal.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Depression Causal Inference</span>
-            </a>
-          </div>
-
-                    
-        </div>
-      </div>
-    </div>     
-
-    <!-- FINISHED HERE WHEN NOT extended ♤ -->
-    
-    <button class="toggle-btn" onclick="toggleContent(this)">  
-      Show More <img src="docs/down_ari.svg" style="height: 1.4em; width: 1.4em; margin: -0.2em; margin-left: 0.3em; margin-bottom: -0.4em; padding: 0.3em; border: 1px solid #c4c4c4; border-radius: 25%; "> 
-    </button> 
-
-    <div class="hidden-content">
-
-      <br><h3 style="margin-bottom: 1em;">Paper Reviews - Click to related PDFs</h3>
-      
-      <div id="carousel">
-        <div class="carousel-container">
-          <div class="carousel-wrapper">
-
-
-            <div class="carousel-item">
-              <a href="docs/Exp_Eco_Santoro.pdf" target="_blank">
-                <img src="docs/carshare.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-                <span class="carousel-description">Nudge Responsible Carsharing</span>
-              </a>
-            </div>
-
-            <div class="carousel-item">
-              <a href="docs/Network_Santoro.pdf" target="_blank">
-                <img src="docs/taxo.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-                <span class="carousel-description">Products Taxonomy & Economy</span>
-              </a>
-            </div>
-
-            <div class="carousel-item">
-              <a href="docs/NLP_Santoro.pdf" target="_blank">
-                <img src="docs/ROD.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-                <span class="carousel-description">Reading Order Detection</span>
-              </a>
-            </div>
-
-            <div class="carousel-item">
-              <a href="docs/Complex_Sys_Santoro.pdf" target="_blank">
-                <img src="docs/stability.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-                <span class="carousel-description">Stability & Bifurcation in Rotors</span>
-              </a>
-            </div>
-
-            <div class="carousel-item">
-              <a href="docs/AdvML_Santoro.pdf" target="_blank">
-                <img src="docs/neo.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-                <span class="carousel-description">Robot Imitation Process</span>
-              </a>
-            </div>
-
-            <div class="carousel-item">
-              <a href="docs/Health_Analytics.pdf" target="_blank">
-                <img src="docs/lepro.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-                <span class="carousel-description">AI Leprosy Diagnosys</span>
-              </a>
-            </div>
-
-            <div class="carousel-item">
-              <a href="docs/StatLearn_Santoro.pdf" target="_blank">
-                <img src="docs/stat-learn.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-                <span class="carousel-description">Drones Swarm MRF optimized</span>
-              </a>
-            </div>
-
-            <!-- Duplicate items again for seamless loop -->
-          
-
-          </div>
-        </div>
-      </div>
-
-          <br>Scroll down the Timeline for more projects.
-          <br>
-          <div class="timeline-text-image">
-            <div class="timeline-text">
-              <br class="show-on-big">
-              Topics:
-
-              <br><a style="text-align: start;">
-                <ul style="padding-left: 2em;">
-                <li>Math & Stat: Stat-Inference/learning, Optimization, Algorithms & Programming, Numerical calculus, Linear algebra, Probability & Stochastic processes.</li> 
-                <li>Complex Systems: Text Mining & NLP, Graph Theory, Geo-Spatial Data (GIS), Network analysis, Complex sys.</li>
-                <li>Decision Theory: Eco-business analytics, Bayesian & Causal inference, Policy impact analysis.</li>
-                <li>(Un)Supervised Learning & RL: Machine Learning, Deep Learning, Reinforcement Learning.</li>
-              </ul></a>
-              
-            </div>
-          </div>
-          <br>
-          <br>
-          Further material:
-          <ul class="horiz-ul">
-            <li><a href="https://github.com/Gianmarco-San" target="_blank" class="links">GitHub Repo</a></li>
-          </ul>
-
-          </ul>
-          
-        </div>
-
-
-          <br>
-          ——
-          <ul class="horiz-ul">
-            <li>Python</li>
-            <li>R & RStudio</li>
-            <li>NumPy</li>
-            <li>PyTorch</li>
-            <li>Matplotlib</li>
-            <li>Seaborn</li>
-            <li>Pandas</li>
-            <li>Pydot</li>
-            <li>Scikit-learn</li>
-          </ul>
-      
-        
-    </div>
-  </div>
-
-
-
-
-
-  <div class="timeline-date show-on-small">&#x25CF 2024<!-- March--></div>  
-    <div class="show-on-small"><br><br></div>
-  <div class="timeline-item">
-    <div class="timeline-date show-on-big show-on-middle">&#x25CF 2024<!--<br><p style="white-space: pre;">   Mar</p>--></div>
-    <div class="timeline-content">
-
-        <div class="project-header">
-
-
-          <div style="display: flex; flex-direction: row; justify-content: left; align-items: center; gap: 1em; flex-wrap: nowrap;">
-            <a href="https://www.unifi.it/en" target="_blank" rel="noopener noreferrer" style="flex: 1; max-width: 150px;">
-              <img class='logo' src="docs/UniFi.webp" style="width: 100%; height: auto;">
-            </a>
-            <a href="https://www.imtlucca.it/en" target="_blank" rel="noopener noreferrer" style="flex: 1; max-width: 150px;">
-              <img class='logo' src="docs/IMT.webp" style="width: 100%; height: auto;">
-            </a>
-          </div> 
-
-
-          <h4><br>Defibrillators Geo-Spatial Data Analysis</h4>
-        </div>
-      
-        <div class="timeline-text-image">
-          <div class="timeline-text show-on-big" style="text-align: end;">
-            <br class="show-on-big">
-            In this work, DAE devices distribution is studied.
-            <br><br>DAE stands for “Automated External Defibrillator”, which are useful in case of cardiac emergencies, when time is crucial, so closeness to one of this devices is very important.
-          </div>
-
-          <div class="timeline-text show-on-middle show-on-small">
-            <br class="show-on-big">
-            In this work, DAE devices distribution is studied.
-            <br><br>DAE stands for “Automated External Defibrillator”, which are useful in case of cardiac emergencies, when time is crucial, so closeness to one of this devices is very important.
-          </div>
-
-          <img src="docs/dae-er.webp" alt="CM_animals" class="timeline-image">
-
-        </div>
-
-        <!-- FINISHED HERE WHEN NOT extended ♤ -->
-        
-        <button class="toggle-btn" onclick="toggleContent(this)">  
-          Show More <img src="docs/down_ari.svg" style="height: 1.4em; width: 1.4em; margin: -0.2em; margin-left: 0.3em; margin-bottom: -0.4em; padding: 0.3em; border: 1px solid #c4c4c4; border-radius: 25%; "> 
-        </button> 
-
-        <div class="hidden-content">
-
-
-      <div class="timeline-text-image" style="place-items: center;">
-
-        <img src="docs/k5000.webp" alt="CM_animals" class="timeline-image show-on-big">
-
-        <div class="timeline-text">
-          Kernel Density Estimate: estimate the intensity of the process, with a kernel estimation.
-          <br><br>In the image:<br>k5000 = density(dae_ppp, sigma = 5000, dimyx = 500).
-          <br><br>It's possible to note that the generator process is related to the population in an area, considering seasonal peaks, e.g. in Riviera during Summer.
-
-        </div>
-
-          <img src="docs/k5000.webp" alt="CM_animals" class="timeline-image show-on-middle show-on-small">
-
-      </div>
-
-
-
-      <div class="show-on-small"><br></div>
-      <br>
-      For deeper analysis:
-      <ul class="horiz-ul">
-        <li><a href="https://github.com/Gianmarco-San/Defibrillators-Geo-Spatial-Data-Analysis.git" target="_blank" class="links">GitHub Repo</a></li>
-        <li><a href="docs/Geo_G.Santoro.pdf" target="_blank" class="links">RMarkdown</a></li>
-      </ul>
-      
-        </div>
-
-      <br>
-      ——
-      <ul class="horiz-ul">
-        <li>R & RStudio</li>
-        <li>sp</li>
-        <li>sf</li>
-        <li>tidyverse</li>
-        <li>rgeos</li>
-        <li>maptools</li>
-        <li>tidyr</li>
-        <li>spatstat</li>
-        <li>splancs</li>
-
-      </ul>
-
-
-    </div>
-  </div>
-
-
-
-    <div class="timeline-date show-on-small">&#x25CF 2023<!-- December--></div>  
-      <div class="show-on-small"><br><br></div>
-    <div class="timeline-item">
-      <div class="timeline-date show-on-big show-on-middle">&#x25CF 2023<!--<br><p style="white-space: pre;">   Dec</p>--></div>
-      <div class="timeline-content">
-
-          <div class="project-header">
-            
-            <div style="display: flex; flex-direction: row; justify-content: left; align-items: center; gap: 1em; flex-wrap: nowrap;">
-              <a href="https://www.unifi.it/en" target="_blank" rel="noopener noreferrer" style="flex: 1; max-width: 150px;">
-                <img class='logo' src="docs/UniFi.webp" style="width: 100%; height: auto;">
-              </a>
-              <a href="https://www.imtlucca.it/en" target="_blank" rel="noopener noreferrer" style="flex: 1; max-width: 150px;">
-                <img class='logo' src="docs/IMT.webp" style="width: 100%; height: auto;">
-              </a>
-            </div>             
-            
-              <h4><br>CIFAR-10 Images Classifier</h4>
-          </div>
-        
-          <div class="timeline-text-image">
-            <div class="timeline-text show-on-big" style="text-align: end;">
-              <div class="show-on-small show-on-middle" style="place-items: center;">
-            </div>
-              <br class="show-on-big">
-              In this project I used CNNs to recognize color images from the <a href="https://www.cs.toronto.edu/~kriz/cifar.html" target="_blank" class="links">CIFAR-10 Dataset</a>.
-              <br><br>Labels are integers, values are float and every image is made by 3 channels (R,G,B) with 32 x 32 pixels.
-              <br><br>Here, an example of an image from the dataset, an horse.
-            </div>
-
-            <div class="timeline-text show-on-middle show-on-small">
-              <div class="show-on-small show-on-middle" style="place-items: center;">
-            </div>
-              <br class="show-on-big">
-              In this project I used CNNs to recognize color images from the <a href="https://www.cs.toronto.edu/~kriz/cifar.html" target="_blank" class="links">CIFAR-10 Dataset</a>.
-              <br><br>Labels are integers, values are float and every image is made by 3 channels (R,G,B) with 32 x 32 pixels.
-              <br><br>Here, an example of an image from the dataset, an horse.
-            </div>
-
-            <img src="docs/horse.webp" alt="CM_animals" class="timeline-image show-on-big" style="width: 30%;">
-            <img src="docs/horse.webp" alt="CM_animals" class="timeline-image show-on-middle" style="width: 50%;">
-            <img src="docs/horse.webp" alt="CM_animals" class="timeline-image show-on-small" style="width: 70%;">
-
-          </div>
-
-                  <!-- FINISHED HERE WHEN NOT extended ♤ -->
-        
-        <button class="toggle-btn" onclick="toggleContent(this)">  
-          Show More <img src="docs/down_ari.svg" style="height: 1.4em; width: 1.4em; margin: -0.2em; margin-left: 0.3em; margin-bottom: -0.4em; padding: 0.3em; border: 1px solid #c4c4c4; border-radius: 25%; "> 
-        </button> 
-
-        <div class="hidden-content">
-
-
-        <div class="timeline-text-image" style="place-items: center;">
-
-          <img src="docs/images.webp" alt="CM_animals" class="timeline-image show-on-big" style="width: 40%;">
-
-          <div class="timeline-text">
-            The CIFAR-10 dataset consists of 60000 32x32 colour images in 10 classes, with 6000 images per class.
-            <br><br>Dataset is splitted into train, validation and test sets as follow:
-            <a style="text-align: start;">
-              <ul style="padding-left: 2em;">
-              <li>Elements in Train set:	48000</li> 
-              <li>Elements in Valid set:	2000</li>
-                <li>Elements in Test set:	10000</li></ul></a>
-          </div>
-
-            <img src="docs/images.webp" alt="CM_animals" class="timeline-image show-on-middle" style="width: 60%;">
-            <img src="docs/images.webp" alt="CM_animals" class="timeline-image show-on-small" style="width: 80%;">
-
-        </div>
-
-
-        <div class="timeline-text-image" style="place-items: center;">
-          <div class="timeline-text" style="text-align: end;">
-            
-            First attempt to images-recogntion with MultiLayerPerceptron (MLP), as a baseline.
-            <br><br>Second model with convolutionalNerualNetwork (CNN) with two convolutional layers and a max pooling.
-            <br><br>Learning rate varies over the epochs, starting with 0.1 and gradually decreasing to about 0.001 at epoch 20.
-          </div>
-          <img src="docs/train-loss-CNN.webp" alt="CM_animals" class="timeline-image">
-        </div>
-
-
-        <div class="timeline-text-image" style="place-items: center;">
-          
-          <img src="docs/conf-mat.webp" alt="CM_animals" class="timeline-image show-on-big" style="width: 40%;">
-                    
-          <div class="timeline-text">
-            Despite a longer training time, the CNN model performed much better than the MLP with a accuracy of 70,4% vs 53,7% on Test set.
-            <br><br>Both models have similar tendency to predict worse some classes, such as Cat.
-            <br><br>Images are related to CNN.
-          </div>
-          
-          <img src="docs/conf-mat.webp" alt="CM_animals" class="timeline-image show-on-middle" style="width: 60%;">
-          <img src="docs/conf-mat.webp" alt="CM_animals" class="timeline-image show-on-small" style="width: 80%;">
-
-        </div>
-
-        <div class="show-on-small"><br></div>
-        <br>
-        Further material:
-        <ul class="horiz-ul">
-          <li><a href="https://github.com/Gianmarco-San/Images_Classifier.git" target="_blank" class="links">GitHub Repo</a></li>
-        </ul>
-        
-        </div>
-
-        <br>
-        ——
-        <ul class="horiz-ul">
-          <li>Python</li>
-          <li>PyTorch</li>
-          <li>NumPy</li>
-          <li>Matplotlib</li>
-          <li>CUDA</li>
-          <li>CIFAR-10 Dataset</li>
-        </ul>
-
-      </div>
-    </div>
-
-
-
-
-    <div class="timeline-date show-on-small">&#x25CF 2023<!-- October--></div>  
-    <div class="show-on-small"><br><br></div>
-    <div class="timeline-item">
-      <div class="timeline-date show-on-big show-on-middle">&#x25CF 2023<!--<br><p style="white-space: pre;">   Oct</p>--></div>  
-      <div class="timeline-content">
-    
-        <div class="project-header">
-
-          <div style="display: flex; flex-direction: row; justify-content: left; align-items: center; gap: 1em; flex-wrap: nowrap;">
-            <a href="https://www.unifi.it/en" target="_blank" rel="noopener noreferrer" style="flex: 1; max-width: 150px;">
-              <img class='logo' src="docs/UniFi.webp" style="width: 100%; height: auto;">
-            </a>
-            <a href="https://www.imtlucca.it/en" target="_blank" rel="noopener noreferrer" style="flex: 1; max-width: 150px;">
-              <img class='logo' src="docs/IMT.webp" style="width: 100%; height: auto;">
-            </a>
-          </div> 
-
-
-          <h4><br>Fitness classes. Do you book and go?</h4>
-        </div>
-
-        <div class="timeline-text-image">
-          <div class="timeline-text show-on-big" style="text-align: end;">
-            <br class="show-on-big">  
-            In this Project I try to predict whether a member will attend a class or not, once booked.
-            <br>You'll find:
-            <br><a style="text-align: start;">
-              <ul style="padding-left: 4em;">
-              <li>EDA.</li> 
-              <li>Data management.</li>
-              <li>Models and their performance.</li> </ul></a>
-          </div>
-
-          <div class="timeline-text show-on-middle show-on-small">
-            <br class="show-on-big">  
-            In this Project I try to predict whether a member will attend a class or not, once booked.
-            <br>You'll find:
-            <br><a style="text-align: start;">
-              <ul style="padding-left: 2em;">
-              <li>EDA.</li> 
-              <li>Data management.</li>
-              <li>Models and their performance.</li> </ul></a>
-          </div>
-
-          <img src="docs/weight.webp" alt="Method flow" class="timeline-image show-on-big" style="width: 50%;">
-          <img src="docs/weight.webp" alt="Method flow" class="timeline-image show-on-small show-on-middle" style="width: 60%;">
-        </div>
-
-                <!-- FINISHED HERE WHEN NOT extended ♤ -->
-        
-                <button class="toggle-btn" onclick="toggleContent(this)">  
-                  Show More <img src="docs/down_ari.svg" style="height: 1.4em; width: 1.4em; margin: -0.2em; margin-left: 0.3em; margin-bottom: -0.4em; padding: 0.3em; border: 1px solid #c4c4c4; border-radius: 25%; "> 
-                </button> 
-        
-                <div class="hidden-content">
-
-
-        <div class="timeline-text-image" style="place-items: center;">
-          <img src="docs/month_memeb.webp" alt="Vision Trasformer" class="timeline-image show-on-big" style="width: 50%;">
-          <div class="timeline-text">
-            Considering graphs, there are some tendencies:
-            <a style="text-align: start;">
-              <ul style="padding-left: 2em;">
-              <li>Weight vs attendance goes down.</li>
-              <li>Attendance grows with months as member.</li></ul></a>
-              <br>This can lead to operative choice of make the booking of loyal users (the ones with more months as member) affordable.
-          </div>
-          <img src="docs/month_memeb.webp" alt="Vision Trasformer" class="timeline-image show-on-small show-on-middle" style="width: 60%;">
-        </div>
-
-        <div class="timeline-text-image" style="place-items: center;">
-          <div class="timeline-text" style="text-align: end;">
-            As expected, there is inverse correlation between mean values of Weight and mean values of Months as member.
-          </div>
-          <img src="docs/mon_wei.webp" alt="Method flow" class="timeline-image show-on-big" style="width: 30%;">
-          <img src="docs/wei.webp" alt="Method flow" class="timeline-image show-on-big" style="width: 10%;">
-          <img src="docs/mon_wei.webp" alt="Method flow" class="timeline-image show-on-middle show-on-small" style="width: 50%;">
-          <img src="docs/wei.webp" alt="Method flow" class="timeline-image show-on-middle show-on-small" style="width: 15%;">
-        </div>
-        
-        <div class="timeline-text-image" style="place-items: center;">
-          
-          <img src="docs/conf_attend.webp" alt="Auc-roc mean value among all forgeries tested" class="timeline-image show-on-big" style="width: 40%;">
-          
-          <div class="timeline-text">
-            Confusion Matrix with best classifier:
-            <a style="text-align: start;">
-              <ul style="padding-left: 2em;">
-              <li>Logistic Regression (random_state = 23)</li>
-              <li>Mean accuracy score: 0.7583</li></ul></a>
-            
-            <br>By changing the proporions of train and test sets I can see that the accuracy is quite stable.
-            <br><br>There is a tendency for outcome to be predicted "0".
-            <br>Considering the unbalanced dataset, where much more records have values "0" as attendance, somehow models tend to learn to predict more often labels of lower value.
-            
-          </div>
-          <img src="docs/conf_attend.webp" alt="Auc-roc mean value among all forgeries tested" class="timeline-image show-on-small show-on-middle" style="width: 60%;">
-          
-        </div>
-
-        <div class="show-on-small"><br></div>
-        <br>
-        Further material:
-        <ul class="horiz-ul">
-          <li><a href="https://github.com/Gianmarco-San/Fitness_Classes_Book_and_Attend.git" target="_blank" class="links">GitHub Repo</a></li>
-        </ul>
-
-        </ul>
-
-                </div>
-        
-        <br>
-        ——
-        <ul class="horiz-ul">
-          <li>Python</li>
-          <li>NumPy</li>
-          <li>Matplotlib</li>
-          <li>Seaborn</li>
-          <li>Pandas</li>
-          <li>Pydot</li>
-          <li>Scikit-learn</li>
-        </ul>
-      
-      </div>
-    </div>
-
-
-
-    <div class="timeline-date show-on-small">&#x25CF 2023<!-- October--></div>  
-      <div class="show-on-small"><br><br></div>
-    <div class="timeline-item">
-      <div class="timeline-date show-on-big show-on-middle">&#x25CF 2023<!--<br><p style="white-space: pre;">   Oct</p>--></div>  
-      <div class="timeline-content">
-    
-        <div class="project-header">
-
-
-          <div style="display: flex; flex-direction: row; justify-content: left; align-items: center; gap: 1em; flex-wrap: nowrap;">
-            <a href="https://www.unifi.it/en" target="_blank" rel="noopener noreferrer" style="flex: 1; max-width: 150px;">
-              <img class='logo' src="docs/UniFi.webp" style="width: 100%; height: auto;">
-            </a>
-            <a href="https://www.imtlucca.it/en" target="_blank" rel="noopener noreferrer" style="flex: 1; max-width: 150px;">
-              <img class='logo' src="docs/IMT.webp" style="width: 100%; height: auto;">
-            </a>
-          </div> 
-
-
-          <h4><br>US Salaries Analysis & Prediction</h4>
-        </div>
-
-        <div class="timeline-text-image">
-          
-          <div class="timeline-text show-on-big" style="text-align: end;">
-            <br class="show-on-big">
-            In this Project I worked on US Adult Census dataset.
-            <br>You'll find:
-            <br><a style="text-align: start;">
-              <ul style="padding-left: 4em;">
-              <li>Exploration of the data to understand demographics trends.</li> 
-              <li>Models to predict if a record makes more or less than 50'000,00 $ in 1994.</li>
-              <li>Comparison between different models and their performance.</li> </ul></a>            
-          </div>
-
-          <div class="timeline-text show-on-middle show-on-small">
-            <br class="show-on-big">
-            In this Project I worked on US Adult Census dataset.
-            <br>You'll find:
-            <br><a style="text-align: start;">
-              <ul style="padding-left: 2em;">
-              <li>Exploration of the data to understand demographics trends.</li> 
-              <li>Models to predict if a record makes more or less than 50'000,00 $ in 1994.</li>
-              <li>Comparison between different models and their performance.</li> </ul></a>            
-          </div>
-
-          <img src="docs/edu_num.webp" alt="Method flow" class="timeline-image show-on-big">
-          <img src="docs/edu_num.webp" alt="Method flow" class="timeline-image show-on-middle" style="width: 60%;">
-          <img src="docs/edu_num.webp" alt="Method flow" class="timeline-image show-on-small" style="width: 80%;">
-        </div>
-
-        <!-- FINISHED HERE WHEN NOT extended ♤ -->
-        
-        <button class="toggle-btn" onclick="toggleContent(this)">  
-          Show More <img src="docs/down_ari.svg" style="height: 1.4em; width: 1.4em; margin: -0.2em; margin-left: 0.3em; margin-bottom: -0.4em; padding: 0.3em; border: 1px solid #c4c4c4; border-radius: 25%; "> 
-        </button> 
-
-        <div class="hidden-content">
-
-        <div class="timeline-text-image" style="place-items: center;">
-          <img src="docs/sex.webp" alt="Vision Trasformer" class="timeline-image show-on-big" style="width: 40%;">
-          <div class="timeline-text">
-            A few insights from the analysis:
-            <a style="text-align: start;">
-              <ul style="padding-left: 2em;">
-              <li>There is direct proportion between number of years of education and the percentage of people erning more than 50'000 USD.</li>
-              <li>Men are nearly 3 times more likely than women to earn more than 50'000 USD.</li></ul></a>
-          </div>
-          <img src="docs/sex.webp" alt="Vision Trasformer" class="timeline-image show-on-small show-on-middle" style="width: 60%;">
-        </div>
-
-        <div class="timeline-text-image" style="place-items: center;">
-          <div class="timeline-text" style="text-align: end;">
-            How a 30 leaf nodes equipped Decision Tree Classifier looks like.
-          </div>
-          <img src="docs/tree_big.webp" alt="Method flow" class="timeline-image show-on-big" style="width: 65%;">
-          <img src="docs/tree_big.webp" alt="Method flow" class="timeline-image show-on-small show-on-middle">
-        </div>
-
-        
-        
-        
-        <div class="timeline-text-image" style="place-items: center;">
-          
-          <img src="docs/variables.webp" alt="Auc-roc mean value among all forgeries tested" class="timeline-image show-on-big">
-          <div class="timeline-text">
-            Most relevant features in case of Gradient Boosting.
-            <br><br>Final remarks about models performance:
-            <a style="text-align: start;">
-              <ul style="padding-left: 2em;">
-              <li>Gradient Boosting: 0.8382 accuracy</li>
-              <li>Random Forest: 0.8135 accuracy</li>
-              <li>Tree Classifier: 0.8348 accuracy</li>
-              <li>Logistic Regression: 0.8217 accuracy</li></ul></a>
-          </div>
-          <img src="docs/variables.webp" alt="Auc-roc mean value among all forgeries tested" class="timeline-image show-on-small show-on-middle">
-          
-        </div>
-
-        <div class="show-on-small"><br></div>
-        <br>
-        Further material:
-        <ul class="horiz-ul">
-          <li><a href="https://github.com/Gianmarco-San/Salary_Analysis_and_Prediction.git" target="_blank" class="links">GitHub Repo</a></li>
-        </ul>
-
-        </ul>
-
-        </div>
-        
-        <br>
-        ——
-        <ul class="horiz-ul">
-          <li>Python</li>
-          <li>NumPy</li>
-          <li>Matplotlib</li>
-          <li>Seaborn</li>
-          <li>Pandas</li>
-          <li>Pydot</li>
-          <li>Scikit-learn</li>
-        </ul>
-      
-      </div>
-    </div>
-
-
-
-
-    <div class="timeline-date show-on-small">&#x25CF 2022<!-- September--> - 2021<!-- June--></div>  
-    <div class="show-on-small"><br><br></div>
-    <div class="timeline-item">
-      <div class="timeline-date show-on-big show-on-middle">&#x25CF 2022<!--<br><p style="white-space: pre;">   Sep</p>-->
-        <p style="white-space: pre;">   —</p>
-         <p style="white-space: pre;">   2021</p><!--<p style="white-space: pre;">   Jun</p>--></div>  
-      <div class="timeline-content">
-    
-        <div class="project-header">
-          <a href="https://www.daikin.com/" target="_blank" rel="noopener noreferrer" style="display: contents;">
-          <img class='logo' src='docs/daikin_logo.webp' style='max-width: 280px;'/></a>
-          <h4><br>IT & System Integration</h4>  <!-- SW engineer & System Integration // SW & Industrial System Engineer -->
-        </div>
-        
-        <div class="timeline-text-image">
-          <div class="timeline-text">
-            <br class="show-on-big">
-          At Daikin, I worked on cloud-based HVAC monitoring, system integration, and services. 
-          <br><br>To name some projects and responsibilities:
-          <a style="text-align: start;">
-            <ul style="padding-left: 1em;">
-            <li>I built a Python-based feature, as part of a of major tool to automate several processes, allowing one-click PLC mapping and alarm selection, reducing manual configuration time and minimizing errors during the Control Department’s work.</li>
-            <li>I developed a sensor-to-cloud temperature control system optimizing energy efficiency and safety in the factory through real-time data processing. <em>You can find some details below</em>.
-            </li>
-            <li>I built and maintained services, such as periodic reports via proprietary cloud-based web API.</li>
-            </ul>
-          </a>
-
-          </div>
-        </div>
-
-        <br class="show-on-big">
-        <!-- FINISHED HERE WHEN NOT extended ♤ -->
-                
-        <button class="toggle-btn" onclick="toggleContent(this)">  
-          Show More <img src="docs/down_ari.svg" style="height: 1.4em; width: 1.4em; margin: -0.2em; margin-left: 0.3em; margin-bottom: -0.4em; padding: 0.3em; border: 1px solid #c4c4c4; border-radius: 25%; "> 
-        </button> 
-
-        <div class="hidden-content">
-
-            
-        <div class="timeline-text-image">
-          <div class="timeline-text">
-            <br>Other tasks included:
-            <ul style="padding-left: 1em;">
-            <li>Cloud and M2M system troubleshooting with customers facing difficulties.</li>
-            <li>Developing an integrated system to show the instant and cumulative amount of water extracted from two wells.</li>
-            <li>Creating preliminary designs of a new M2M communication device.</li>
-            <li>Training colleagues to use and interface with the proprietary cloud system.</li>
-            <li>Collecting feedback from the field and collaborating with the cloud system supplier to propose improvements.</li>
-            <li>Conducting tests, making proposals and collaborating on new devices, systems, and processes such as: a system to manage the air in a closed spaces, air quality monitoring, and embedding new IoT services in the cloud.</li>
-          </ul>
-            <br>
-          </div>
-        </div>
-
-       
-          
-
-          <div class="timeline-text-image">
-            <div class="timeline-text" style="text-align: end;">
-              <br class="show-on-big">
-              In the temperature control system project, I used E+E Sensors to measure the temperature in each of the 9 main columns of the factory, on 2 or 3 levels. 
-              <br><br>Sensors have been cabled via Modbus RTU (RS485) to a Siemens Controller, which is connected to the proprietary cloud to transmit the data.
-              <br><br>All data-points have been processed and displayed via cloud on a web interface to show real-time behavior of the system.
-            </div>
-            <img src="docs/temp-control.webp" alt="Gearbox" class="timeline-image show-on-big" style="width: 60%;">
-            <img src="docs/temp-control.webp" alt="Gearbox" class="timeline-image show-on-small show-on-middle">
-          </div>
-
-          <div class="show-on-small show-on-middle"><br></div>
-
-        
-        <div class="timeline-text-image" style="place-items: center;">
-          <img src="docs/hot.webp" alt="Gearbox" class="timeline-image show-on-big" style="width: 40%;">
-          
-          
-            <div class="timeline-text"> 
-              I developed the control logic on the PLC to activate the heating system when a weighted temperature measurement, based on all available data-points, falls below a threshold.            
-            </div>
-            <img src="docs/hot.webp" alt="Gearbox" class="timeline-image  show-on-middle" style="width: 65%;">
-            <img src="docs/hot.webp" alt="Gearbox" class="timeline-image show-on-small">
-            
-        </div>
-        
-
-        <div class="timeline-text-image" style="place-items: center;">
-          <div class="timeline-text" style=" text-align: end;">
-            Similarly, when the temperature exceeds the threshold, the cooling system activates.
-          </div>
-          <img src="docs/cold.webp" alt="Gearbox" class="timeline-image show-on-big" style="width: 40%;">
-          <img src="docs/cold.webp" alt="Gearbox" class="timeline-image show-on-middle" style="width: 65%;">
-          <img src="docs/cold.webp" alt="Gearbox" class="timeline-image show-on-small">
-        </div>
-
-
-        <div class="show-on-small"><br></div>
-        <!-- <br>
-        For more:
-        <ul class="horiz-ul">
-          <li><a href="https://www.daikinapplied.eu/technologies/smart-controls" target="_blank" class="links">Daikin Applied EU</a></li>
-        </ul> -->
-        
-        <br>
-        The Team:
-        <ul class="horiz-ul">          
-          <li><a href="https://linkedin.com/in/edoardo-merola" class="links" target="_blank">Edoardo</a></li>
-          <li>Sara</li>
-        </ul>
-
-      </div>
-
-        <br>
-        ——
-        <ul class="horiz-ul">
-          <li>Python, PyCharm</li>
-          <li>Virtual Machine</li>
-          <li>Modbus, qModMaster</li>
-          <li>TCP-IP, mRemoteNG</li>
-          <li>PLC Siemens Climatix IC & Cloud related programs</li>
-          <li>Internal SWs and tools</li>
-          
-        </ul>
-      
-      </div>
-    </div>
-
-
-
-
-    <div class="timeline-date show-on-small">&#x25CF 2021<!-- April--></div>  
-    <div class="show-on-small"><br><br></div>
-    <div class="timeline-item">
-      <div class="timeline-date show-on-big show-on-middle">&#x25CF 2021<!--<br><p style="white-space: pre;">   Apr</p>-->
-      </div>  
-      <div class="timeline-content">
-    
-        <div class="project-header">
-          <a href="http://www.enermovesrl.it/" target="_blank" rel="noopener noreferrer" style="display: contents;">
-          <img class='logo' src='docs/enermoveColor.webp' style='max-width: 200px;'/></a>
-          <h4><br>Optimized Infrastructure Design for Wireless Charging of Electric Vehicles</h4>
-        </div>
-        
-        <div class="timeline-text-image">
-          <div class="timeline-text">
-            <br class="show-on-big">
-            In this work I focused on optimizing the infrastructure layout for dynamic and static wireless charging systems for industrial electric vehicles, developed by <em>Enermove</em>.
-          </div>
-        </div>  
-
-          <div class="timeline-text-image">
-
-            <div class="timeline-text show-on-big" style="text-align: end;">
-              <br class="show-on-big">
-              The Wireless Power Transfer (WPT) system enables contactless charging for forklifts and other logistics vehicles, eliminating the need for dedicated charging stations and minimizing downtime.
-              <br><br>The research develops a mathematical model to determine the optimal placement and number of transmitting coils to balance charging efficiency, operational logistics, and cost minimization.
-            </div>
-
-            <div class="timeline-text show-on-middle show-on-small">
-              <br class="show-on-big">
-              The Wireless Power Transfer (WPT) system enables contactless charging for forklifts and other logistics vehicles, eliminating the need for dedicated charging stations and minimizing downtime.
-              <br><br>The research develops a mathematical model to determine the optimal placement and number of transmitting coils to balance charging efficiency, operational logistics, and cost minimization.
-            </div>
-
-            <img src="docs/ener-magaz.webp" alt="Gearbox" class="timeline-image show-on-big" style="width: 60%;">
-            <img src="docs/ener-magaz.webp" alt="Gearbox" class="timeline-image show-on-small show-on-middle">
-          </div>
-
-          <!-- FINISHED HERE WHEN NOT extended ♤ -->
-                
-        <button class="toggle-btn" onclick="toggleContent(this)">  
-          Show More <img src="docs/down_ari.svg" style="height: 1.4em; width: 1.4em; margin: -0.2em; margin-left: 0.3em; margin-bottom: -0.4em; padding: 0.3em; border: 1px solid #c4c4c4; border-radius: 25%; "> 
-        </button> 
-
-        <div class="hidden-content">
-
-          <br class="show-on-small show-on-middle">
-
-        
-        <div class="timeline-text-image" style="place-items: center;">
-          <img src="docs/ener-warehouse.webp" alt="Gearbox" class="timeline-image show-on-big">
-          
-          
-            <div class="timeline-text"> 
-              The methodology involves discretizing the warehouse layout into computational cells, analyzing vehicle movement patterns, charging time, and energy consumption.
-              <br><br>The model integrates genetic algorithms in Matlab to optimize the coil placement based on vehicle traffic density, energy demands and predict high-priority charging zones.
-              
-            </div>
-            <img src="docs/ener-warehouse.webp" alt="Gearbox" class="timeline-image  show-on-middle" style="width: 75%;">
-            <img src="docs/ener-warehouse.webp" alt="Gearbox" class="timeline-image show-on-small">
-            
-        </div>
-        
-
-        <div class="timeline-text-image" style="place-items: center;">
-          <div class="timeline-text" style=" text-align: end;">
-            The energy, economic, and operational impact of different charging configurations are considered.
-            <br><br>Additionally, cost-benefit analysis confirms that dynamic charging reduces overall infrastructure costs by minimizing the need for stationary charging points.
-            <br><br>Simulation results demonstrate that strategic coil placement significantly improves battery State of Charge (SoC) during operations.
-          </div>
-          <img src="docs/ener-plant.webp" alt="Gearbox" class="timeline-image show-on-big" style="width: 50%;">
-          <img src="docs/ener-plant.webp" alt="Gearbox" class="timeline-image show-on-middle" style="width: 65%;">
-          <img src="docs/ener-plant.webp" alt="Gearbox" class="timeline-image show-on-small">
-        </div>
-
-        
-        <div class="timeline-text-image" style="place-items: center;">
-          <img src="docs/ener-graph.webp" alt="Gearbox" class="timeline-image show-on-big">
-          
-            <div class="timeline-text"> 
-              The proposed optimized WPT infrastructure presents a scalable and adaptable solution for smart logistics and industrial automation.
-              <br><br>Future developments may explore its integration with renewable energy sources, AI-driven traffic management, and broader applications in autonomous vehicle fleets.
-              
-            </div>
-            <img src="docs/ener-graph.webp" alt="Gearbox" class="timeline-image  show-on-middle" style="width: 75%;">
-            <img src="docs/ener-graph.webp" alt="Gearbox" class="timeline-image show-on-small">
-            
-        </div>
-
-
-        <div class="show-on-small"><br></div>
-        <br>
-        For more:
-        <ul class="horiz-ul">
-          <li><a href="docs/Tesi_Enermove_Santoro.pdf" target="_blank" class="links">Enermove Research.pdf</a></li>
-        </ul> 
-        
-        <br>
-        The Team:
-        <ul class="horiz-ul">          
-          <li>Emiliano</li>
-          <li>Alberto</li>
-          <li>Saverio Stefano</li>
-          <li>Giulia</li>
-        </ul>
-
-        </div>
-
-        <br>
-        ——
-        <ul class="horiz-ul">
-          <li>Matlab</li>
-          <li>Excel</li>
-          <li>Word</li>
-          
-        </ul>
-      
-      </div>
-    </div>
-
-
-
-
-    <div class="timeline-date show-on-small">&#x25CF 2021<!-- April--></div>  
-    <div class="show-on-small"><br><br></div>
-    <div class="timeline-item">
-      <div class="timeline-date show-on-big show-on-middle">&#x25CF 2021</p>
-        <!--<p style="white-space: pre;">   Apr</p>-->
-      </div>  
-      <div class="timeline-content">
-    
-        <div class="project-header">
-
-          <div style="display: flex; flex-direction: row; justify-content: left; align-items: center; gap: 1em; flex-wrap: nowrap;">
-            <a href="https://www.polito.it/en" target="_blank" rel="noopener noreferrer" style="flex: 1; max-width: 160px;">
-              <img class='logo' src="docs/logo-polito2.webp" style="width: 100%;">
-            </a>
-            <a href="https://www.unibo.it/en" target="_blank" rel="noopener noreferrer" style="flex: 1; max-width: 100px;">
-              <img class='logo' src="docs/unibo.webp" style="width: 100%; height: auto;">
-            </a>
-          </div> 
-
-          <h4><br>Mechanical Engineering  -  M.Sc. @ PoliTo & B.Sc. @ UniBo</h4>
-        </div>
-
-        <div class="timeline-text-image">
-          <div class="timeline-text">
-            <br class="show-on-big">
-
-            I earned two degrees in Mechanical Engineering:
-            <br><a style="text-align: start;">
-              <ul style="padding-left: 2em;">
-              <li>Bachelor of Science from the <a class="links" target="_blank" href="https://corsi.unibo.it/1cycle/IngegneriaMeccanicaForliEN/course-structure-diagram/piano/2014/0949/000/000/0">University of Bologna</a>: general engineering path.</li> 
-              <li>Master of Science from the <a class="links" target="_blank" href="https://didattica.polito.it/pls/portal30/sviluppo.offerta_formativa_2019.vis?p_a_acc=2025&p_sdu=32&p_cds=37#137-272751">Polytechnic University of Turin</a>: Automation path.</li>
-            </ul></a>
-            
-          </div>
-        </div>
-
-
-    <br><h3 style="margin-bottom: 1em;">Further projects during the Academic Years - Click for related material</h3>
-    
-    <div id="carousel">
-      <div class="carousel-container">
-        <div class="carousel-wrapper">
-
-
-
-
-          <div class="carousel-item">
-            <a href="docs/Bici.pdf" target="_blank">
-              <img src="docs/bike-MSC.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">MSC APex - CAE</span>
-            </a>
-          </div>
-          
-
-          <div class="carousel-item">
-            <a href="docs/striling.pdf" target="_blank">
-              <img src="docs/stirling.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Stirling Engine Design</span>
-            </a>
-          </div>
-
-          <div class="carousel-item">
-            <a href="docs/epiciclo-render-int.webp" target="_blank">
-              <img src="docs/epiciclo.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Planetary Gearbox Design</span>
-            </a>
-          </div>
-
-          
-
-          <div class="carousel-item">
-            <a href="docs/AutomazioneSys.pdf" target="_blank">
-              <img src="docs/fuzzy.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Sys Automation Lab</span>
-            </a>
-          </div>
-
-          <div class="carousel-item">
-            <a href="docs/Fluid_Lab.pdf" target="_blank">
-              <img src="docs/fluid-auto.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Fluid Automation Lab</span>
-            </a>
-          </div>
-
-          <div class="carousel-item">
-            <a href="docs/attrezzo.webp" target="_blank">
-              <img src="docs/attrezzo.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Functional GD&T Design</span>
-            </a>
-          </div>
-
-          <div class="carousel-item">
-            <a href="docs/Mechatronics.pdf" target="_blank">
-              <img src="docs/mechatronics.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Mechatronics Lab</span>
-            </a>
-          </div>
-
-          <div class="carousel-item">
-            <a href="docs/Mechanisms.pdf" target="_blank">
-              <img src="docs/mechanisms.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Mechanisms Lab</span>
-            </a>
-          </div>
-    
-          <!-- Duplicate items again for seamless loop -->
-
-
-
-          <div class="carousel-item">
-            <a href="docs/Bici.pdf" target="_blank">
-              <img src="docs/bike-MSC.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">MSC APex - CAE</span>
-            </a>
-          </div>
-
-          <div class="carousel-item">
-            <a href="docs/striling.pdf" target="_blank">
-              <img src="docs/stirling.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Stirling Engine Design</span>
-            </a>
-          </div>
-
-
-          <div class="carousel-item">
-            <a href="docs/epiciclo-render-int.webp" target="_blank">
-              <img src="docs/epiciclo.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Planetary Gearbox Design</span>
-            </a>
-          </div>
-
-          
-
-          <div class="carousel-item">
-            <a href="docs/AutomazioneSys.pdf" target="_blank">
-              <img src="docs/fuzzy.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Sys Automation Lab</span>
-            </a>
-          </div>
-
-          <div class="carousel-item">
-            <a href="docs/Fluid_Lab.pdf" target="_blank">
-              <img src="docs/fluid-auto.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Fluid Automation Lab</span>
-            </a>
-          </div>
-
-          <div class="carousel-item">
-            <a href="docs/attrezzo.webp" target="_blank">
-              <img src="docs/attrezzo.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Functional GD&T Design</span>
-            </a>
-          </div>
-
-          <div class="carousel-item">
-            <a href="docs/Mechatronics.pdf" target="_blank">
-              <img src="docs/mechatronics.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Mechatronics Lab</span>
-            </a>
-          </div>
-
-          <div class="carousel-item">
-            <a href="docs/Mechanisms.pdf" target="_blank">
-              <img src="docs/mechanisms.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
-              <span class="carousel-description">Mechanisms Lab</span>
-            </a>
-          </div>
-
-                    
-        </div>
-      </div>
-    </div>     
-
-
-        <br>Scroll down the Timeline for more projects.
-        <br><br>
-
-        <!-- FINISHED HERE WHEN NOT extended ♤ -->
-                
-        <button class="toggle-btn" onclick="toggleContent(this)">  
-          Show More <img src="docs/down_ari.svg" style="height: 1.4em; width: 1.4em; margin: -0.2em; margin-left: 0.3em; margin-bottom: -0.4em; padding: 0.3em; border: 1px solid #c4c4c4; border-radius: 25%; "> 
-        </button> 
-
-        <div class="hidden-content">
-
-          <br class="show-on-small show-on-middle">
-
-        <br>Topics:
-
-            <br><a style="text-align: start;">
-              <ul style="padding-left: 2em;">
-
-              <li>Manufacturing: Integrated Sys, Materials and Processes.</li> 
-              <li>Fluid Machinery & Dynamics, Advanced Engineering Thermodynamics, Numerical Modelling.</li>
-              <li>Mechatronics, Fluid Automation, Mechanics of Automatic Machines, Mechanical Sys Automation.</li>
-              <li>Business Economics, Industrial & Mechanical Plants, Structural Diagnostics, Reliability of Machines.</li>
-              <li>Dynamics of Mechanical Sys, Machine & Functional Design, Electrotechnics.</li>
-                
-            </ul></a>
-
-        <br class="show-on-small">
-        
-        <!-- <br>
-        Further material:
-        <ul class="horiz-ul">
-          <li><a href="https://github.com/Gianmarco-San" target="_blank" class="links">GitHub Repo</a></li>
-        </ul> -->
-
-
-      </div>
-        
-        
-        <br>
-        ——
-        <ul class="horiz-ul">
-          <li>PLC</li>
-          <li>Excel</li>
-          <li>Matlab</li>
-          <li>C</li>
-          <li>Simulink</li>
-          <li>AutoCad</li>
-          <li>SolidWorks</li>
-          <li>GIM, MSC-Adams/Apex, and more</li>
-        </ul>
-      
-      
-    </div>
-  </div>
-
-    
-
-
-
-    <div class="timeline-date show-on-small">&#x25CF 2019<!-- July--></div>  
-      <div class="show-on-small"><br><br></div>
-    <div class="timeline-item">
-      <div class="timeline-date show-on-big show-on-middle">&#x25CF 2019<!--<br><p style="white-space: pre;">   Jul</p>--></div>  
-      <div class="timeline-content">
-    
-        <div class="project-header">
-          <a href="https://www.polito.it/en" target="_blank" rel="noopener noreferrer" style="display: contents;">
-            <img class='logo' src='docs/logo-polito2.webp' style='max-width: 160px;'/></a>
-          <h4><br>Fluid in Conduit Heat Exchange Numerical Modeling</h4>
-        </div>
-        
-          <div class="timeline-text-image">
-
-            <div class="timeline-text show-on-big" style="text-align: end;">
-              <br class="show-on-big">
-              We worked on the finite element numerical modeling of heat exchange in a flue gas conduit, simulating convective-diffusive thermal transfer.
-              <br><br>Based on a previously designed air-based residential boiler, you can see the project below.
-              <br><br>We examated how heat dissipates from the combustion gases flowing through the chimney, both inside and outside the building, quantifying temperature distribution and energy recovery.
-            </div>
-
-          <div class="timeline-text show-on-middle show-on-small">
-            <br class="show-on-big">
-            We worked on the finite element numerical modeling of heat exchange in a flue gas conduit, simulating convective-diffusive thermal transfer.
-            <br><br>Based on a previously designed air-based residential boiler, you can see the project below.
-            <br><br>We examated how heat dissipates from the combustion gases flowing through the chimney, both inside and outside the building, quantifying temperature distribution and energy recovery.
-          </div>
-
-          <img src="docs/tube.webp" alt="Gearbox" class="timeline-image">
-        </div>
-
-          <!-- FINISHED HERE WHEN NOT extended ♤ -->
-                
-        <button class="toggle-btn" onclick="toggleContent(this)">  
-          Show More <img src="docs/down_ari.svg" style="height: 1.4em; width: 1.4em; margin: -0.2em; margin-left: 0.3em; margin-bottom: -0.4em; padding: 0.3em; border: 1px solid #c4c4c4; border-radius: 25%; "> 
-        </button> 
-
-        <div class="hidden-content">
-
-
-          <div class="show-on-small show-on-middle"><br></div>
-
-        
-        <div class="timeline-text-image" style="place-items: center;">
-          <img src="docs/conditions.webp" alt="Gearbox" class="timeline-image show-on-big">
-          
-            <div class="timeline-text"> 
-              The governing equation accounts for convective heat transfer within the flue gases and conductive transfer through the metal walls, using a cylindrical coordinate system for computational efficiency.
-              <br><br>The model incorporates boundary conditions for internal and external environments, including Dirichlet, Neumann, and Robin conditions, ensuring realistic heat exchange representation.
-            
-            </div>
-            <img src="docs/conditions.webp" alt="Gearbox" class="timeline-image  show-on-middle" style="width: 65%;">
-            <img src="docs/conditions.webp" alt="Gearbox" class="timeline-image show-on-small">
-            
-        </div>
-        
-        <div class="timeline-text-image" style="place-items: center;">
-          <div class="timeline-text" style=" text-align: end;">
-            We applied finite element discretization to solve the stationary and transient heat transfer problem.
-            <br><br>The mesh resolution was optimized to balance computational cost and accuracy, using Gaussian elimination for matrix resolution.
-            <br><br>The transient simulation models the system’s thermal evolution, validating that steady-state conditions match real operational scenarios.
-          </div>
-          <img src="docs/gradient.webp" alt="Tree" class="timeline-image">
-        </div>
-
-
-        <div class="timeline-text-image" style="place-items: center;">
-          <img src="docs/transient.webp" alt="Gearbox" class="timeline-image show-on-big">
-            
-          <div class="timeline-text"> 
-            The sensitivity analysis was conducted by varying the gas velocity, demonstrating its impact on heat dissipation and flue gas temperature at the outlet.
-            <br><br>Results confirmed that lower velocities increase heat loss, reducing the final temperature of exhaust gases.
-            </div>
-
-            <img src="docs/transient.webp" alt="Gearbox" class="timeline-image show-on-small show-on-middle">            
-        </div>
-
-
-        <div class="show-on-small"><br></div>
-        <br>
-        Further material:
-        <ul class="horiz-ul">
-          <li><a href="docs/Numerical_model-Heat_exchange.pdf" target="_blank" class="links">Report.pdf</a></li>
-          <li><a href="https://github.com/Gianmarco-San/Numerical_Model_Heat_Exchange.git" target="_blank" class="links">GitHub Repo</a></li>
-        </ul>
-        
-        <br>
-        The Team:
-        <ul class="horiz-ul">          
-          <li><a href="https://linkedin.com/in/alessandro-peripoli-9683931b6" class="links" target="_blank">Alessandro</a></li>
-          <li><a href="https://linkedin.com/in/luca-pirini-casadei-54a7001a6" class="links" target="_blank">Luca</a></li>
-        </ul>
-
-        </div>
-
-        <br>
-        ——
-        <ul class="horiz-ul">
-          <li>Matlab</li>
-        </ul>
-      
-      </div>
-    </div>
-
-
-
-    <div class="timeline-date show-on-small">&#x25CF 2019<!-- July--></div>  
-      <div class="show-on-small"><br><br></div>
-    <div class="timeline-item">
-      <div class="timeline-date show-on-big show-on-middle">&#x25CF 2019<!--<br><p style="white-space: pre;">   Jul</p>--></div>  
-      <div class="timeline-content">
-    
-        <div class="project-header">
-          <a href="https://www.polito.it/en" target="_blank" rel="noopener noreferrer" style="display: contents;">
-            <img class='logo' src='docs/logo-polito2.webp' style='max-width: 160px;'/></a>
-          <h4><br>Residential Air-Based Boiler Design & Optimization</h4>
-        </div>
-        
-          <div class="timeline-text-image">
-
-            <div class="timeline-text show-on-big" style="text-align: end;">
-              <br class="show-on-big">
-              Design and optimized a residential air-based boiler using methane combustion.<br><br>
-              The system features two concentric chambers:
-              <a style="text-align: start;">
-                <ul style="padding-left: 5em;">
-                <li>An inner combustion chamber</li>
-                <li>An outer airflow chamber for heat distribution</li></ul></a> 
-                <br>
-                Two fans regulate combustion air intake and heated air circulation, while an integrated chimney enhances energy recovery from flue gases.
-                <br><br>
-              The thermodynamic analysis includes stoichiometric combustion modeling, temperature calculations, and efficiency evaluation.
-            </div>
-
-            <div class="timeline-text show-on-middle show-on-small">
-              <br class="show-on-big">
-              Design and optimized a residential air-based boiler using methane combustion.<br><br>
-              The system features two concentric chambers:
-              <a style="text-align: start;">
-                <ul style="padding-left: 2em;">
-                <li>An inner combustion chamber</li>
-                <li>An outer airflow chamber for heat distribution</li></ul></a> 
-                <br>
-                Two fans regulate combustion air intake and heated air circulation, while an integrated chimney enhances energy recovery from flue gases.
-                <br><br>
-              The thermodynamic analysis includes stoichiometric combustion modeling, temperature calculations, and efficiency evaluation.
-            </div>
-
-
-            <img src="docs/home-sys.webp" alt="Gearbox" class="timeline-image">
-          </div>
-
-          <!-- FINISHED HERE WHEN NOT extended ♤ -->
-                
-        <button class="toggle-btn" onclick="toggleContent(this)">  
-          Show More <img src="docs/down_ari.svg" style="height: 1.4em; width: 1.4em; margin: -0.2em; margin-left: 0.3em; margin-bottom: -0.4em; padding: 0.3em; border: 1px solid #c4c4c4; border-radius: 25%; "> 
-        </button> 
-
-        <div class="hidden-content">
-
-
-          <div class="show-on-small show-on-middle"><br></div>
-
-        
-        <div class="timeline-text-image" style="place-items: center;">
-          <img src="docs/heat-model.webp" alt="Gearbox" class="timeline-image show-on-big">
-          <img src="docs/alette.webp" alt="Gearbox" class="timeline-image show-on-big" style="width: 20%; margin-left: 0.5em;">
-            <div class="timeline-text"> 
-              The heat exchanger, sized via LMTD methodology, was analyzed in finned and non-finned configurations to maximize heat transfer. 
-              <br><br>Radiation effects and insulation were also considered to minimize thermal losses.
-            
-            </div>
-            <img src="docs/heat-model.webp" alt="Gearbox" class="timeline-image  show-on-middle" style="width: 65%;">
-            <img src="docs/alette.webp" alt="Gearbox" class="timeline-image show-on-middle" style="width: 25%;">
-            <img src="docs/heat-model.webp" alt="Gearbox" class="timeline-image show-on-small">
-            <img src="docs/alette.webp" alt="Gearbox" class="timeline-image show-on-small" style="width: 65%;">
-        </div>
-        
-        <div class="timeline-text-image" style="place-items: center;">
-          <div class="timeline-text" style=" text-align: end;">
-            The ventilation system was dimensioned based on pressure drop calculations and flow balancing, ensuring optimal air distribution. 
-            <br><br>Fan power requirements were determined using fluid dynamics principles, accounting for concentrated and distributed pressure losses.
-            <br><br>An exergy analysis quantified system irreversibilities and efficiency, optimizing heat recovery through the chimney.
-          </div>
-          <img src="docs/ventil.webp" alt="Tree" class="timeline-image">
-        </div>
-
-        <div class="timeline-text-image" style="place-items: center;">
-          <img src="docs/smoke-temp.webp" alt="Gearbox" class="timeline-image show-on-big">
-            
-          <div class="timeline-text"> 
-            In the image the temperature of the air flowing into the system.
-            <br><br>For detailed information on the initial considerations, calculations, and the complete design documentation, please refer to the attached material. The documents are in Italian but should be straightforward to navigate.
-            </div>
-
-            <img src="docs/smoke-temp.webp" alt="Gearbox" class="timeline-image show-on-small show-on-middle">            
-        </div>
-
-
-        <div class="show-on-small"><br></div>
-        <br>
-        Further material:
-        <ul class="horiz-ul">
-          <li><a href="docs/Relazione_caldaria.pdf" target="_blank" class="links">Report.pdf</a></li>
-          <li><a href="docs/caldaia-residenziale.xlsx" target="_blank" class="links">Calculations.xlsx</a></li>
-        </ul>
-        
-        <br>
-        The Team:
-        <ul class="horiz-ul">          
-          <li><a href="https://linkedin.com/in/alessandro-peripoli-9683931b6" class="links" target="_blank">Alessandro</a></li>
-          <li><a href="https://linkedin.com/in/luca-pirini-casadei-54a7001a6" class="links" target="_blank">Luca</a></li>
-          <li><a href="https://linkedin.com/in/simone-pasini-it" class="links" target="_blank">Simone</a></li>
-          <li><a>Luigi</a></li>
-        </ul>
-
-        </div>
-
-        <br>
-        ——
-        <ul class="horiz-ul">
-          <li>Excel & Solver</li>
-          <li>AutoCad</li>
-          <li>Word</li>
-          <li>Various manuals</li>
-          <li>UNI, EN, ISO, DIN Standards</li>
-        </ul>
-      
-      </div>
-    </div>
-  
-
-
-    <div class="timeline-date show-on-small">&#x25CF 2019<!-- June--></div>  
-      <div class="show-on-small"><br><br></div>
-    <div class="timeline-item">
-      <div class="timeline-date show-on-big show-on-middle">&#x25CF 2019<!--<br><p style="white-space: pre;">   Jun</p>--></div>  
-      <div class="timeline-content">
-    
-        <div class="project-header">
-          <a href="https://www.polito.it/en" target="_blank" rel="noopener noreferrer" style="display: contents;">
-            <img class='logo' src='docs/logo-polito2.webp' style='max-width: 160px;'/></a>
-          <h4><br>Design of a two-stage reduction gearbox for general applications</h4>
-        </div>
-        
-          <div class="timeline-text-image">
-
-            <div class="timeline-text show-on-big" style="text-align: end;">
-              <br class="show-on-big">
-              The goal was to design a two-stage parallel-axis pendular gearbox.
-              <br><br>Shafts and gears were dimensioned based on key design specifications, starting with a conservative approach and refining iteratively to minimize oversizing.
-              <br>
-            </div>
-
-            <div class="timeline-text show-on-middle show-on-small">
-              <br class="show-on-big">
-              The goal was to design a two-stage parallel-axis pendular gearbox.
-              <br><br>Shafts and gears were dimensioned based on key design specifications, starting with a conservative approach and refining iteratively to minimize oversizing.
-              <br>
-            </div>
-
-            <img src="docs/3D_Comp.webp" alt="Gearbox" class="timeline-image show-on-big" style="width: 30%;">
-            <img src="docs/3D_Comp.webp" alt="Gearbox" class="timeline-image show-on-middle" style="width: 60%;">
-            <img src="docs/3D_Comp.webp" alt="Gearbox" class="timeline-image show-on-small" style="width: 80%;">
-          </div>
-
-          <!-- FINISHED HERE WHEN NOT extended ♤ -->
-                
-        <button class="toggle-btn" onclick="toggleContent(this)">  
-          Show More <img src="docs/down_ari.svg" style="height: 1.4em; width: 1.4em; margin: -0.2em; margin-left: 0.3em; margin-bottom: -0.4em; padding: 0.3em; border: 1px solid #c4c4c4; border-radius: 25%; "> 
-        </button> 
-
-        <div class="hidden-content">
-
-          <div class="show-on-small"><br></div>
-          <div class="show-on-middle"><br></div>
-
-        
-        <div class="timeline-text-image" style="place-items: center;">
-          <img src="docs/gearbox-section.webp" alt="Gearbox" class="timeline-image show-on-big">
-            <div class="timeline-text">
-              <p>Bearings were selected with attention to assembly challenges, and the gearbox was completed with the most suitable mechanical components, aiming for a practical design.<br><br>In this image, you can see a section of the assembly drawing of the gearbox.</p>
-            
-            </div>
-            <img src="docs/gearbox-section.webp" alt="Gearbox" class="timeline-image show-on-small show-on-middle">
-        </div>
-        
-        <div class="timeline-text-image" style="place-items: center;">
-          <div class="timeline-text" style=" text-align: end;">
-            <p>The design of one of the drive shafts.<br><br>For detailed information on the initial considerations, calculations, and the complete design documentation, please refer to the attached material. The documents are in Italian but should be straightforward to navigate.</p>
-          </div>
-          <img src="docs/albero.webp" alt="Tree" class="timeline-image">
-        </div>
-        <div class="show-on-small"><br></div>
-        <br>
-        Further material:
-        <ul class="horiz-ul">
-          <li><a href="docs/Relazione_progetto.pdf" target="_blank" class="links">Report.pdf</a></li>
-          <li><a href="docs/riduttore.pdf" target="_blank" class="links">Gearbox-design.pdf</a></li>
-          <li><a href="docs/albero.pdf" target="_blank" class="links">DriverShaft-design.pdf</a></li>
-          <li><a href="docs/Progetto_CdM.xlsx" target="_blank" class="links">Calculations.xlsx</a></li>
-        </ul>
-        
-        <br>
-        The Team:
-        <ul class="horiz-ul">          
-          <li><a href="https://linkedin.com/in/alessandro-peripoli-9683931b6" class="links" target="_blank">Alessandro</a></li>
-          <li><a href="https://linkedin.com/in/luca-pirini-casadei-54a7001a6" class="links" target="_blank">Luca</a></li>
-        </ul>
-
-        </div>
-        <br>
-        ——
-        <ul class="horiz-ul">
-          <li>Excel & Solver</li>
-          <li>SolidWorks</li>
-          <li>AutoCad</li>
-          <li>Word</li>
-          <li>Various manuals</li>
-          <li>UNI, EN, ISO, DIN Standards</li>
-        </ul>
-      
-      </div>
-    </div>
-
-
-
-    <div class="timeline-date show-on-small">&#x25CF 2018<!-- September--></div>  
-      <div class="show-on-small"><br><br></div>
-    <div class="timeline-item">
-      <div class="timeline-date show-on-big show-on-middle">&#x25CF 2018<!--<br><p style="white-space: pre;">   Sep</p>--></div>  
-      <div class="timeline-content">
-    
-        <div class="project-header">
-          <a href="https://iul.mb.tu-dortmund.de/en/" target="_blank" rel="noopener noreferrer" style="display: contents;">
-          <img class='logo' src='docs/IUL.webp' style='max-width: 250px;'/></a>
-          <h4><br>Mixed Alloy Chip Extrusion</h4>
-        </div>
-
-        
-        
-          <div class="timeline-text-image">
-            <div class="timeline-text">
-              <br class="show-on-big">
-              I've conducted this research at the Institut für Umformtechnik und Leichtbau (IUL), TU Dortmund, combining experiments and FEM simulations.
-              <br><br>The direct recycling of aluminum machining chips using hot extrusion (Chip Extrusion), avoids re-melting to produce high-quality profiles.
-              <br><br>The research explores the feasibility of extruding mixed alloy chips of varying shapes and sizes, optimizing processing parameters to achieve structural and aesthetic properties comparable to standard cast billets and assessing the feasibility of the process at an industrial level.
-              <br><br>The process involves chip classification, cleaning, and cold compaction into billets before undergoing hot extrusion using porthole and flat-face dies.
-            </div>
-          </div>
-          <br>
-          <img src="docs/chip-process.webp" alt="Gearbox" class="timeline-image" style="width: 100%;">
-
-          <!-- FINISHED HERE WHEN NOT extended ♤ -->
-                
-        <button class="toggle-btn" onclick="toggleContent(this)">  
-          Show More <img src="docs/down_ari.svg" style="height: 1.4em; width: 1.4em; margin: -0.2em; margin-left: 0.3em; margin-bottom: -0.4em; padding: 0.3em; border: 1px solid #c4c4c4; border-radius: 25%; "> 
-        </button> 
-
-        <div class="hidden-content">
-
-          <br class="show-on-small show-on-middle">
-
-          <div class="timeline-text-image" style="place-items: center;">
-            <div class="timeline-text" style=" text-align: end;"> 
-              Tensile, hardness, and microstructural analyses assess the bonding quality between chips, identifying key factors like oxide layer disruption and strain levels.
-              <br><br>Chip-based extrudates can achieve comparable mechanical properties to cast billets, with some cases exhibiting higher strength due to grain refinement and oxide layer effects.
-            </div>
-            <img src="docs/chip-level.webp" alt="Tree" class="timeline-image">
-          </div>
-          
-
-        
-        <div class="timeline-text-image" style="place-items: center;">
-          <img src="docs/chip-stress.webp" alt="Gearbox" class="timeline-image show-on-big">
-            <div class="timeline-text">
-              FEM simulations using HyperMesh, HyperExtrude and Matlab validate the experimental findings, modeling stress, strain, and temperature distributions during extrusion.
-              <br><br>The welding line criteria has been applied to predict chip bonding and optimize process parameters.
-              <br><br>Results show that higher extrusion ratios and optimized die designs significantly improve mechanical performance and surface quality.
-            </div>
-            <img src="docs/chip-stress.webp" alt="Gearbox" class="timeline-image show-on-small show-on-middle">
-        </div>
-        
-        <div class="timeline-text-image" style="place-items: center;">
-          <div class="timeline-text" style=" text-align: end;">
-            The research demonstrates an energy-efficient recycling alternative with 3-4% additional energy savings over conventional secondary aluminum re-melting.
-            <br><br>While challenges remain in surface quality and porosity, as well as in the standardization of the process.
-            <br><br>The findings suggest a viable path for industrial-scale adoption of chip extrusion in sustainable metal manufacturing.
-          </div>
-          <img src="docs/chip-matlab.webp" alt="Tree" class="timeline-image">
-        </div>
-
-        <div class="timeline-text-image">
-          <div class="timeline-text">
-            <br class="show-on-big">
-            Hereafter, an extruded profile and a section after chemical process on microscope.
-          </div>
-          <img src="docs/chip-profile.webp" alt="Gearbox" class="timeline-image show-on-middle show-on-small">
-          <img src="docs/chip-section.webp" alt="Gearbox" class="timeline-image show-on-middle show-on-small">
-        </div>
-        
-          <br>
-          
-          <div class="show-on-big" style="display: flex; flex-direction: row; gap: 10px;">
-          <img src="docs/chip-profile.webp" alt="Gearbox" class="timeline-image show-on-big">
-          <img src="docs/chip-section.webp" alt="Gearbox" class="timeline-image show-on-big">
-          </div>
-
-        
-        
-        
-        <div class="show-on-small"><br></div>
-        <br>
-        For more:
-        <ul class="horiz-ul">
-          <li><a href="docs/chip_extrusion_thesis.pdf" target="_blank" class="links">Chip Extrusion Thesis.pdf</a></li>
-        </ul>
-        
-        <br>
-        The Team:
-        <ul class="horiz-ul">          
-          <li>Johannes</li>
-          <li>Felix</li>
-          <li>Andre</li>
-          <li>Oliver²</li>
-          <li>Christoph</li>
-        </ul>
-
-        </div>
-
-        <br>
-        ——
-        <ul class="horiz-ul">
-          <li>Matlab</li>
-          <li>CATIA</li>
-          <li>HyperMesh & HyperExtrude</li>
-          <li>Excel</li>
-          <li>Word</li>
-          <li>PowerPoint</li>
-          <li>Great variety of mechanical, chemical and lab tools</li>
-        </ul>
-      
-      </div>
-    </div>
-
-
-  
-  </div>
-
+  <div class="filter-bar" id="bento-filter-bar"></div>
+  <div class="bento-grid" id="bento-grid"></div>
   </section>
   
 
 
-    <br><br><br>
-
   <hr class="custom-separator">
+
+  <div id="egg-mistery-wrap">
 
 
   <section id="mistery">
 
     <!-- <h3>A few Useful, Interesting, Inspiring Websites, People & Products</h3> -->
 
-    <h2 style="text-align: center; margin: 1em;">A few Useful, Interesting, Inspiring Websites, People & Products</h2>
+    <h2 style="text-align: center; margin: 0.9em;">A few Useful, Interesting, Inspiring Websites, People & Products</h2>
     
     <div id="carousel">
       <div class="carousel-container">
@@ -2122,41 +446,60 @@
 
         
           <div class="carousel-item">
-            <a href="https://internetingishard.netlify.app/" target="_blank">
+            <a href="https://internetingishard.netlify.app/" target="_blank" rel="noopener noreferrer">
                 <img src="docs/internnetting.webp" alt="Internetting is Hard Website">
                 <span class="carousel-description">Front-End Web Developing</span>
             </a>
           </div>
       
           <div class="carousel-item">
-            <a href="https://teenage.engineering/products" target="_blank">
+            <a href="https://teenage.engineering/products" target="_blank" rel="noopener noreferrer">
             <img src="docs/teen-engineering-2.webp">
             <span class="carousel-description">Teenage Engineering Products</span>
           </a>
         </div>
 
+        <div class="carousel-item">
+          <a href="https://foundersfund.com/portfolio/" target="_blank" rel="noopener noreferrer">
+          <img src="docs/ffund.webp">
+          <span class="carousel-description">Founders Fund Portfolio</span>
+        </a>
+      </div>
+          
+        <!--
           <div class="carousel-item"><iframe src="https://foundersfund.com/portfolio/"></iframe>
             <span class="carousel-description">Founders Fund Portfolio</span>
           </div>
+          -->
 
           <div class="carousel-item">
-            <a href="https://karpathy.ai/" target="_blank">
+            <a href="https://karpathy.ai/" target="_blank" rel="noopener noreferrer">
             <img src="docs/karpa.webp">
             <span class="carousel-description">Computer Vision guy</span>
           </a>
           </div>
 
           <div class="carousel-item">
-            <a href="https://retireinprogress.com/" target="_blank">
+            <a href="https://retireinprogress.com/" target="_blank" rel="noopener noreferrer">
             <img src="docs/rip.webp">
             <span class="carousel-description">Mr. RiP</span>
           </a>
           </div>
 
+
+          <div class="carousel-item">
+            <a href="https://www.lovefrom.com/" target="_blank" rel="noopener noreferrer">
+            <img src="docs/lovefrom.webp">
+            <span class="carousel-description">®<k style="font-family: 'Baskervville', sans-serif;">LoveFrom,</k> <em>Sir Jony Ive</em> ™</span>
+          </a>
+          </div>
+
+          <!--
           <div class="carousel-item">
             <iframe src="https://www.lovefrom.com/"></iframe>
             <span class="carousel-description">®<k style="font-family: 'Baskervville', sans-serif;">LoveFrom,</k> <em>Sir Jony Ive</em> ™</span>
-          </div>   
+          </div>  
+          --> 
              
 
     
@@ -2164,41 +507,59 @@
 
 
           <div class="carousel-item">
-            <a href="https://internetingishard.netlify.app/" target="_blank">
+            <a href="https://internetingishard.netlify.app/" target="_blank" rel="noopener noreferrer">
                 <img src="docs/internnetting.webp" alt="Internetting is Hard Website">
                 <span class="carousel-description">Front-End Web Developing</span>
             </a>
           </div>
       
           <div class="carousel-item">
-            <a href="https://teenage.engineering/products" target="_blank">
+            <a href="https://teenage.engineering/products" target="_blank" rel="noopener noreferrer">
             <img src="docs/teen-engineering-2.webp">
             <span class="carousel-description">Teenage Engineering Products</span>
           </a>
         </div>
 
+        <div class="carousel-item">
+          <a href="https://foundersfund.com/portfolio/" target="_blank" rel="noopener noreferrer">
+          <img src="docs/ffund.webp">
+          <span class="carousel-description">Founders Fund Portfolio</span>
+        </a>
+      </div>
+          
+        <!--
           <div class="carousel-item"><iframe src="https://foundersfund.com/portfolio/"></iframe>
             <span class="carousel-description">Founders Fund Portfolio</span>
           </div>
+          -->
 
           <div class="carousel-item">
-            <a href="https://karpathy.ai/" target="_blank">
+            <a href="https://karpathy.ai/" target="_blank" rel="noopener noreferrer">
             <img src="docs/karpa.webp">
             <span class="carousel-description">Computer Vision guy</span>
           </a>
           </div>
 
           <div class="carousel-item">
-            <a href="https://retireinprogress.com/" target="_blank">
+            <a href="https://retireinprogress.com/" target="_blank" rel="noopener noreferrer">
             <img src="docs/rip.webp">
             <span class="carousel-description">Mr. RiP</span>
           </a>
           </div>
 
           <div class="carousel-item">
+            <a href="https://www.lovefrom.com/" target="_blank" rel="noopener noreferrer">
+            <img src="docs/lovefrom.webp">
+            <span class="carousel-description">®<k style="font-family: 'Baskervville', sans-serif;">LoveFrom,</k> <em>Sir Jony Ive</em> ™</span>
+          </a>
+          </div>
+
+          <!--
+          <div class="carousel-item">
             <iframe src="https://www.lovefrom.com/"></iframe>
             <span class="carousel-description">®<k style="font-family: 'Baskervville', sans-serif;">LoveFrom,</k> <em>Sir Jony Ive</em> ™</span>
-          </div> 
+          </div>  
+          --> 
                     
         </div>
       </div>
@@ -2242,53 +603,32 @@
   <!--"https://eml.wikipedia.org/w/index.php?curid=42464" https://www.motorvalley.it/en/ o altro su turismo e cibo tipo-->
 
 </section>
+  </div><!-- end #egg-mistery-wrap -->
+
 <section id="about">
 
     <!-- Footer Section -->
+    <!-- Suggestion box: uses Formspree for email delivery.
+         1. Sign up free at https://formspree.io
+         2. Create a new form → copy the form ID
+         3. Replace YOUR_FORM_ID below with your ID -->
     <footer class="custom-footer1">
-      <footer class="footer-content1">        
-      
-        <br><br><br><br><br>
-          
-          <div class="social-links">
-            <div class="footer-social-icons" style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 2em;">
-
-              <a class="gradient-text tooltip" style="border-radius: 15%;" >
-              <p href="Gianmarco_Santoro_CV.pdf" style="font-weight: 400; font-size: 1.2; line-height: 2.0em;" id="cv-download" target="_blank" class="social-icon">
-                CV
-              </p><span class="tooltip-text">Download my Resume <img src="docs/download_icon.png" style="height: 1.0em;"></span>
-              </a>
-              
-              
-              <a class="gradient-text tooltip" style="border-radius: 15%;" onclick="copyToClipboard(this)">
-                <img src="docs/mail_icon.png" alt="Mail Logo" class="social-icon">
-                <span class="tooltip-text">Click to Copy my Mail <img src="docs/copy-icon.png" style="height: 1.0em;"></span>
-              </a>
-              
-              
-              <a class="gradient-text tooltip" href="https://www.github.com/Gianmarco-San" target="_blank" rel="noopener noreferrer" style="border-radius: 50%;">
-                <img src="docs/github_logo.webp" alt="GitHub Logo" class="social-icon" style="border-radius: 50%;">
-                <span class="tooltip-text">Visit my GitHub <img src="docs/new-tab-icon.png" style="height: 1.0em;"></span>
-              </a>
-              
-
-              <a class="gradient-text tooltip" href="https://www.linkedin.com/in/gianmarco-ai-engineer" target="_blank" rel="noopener noreferrer" style="border-radius: 15%;">
-                <img src="docs/linkedin_logo.webp" alt="LinkedIn Logo" class="social-icon">
-                <span class="tooltip-text">Visit my Linkedin <img src="docs/new-tab-icon.png" style="height: 1.0em;"></span>
-              </a>
-                
-              
-              <a class="gradient-text tooltip" href="https://www.imdb.com/user/ur124794700/ratings/?ref_=ext_shr_lnk" target="_blank" rel="noopener noreferrer" style="border-radius: 15%;">
-                <img src="docs/imdb_logo.webp" alt="IMDb Logo" class="social-icon">
-                <span class="tooltip-text">Check my Ratings ✩</span>
-              </a>
-            </div>
+      <div class="suggest-box">
+        <h3 class="suggest-title">Got a suggestion? Please send me a message!</h3>
+        <p class="suggest-sub">For me, for this website, a new tool or any project I could help with.</p>
+        <form class="suggest-form" action="https://formspree.io/f/maqlkvoe" method="POST">
+          <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+          <div class="suggest-row">
+            <input type="text"  name="name"    placeholder="Your name (optional)">
+            <input type="email" name="email"   placeholder="Your email (optional, to get a reply)">
           </div>
-
-          <br><br><br><br><br>
-      
-
-    </footer>
+          <textarea name="message" placeholder="Your suggestion..." rows="4" required></textarea>
+          <p class="suggest-privacy-note">Messages are processed by Formspree → <a href="https://formspree.io/legal/privacy-policy" target="_blank" rel="noopener noreferrer"><em>Privacy Policy</em></a></p>
+          <div class="suggest-btn-wrap">
+            <button type="submit" class="suggest-btn">Send ♡</button>
+          </div>
+        </form>
+      </div>
     </footer>
 
     <footer class="custom-footer2">
@@ -2297,10 +637,10 @@
 
           J | I've crafted this website mixing UX-UI directly via HTML, CSS, and a glimpse of JS.
     
-          <br>This website is cookies free! But if you ask, you might have one. 🍪
+          <br>This website is cookies free!<span id="egg-cookie"> But if you ask, you might have one. 🍪</span>
           
     <br><br>I'm not affiliated with any of the brands, websites, people, companies shown.
-    <br>Website and Content © 2024 - '25 by <em>Gianmarco Santoro</em>. <img src="docs/icons8-one-ring-48.png" style="width: 1.0em; height: auto;" title= 'Three Rings for the Elven-kings under the sky, 👑
+    <br>Website and Content © 2024 - '26 by <em>Gianmarco Santoro</em>. <img id="egg-ring" src="docs/icons8-one-ring-48.png" style="width: 1.0em; height: auto;" title= 'Three Rings for the Elven-kings under the sky, 👑
     Seven for the Dwarf-lords in their halls of stone, ⛰️
     Nine for Mortal Men, doomed to die, 🗡️
     One for the Dark Lord on his dark throne ☄️
@@ -2328,8 +668,8 @@
     -->
     
     <a class="gradient-text tooltip" href='#home' id="logo-link" target="_blank" rel="noopener noreferrer" style='max-width: 60px; max-height: 60px; border-radius: 50%;'>
-      <img class='logo' src='docs/MyDuckR.png' style='max-width: 60px; max-height: 60px; border-radius: 50%;' class="social-icon">
-      <span class="tooltip-text">Click to quack back to start! 🦆</span>
+      <img id="egg-logo" class='logo' src='docs/MyDuckR.png' style='max-width: 60px; max-height: 60px; border-radius: 50%;'>
+      <span id="egg-logo-tooltip" class="tooltip-text">Quack back to start! 🦆</span>
     
 
 
@@ -2368,7 +708,7 @@
       tooltip.textContent = "Copied! ✅"; // Show success message
 
       setTimeout(() => {
-        tooltip.innerHTML = 'Click to Copy my Mail  <img src="docs/copy-icon.png" style="height: 1.0em;">'; // Reset after 2s
+        tooltip.innerHTML = 'Copy my Mail <img src="docs/copy-icon.png" style="height: 1.0em;">'; // Reset after 2s
       }, 2000);
     }).catch(err => console.error("Copy failed:", err));
   }
@@ -2418,6 +758,8 @@
     // Apply smooth scrolling to nav links
     navLinks.forEach(link => {
       link.addEventListener("click", (e) => {
+        var href = link.getAttribute("href");
+        if (!href || !href.startsWith('#')) return;
         e.preventDefault();
         smoothScroll(link);
       });
@@ -2442,9 +784,12 @@
         }
       });
 
+      var sectionNavMap = { home: 'home', portfolio: 'home', mistery: 'home', about: 'home' };
+      var navSection = sectionNavMap[currentSection] || currentSection;
       navLinks.forEach(link => {
         link.classList.remove("selected");
-        if (link.getAttribute("href").substring(1) === currentSection) {
+        var href = link.getAttribute("href");
+        if (href && href.startsWith('#') && href.substring(1) === navSection) {
           link.classList.add("selected");
         }
       });
@@ -2550,13 +895,6 @@ document.addEventListener("DOMContentLoaded", () => {
       isHovered = false;
     });
 
-    // Restart the loop if reached the end
-    carouselWrapper.addEventListener("animationiteration", () => {
-      if (!isHovered) {
-        carouselWrapper.style.transform = "translateX(0)";
-      }
-    });
-
     // Initial auto-scroll start
     startAutoScroll();
   });
@@ -2610,5 +948,239 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   </script>
   -->
+
+
+<!-- Bento modal -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-box">
+    <img class="modal-img" id="modal-img" src="" alt="">
+    <div style="padding: 1.2em 1.4em 1.4em; display: flex; flex-direction: column; gap: 0.55em;">
+      <div style="font-size: 0.78em; color: #aaa;" id="modal-year"></div>
+      <div style="font-weight: 700; font-size: 1.1em; color: #222; line-height: 1.3;" id="modal-title"></div>
+      <div style="font-size: 0.86em; color: #999;" id="modal-subtitle"></div>
+      <p style="font-size: 0.88em; color: #5D6063; line-height: 1.55; margin-top: 0.4em;" id="modal-desc"></p>
+      <div style="display: flex; gap: 0.8em; justify-content: flex-end; margin-top: 0.6em; flex-wrap: wrap; align-items: center;">
+        <button class="modal-close-btn" id="modal-close-btn">Close</button>
+        <a class="modal-timeline-btn" id="modal-timeline-btn" href="#" target="_blank" rel="noopener noreferrer">View in Timeline →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>  // Bento grid + modal
+(function () {
+  var projects = [
+    { id: 'item-ai-advisor', year: 'Now', title: 'Applied AI Advisor', subtitle: 'Confidential Startup', image: 'docs/CNC.png', imageFit: 'contain', categories: ['AI/ML & Data Science', 'Mechanical Eng. & Industry'], description: 'Supporting early-stage startups implementing AI to automate workflows: feasibility analysis, PoC architecture, technology selection, and field testing. Case study: CNC programming automation via LLMs and computer vision.', tags: ['LLMs', 'Fine Tuning', 'CNC', 'Rapid Prototyping'] },
+    { id: 'item-side-projects', year: 'Now', title: 'Side Projects', subtitle: 'Startup MVPs', image: 'docs/startup.png', imageFit: 'contain', imageBg: '#f5f5f5', categories: ['Startup & Web Design'], description: 'Multiple startup projects applying AI-driven rapid prototyping and Lean Startup Methodology: Physical AI for tradespeople, food logistics platform, food-based social media, products referral platform, and work community.', tags: ['Lean Startup', 'Figma', 'UX-UI', 'Product'] },
+    { id: 'item-website', year: '2024', title: 'My Website', subtitle: 'Personal portfolio', image: 'docs/J-favicon_tech.png', imageFit: 'contain', imageBg: '#f0f0f0', categories: ['Startup & Web Design'], description: 'Personal webplace built from scratch in vanilla HTML, CSS and JS — projects, news, and more.', tags: ['HTML', 'CSS', 'JS', 'GitHub'] },
+    { id: 'item-deepfake', year: '2024', title: 'DeepFake Detection', subtitle: 'Self-Attention Maps · MICC', image: 'docs/deepfake.webp', imageFit: 'contain', categories: ['AI/ML & Data Science'], description: '3-step deepfake detection exploiting ViT self-attention maps: extracting heatmaps, training a convolutional autoencoder, and testing real vs. fake reconstruction error.', tags: ['Python', 'PyTorch', 'Computer Vision', 'Transformers'] },
+    { id: 'item-data-master', year: '2024 – 2023', title: 'Master in Data Science', subtitle: 'Statistical Learning · UniFi & IMT Lucca', image: 'docs/taxo.webp', imageFit: 'contain', categories: ['AI/ML & Data Science'], description: 'Inter-university 2nd-level Master in Data Science & Statistical Learning at UniFi & IMT Lucca. Grade: 110/110 cum laude.', tags: ['Python', 'R', 'ML', 'Deep Learning', 'Bayesian'] },
+    { id: 'item-stat-projects', timelineId: 'item-data-master', year: '2024 – 2023', title: 'Statistical & DS Projects', subtitle: 'R & Python · UniFi & IMT Lucca', image: 'docs/PM10.webp', imageFit: 'contain', categories: ['AI/ML & Data Science'], description: 'Five DS projects: statistical salary analysis, PM10 level estimation, policy impact evaluation, Bayesian causal inference on depression, and algorithm implementations from scratch in Python & R.', tags: ['R', 'Python', 'Bayesian', 'Causal Inference', 'Statistics', 'Algorithms'] },
+    { id: 'item-paper-reviews', timelineId: 'item-data-master', year: '2024 – 2023', title: 'Paper Reviews', subtitle: 'Research · UniFi & IMT Lucca', image: 'docs/neo.webp', imageFit: 'contain', categories: ['AI/ML & Data Science'], description: 'Critical reviews of 7 research papers covering NLP, health AI, reinforcement learning, statistical learning, complex systems, experimental economics, and network science.', tags: ['NLP', 'Health AI', 'RL', 'Statistical Learning', 'Complex Systems'] },
+    { id: 'item-dae', year: '2024', title: 'Defibrillators Geo-Spatial Analysis', subtitle: 'Spatial Statistics · UniFi & IMT', image: 'docs/dae-er.webp', imageFit: 'contain', categories: ['AI/ML & Data Science'], description: 'Geo-spatial analysis of AED device distribution across territory using spatial statistics in R, studying coverage and proximity for cardiac emergency response.', tags: ['R', 'GIS', 'Spatial Stats', 'spatstat'] },
+    { id: 'item-cifar', year: '2023', title: 'CIFAR-10 Image Classifier', subtitle: 'CNN · UniFi & IMT', image: 'docs/images.webp', imageFit: 'contain', categories: ['AI/ML & Data Science'], description: 'Image classification on CIFAR-10 32×32 RGB images using MLP baseline and CNN. CNN achieved 70.4% accuracy vs 53.7% for MLP.', tags: ['Python', 'PyTorch', 'CNN', 'CUDA'] },
+    { id: 'item-fitness', year: '2023', title: 'Fitness Classes Attendance', subtitle: 'ML Classification · UniFi & IMT', image: 'docs/mon_wei.webp', imageFit: 'contain', categories: ['AI/ML & Data Science'], description: 'Predicting whether a gym member will attend a booked fitness class. EDA, data management, and model comparison. Best model: Logistic Regression with 75.8% accuracy.', tags: ['Python', 'Scikit-learn', 'EDA', 'Pandas'] },
+    { id: 'item-salaries', year: '2023', title: 'US Salaries Analysis & Prediction', subtitle: 'ML · US Census · UniFi & IMT', image: 'docs/tree_big.webp', imageFit: 'contain', categories: ['AI/ML & Data Science'], description: 'US Adult Census dataset: demographic trends exploration and income prediction (above $50K) comparing Gradient Boosting, Random Forest, Decision Trees, and Logistic Regression.', tags: ['Python', 'Scikit-learn', 'Gradient Boosting', 'EDA'] },
+    { id: 'item-daikin', year: '2022 – 2021', title: 'SW & System Integration', subtitle: 'Daikin', image: 'docs/daikin_logo.webp', imageFit: 'contain', categories: ['Mechanical Eng. & Industry'], description: 'At Daikin: cloud-based HVAC monitoring, Python automation for one-click PLC mapping, sensor-to-cloud temperature control system, and API-based reporting services.', tags: ['Python', 'PLC', 'Modbus', 'IoT', 'Cloud'] },
+    { id: 'item-enermove', year: '2021', title: 'Wireless EV Charging Infrastructure', subtitle: 'Optimization · Enermove', image: 'docs/ener-magaz.webp', imageFit: 'cover', categories: ['Mechanical Eng. & Industry'], description: 'Optimized WPT infrastructure layout for dynamic and static wireless charging of industrial electric vehicles (forklifts) using genetic algorithms, balancing efficiency, logistics, and cost.', tags: ['Matlab', 'Genetic Algorithms', 'WPT', 'Optimization'] },
+    { id: 'item-mech-eng', year: '2021 – 2015', title: 'Mechanical Engineering', subtitle: 'M.Sc. PoliTo · B.Sc. UniBo', image: 'docs/epiciclo.webp', imageFit: 'cover', categories: ['Mechanical Eng. & Industry'], description: 'M.Sc. in Mechanical Engineering (Automation) at PoliTo and B.Sc. at UniBo. Academic projects: CAE bike frame analysis, Stirling engine, planetary gearbox, mechatronics, fluid automation, and GD&T design.', tags: ['Matlab', 'SolidWorks', 'AutoCad', 'Simulink', 'CAE', 'Mechatronics'] },
+    { id: 'item-heat-exchange', year: '2019', title: 'Heat Exchange Numerical Modeling', subtitle: 'FEM · PoliTo', image: 'docs/tube.webp', imageFit: 'contain', categories: ['Mechanical Eng. & Industry'], description: 'FEM numerical modeling of heat exchange in a flue gas conduit, simulating convective-diffusive thermal transfer and temperature distribution along the chimney.', tags: ['Matlab', 'FEM', 'Thermal Analysis'] },
+    { id: 'item-boiler', year: '2019', title: 'Residential Boiler Design', subtitle: 'Thermodynamics · PoliTo', image: 'docs/home-sys_cut.webp', imageFit: 'contain', categories: ['Mechanical Eng. & Industry'], description: 'Design and optimization of a residential air-based methane boiler: dual-chamber system, thermodynamic analysis, heat exchanger sizing, exergy analysis, and fan dimensioning.', tags: ['Excel', 'AutoCad', 'Thermodynamics', 'LMTD'] },
+    { id: 'item-gearbox', year: '2019', title: 'Two-Stage Gearbox Design', subtitle: 'Machine Design · PoliTo', image: 'docs/albero.webp', imageFit: 'contain', categories: ['Mechanical Eng. & Industry'], description: 'Design of a two-stage parallel-axis pendular gearbox: iterative shaft and gear dimensioning, bearing selection, and optimization to minimize oversizing.', tags: ['SolidWorks', 'Excel', 'AutoCad', 'Standards'] },
+    { id: 'item-chip-extrusion', year: '2018', title: 'Mixed Alloy Chip Extrusion', subtitle: 'Research · IUL, TU Dortmund', image: 'docs/chip-process.webp', imageFit: 'contain', categories: ['Mechanical Eng. & Industry'], description: 'Research at IUL, TU Dortmund on direct recycling of aluminum mixed-alloy chips via hot extrusion, avoiding re-melting. FEM simulations and experiments assessing industrial feasibility.', tags: ['Matlab', 'HyperMesh', 'FEM', 'CATIA', 'Materials'] }
+  ];
+
+  var FEATURED = ['item-ai-advisor','item-side-projects','item-deepfake','item-daikin','item-enermove','item-chip-extrusion'];
+
+  var categories = ['Featured', 'All', 'AI/ML & Data Science', 'Mechanical Eng. & Industry', 'Startup & Web Design'];
+
+  var filterBar = document.getElementById('bento-filter-bar');
+
+  function getSearchTerm() {
+    return searchInput.value.toLowerCase().trim();
+  }
+
+  function countForCategory(cat) {
+    var term = getSearchTerm();
+    return projects.filter(function (p) {
+      var matchesCat = cat === 'All' ||
+        (cat === 'Featured' ? FEATURED.indexOf(p.id) !== -1 : p.categories.indexOf(cat) !== -1);
+      var matchesSearch = !term || p._searchText.includes(term);
+      return matchesCat && matchesSearch;
+    }).length;
+  }
+
+  function updateCounts() {
+    document.querySelectorAll('.filter-btn').forEach(function (b) {
+      var cat = b.dataset.category;
+      var n = countForCategory(cat);
+      b.textContent = cat + ' · ' + n;
+    });
+  }
+
+  function applyFilters() {
+    var selected = document.querySelector('.filter-btn.active').dataset.category;
+    var term = getSearchTerm();
+    document.querySelectorAll('.bento-card').forEach(function (card) {
+      var cats = card.dataset.categories.split(',');
+      var matchesCat = selected === 'All' ||
+        (selected === 'Featured' ? FEATURED.indexOf(card.dataset.id) !== -1 : cats.indexOf(selected) !== -1);
+      var matchesSearch = !term || card.dataset.searchText.includes(term);
+      card.classList.toggle('hidden', !(matchesCat && matchesSearch));
+    });
+    updateCounts();
+  }
+
+  categories.forEach(function (cat) {
+    var btn = document.createElement('button');
+    btn.className = 'filter-btn' + (cat === 'Featured' ? ' active' : '');
+    btn.dataset.category = cat;
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.filter-btn').forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      applyFilters();
+    });
+    filterBar.appendChild(btn);
+  });
+
+  var searchInput = document.createElement('input');
+  searchInput.type = 'search';
+  searchInput.className = 'bento-search';
+  searchInput.placeholder = 'Search projects…';
+  searchInput.addEventListener('input', applyFilters);
+  filterBar.appendChild(searchInput);
+
+  var grid = document.getElementById('bento-grid');
+  projects.forEach(function (p) {
+    p._searchText = [p.title, p.subtitle, p.description, p.tags.join(' ')].join(' ').toLowerCase();
+    var card = document.createElement('div');
+    card.className = 'bento-card';
+    card.dataset.id = p.id;
+    card.dataset.categories = p.categories.join(',');
+    card.dataset.searchText = p._searchText;
+
+    var img = document.createElement('img');
+    img.src = p.image;
+    img.alt = p.title;
+    var imgSlot;
+    if (p.imageFit === 'cover') {
+      img.className = 'bento-card-image';
+      img.style.objectFit = 'cover';
+      imgSlot = img;
+    } else {
+      img.className = 'bento-card-image--contain';
+      var inner = document.createElement('div');
+      inner.className = 'bento-card-image-contain-inner';
+      if (p.imageBg) inner.style.background = p.imageBg;
+      inner.appendChild(img);
+      imgSlot = document.createElement('div');
+      imgSlot.className = 'bento-card-image-contain-wrap';
+      imgSlot.appendChild(inner);
+    }
+
+    var body = document.createElement('div');
+    body.className = 'bento-card-body';
+
+    var yr = document.createElement('div');
+    yr.className = 'bento-card-year';
+    yr.textContent = p.year;
+
+    var ttl = document.createElement('div');
+    ttl.className = 'bento-card-title';
+    ttl.textContent = p.title;
+
+    var sub = document.createElement('div');
+    sub.className = 'bento-card-subtitle';
+    sub.textContent = p.subtitle;
+
+    var tagsDiv = document.createElement('div');
+    tagsDiv.className = 'bento-card-tags';
+    p.tags.forEach(function (t) {
+      var tag = document.createElement('span');
+      tag.className = 'bento-tag';
+      tag.textContent = t;
+      tagsDiv.appendChild(tag);
+    });
+
+    body.appendChild(yr);
+    body.appendChild(ttl);
+    body.appendChild(sub);
+    body.appendChild(tagsDiv);
+    card.appendChild(imgSlot);
+    card.appendChild(body);
+    card.addEventListener('click', function () { openModal(p); });
+    grid.appendChild(card);
+  });
+
+  applyFilters();
+
+  var overlay = document.getElementById('modal-overlay');
+  var modalImg = document.getElementById('modal-img');
+  var modalTitle = document.getElementById('modal-title');
+  var modalSubtitle = document.getElementById('modal-subtitle');
+  var modalYear = document.getElementById('modal-year');
+  var modalDesc = document.getElementById('modal-desc');
+  var modalTimelineBtn = document.getElementById('modal-timeline-btn');
+  var modalCloseBtn = document.getElementById('modal-close-btn');
+
+  function openModal(p) {
+    modalImg.src = p.image;
+    modalImg.alt = p.title;
+    modalImg.style.objectFit = p.imageFit || 'cover';
+    modalImg.style.background = p.imageBg || '';
+    modalTitle.textContent = p.title;
+    modalSubtitle.textContent = p.subtitle;
+    modalYear.textContent = p.year;
+    modalDesc.textContent = p.description;
+    modalTimelineBtn.href = 'timeline.html#' + (p.timelineId || p.id);
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  modalCloseBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+})();
+</script>
+
+<script>
+(function () {
+  var toggle    = document.getElementById('egg-toggle-input');
+  var eggImg    = document.getElementById('egg-img');
+  var cookie    = document.getElementById('egg-cookie');
+  var ring      = document.getElementById('egg-ring');
+  var logo      = document.getElementById('egg-logo');
+  var logoTip   = document.getElementById('egg-logo-tooltip');
+  var mistery   = document.getElementById('egg-mistery-wrap');
+
+  function applyEggMode(on) {
+    eggImg.src             = on ? 'docs/precursor_egg_on_bg.png' : 'docs/precursor_egg_off_bg.png';
+    cookie.style.display   = on ? '' : 'none';
+    ring.style.display     = on ? '' : 'none';
+    logo.src               = on ? 'docs/MyDuckR.png' : 'docs/J-favicon_tech-gray.png';
+    logoTip.textContent    = on ? 'Quack back to start! 🦆' : 'Back to start ↑';
+    mistery.style.display  = on ? '' : 'none';
+    document.querySelectorAll('img[data-src-egg]').forEach(function(img) {
+      img.src = on ? img.getAttribute('data-src-egg') : img.getAttribute('data-src-default');
+    });
+    document.body.classList.toggle('egg-on', on);
+  }
+
+  var saved = localStorage.getItem('easterEgg') === 'true';
+  toggle.checked = saved;
+  applyEggMode(saved);
+
+  toggle.addEventListener('change', function () {
+    var on = toggle.checked;
+    localStorage.setItem('easterEgg', on);
+    applyEggMode(on);
+  });
+})();
+</script>
 
 </html>

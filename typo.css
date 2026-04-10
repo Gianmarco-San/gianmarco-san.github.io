@@ -1519,15 +1519,21 @@ nav a:hover .nav-tooltip {
 body.egg-on .hs-icon > img {
   filter: none;
   border-radius: 15%;
-  transition: filter 0.18s, border-radius 0.18s;
+  transition: filter 0.18s, border-radius 0.18s, transform 0.18s ease;
 }
 
 body.egg-on .hs-icon > img[alt="GitHub"] {
   border-radius: 50%;
 }
 
+body.egg-on .hs-icon:hover {
+  box-shadow: none;
+  background: transparent;
+}
+
 body.egg-on .hs-icon:hover > img {
   filter: none;
+  transform: scale(1.38);
 }
 
 @media only screen and (max-width: 661px) {

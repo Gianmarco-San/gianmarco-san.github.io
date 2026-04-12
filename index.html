@@ -13,6 +13,9 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- for responsiveness -->
 
+  <link rel="preload" href="docs/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="docs/fonts/InterVariable-Italic.woff2" as="font" type="font/woff2" crossorigin>
+
 
   <!--
   <style>
@@ -310,7 +313,7 @@
   
       
       <div class="pic-container">
-          <img src="docs/ser-j.png" alt="Description of image" class="pic">
+          <img src="docs/ser-j.png" alt="Description of image" class="pic" fetchpriority="high">
       <!--    <a href="https://www.allered.me/" target="_blank" rel="noopener noreferrer" class="pic-description">Pic by allered.me</a> -->
       </div>
 
@@ -446,21 +449,21 @@
         
           <div class="carousel-item">
             <a href="https://internetingishard.netlify.app/" target="_blank" rel="noopener noreferrer">
-                <img src="docs/internnetting.webp" alt="Internetting is Hard Website">
+                <img src="docs/internnetting.webp" alt="Internetting is Hard Website" loading="lazy">
                 <span class="carousel-description">Front-End Web Developing</span>
             </a>
           </div>
       
           <div class="carousel-item">
             <a href="https://teenage.engineering/products" target="_blank" rel="noopener noreferrer">
-            <img src="docs/teen-engineering-2.webp">
+            <img src="docs/teen-engineering-2.webp" loading="lazy">
             <span class="carousel-description">Teenage Engineering Products</span>
           </a>
         </div>
 
         <div class="carousel-item">
           <a href="https://foundersfund.com/portfolio/" target="_blank" rel="noopener noreferrer">
-          <img src="docs/ffund.webp">
+          <img src="docs/ffund.webp" loading="lazy">
           <span class="carousel-description">Founders Fund Portfolio</span>
         </a>
       </div>
@@ -473,14 +476,14 @@
 
           <div class="carousel-item">
             <a href="https://karpathy.ai/" target="_blank" rel="noopener noreferrer">
-            <img src="docs/karpa.webp">
+            <img src="docs/karpa.webp" loading="lazy">
             <span class="carousel-description">Computer Vision guy</span>
           </a>
           </div>
 
           <div class="carousel-item">
             <a href="https://retireinprogress.com/" target="_blank" rel="noopener noreferrer">
-            <img src="docs/rip.webp">
+            <img src="docs/rip.webp" loading="lazy">
             <span class="carousel-description">Mr. RiP</span>
           </a>
           </div>
@@ -488,7 +491,7 @@
 
           <div class="carousel-item">
             <a href="https://www.lovefrom.com/" target="_blank" rel="noopener noreferrer">
-            <img src="docs/LoveFrom.webp">
+            <img src="docs/LoveFrom.webp" loading="lazy">
             <span class="carousel-description">®<k style="font-family: 'Baskervville', sans-serif;">LoveFrom,</k> <em>Sir Jony Ive</em> ™</span>
           </a>
           </div>
@@ -507,21 +510,21 @@
 
           <div class="carousel-item">
             <a href="https://internetingishard.netlify.app/" target="_blank" rel="noopener noreferrer">
-                <img src="docs/internnetting.webp" alt="Internetting is Hard Website">
+                <img src="docs/internnetting.webp" alt="Internetting is Hard Website" loading="lazy">
                 <span class="carousel-description">Front-End Web Developing</span>
             </a>
           </div>
       
           <div class="carousel-item">
             <a href="https://teenage.engineering/products" target="_blank" rel="noopener noreferrer">
-            <img src="docs/teen-engineering-2.webp">
+            <img src="docs/teen-engineering-2.webp" loading="lazy">
             <span class="carousel-description">Teenage Engineering Products</span>
           </a>
         </div>
 
         <div class="carousel-item">
           <a href="https://foundersfund.com/portfolio/" target="_blank" rel="noopener noreferrer">
-          <img src="docs/ffund.webp">
+          <img src="docs/ffund.webp" loading="lazy">
           <span class="carousel-description">Founders Fund Portfolio</span>
         </a>
       </div>
@@ -534,21 +537,21 @@
 
           <div class="carousel-item">
             <a href="https://karpathy.ai/" target="_blank" rel="noopener noreferrer">
-            <img src="docs/karpa.webp">
+            <img src="docs/karpa.webp" loading="lazy">
             <span class="carousel-description">Computer Vision guy</span>
           </a>
           </div>
 
           <div class="carousel-item">
             <a href="https://retireinprogress.com/" target="_blank" rel="noopener noreferrer">
-            <img src="docs/rip.webp">
+            <img src="docs/rip.webp" loading="lazy">
             <span class="carousel-description">Mr. RiP</span>
           </a>
           </div>
 
           <div class="carousel-item">
             <a href="https://www.lovefrom.com/" target="_blank" rel="noopener noreferrer">
-            <img src="docs/LoveFrom.webp">
+            <img src="docs/LoveFrom.webp" loading="lazy">
             <span class="carousel-description">®<k style="font-family: 'Baskervville', sans-serif;">LoveFrom,</k> <em>Sir Jony Ive</em> ™</span>
           </a>
           </div>
@@ -577,7 +580,7 @@
       
       <a href="https://emiliaromagnaturismo.it/en/riviera" class="links" style="text-align: center; display: block; margin: 0 auto; width: fit-content;">Riviera Romagnola</a>
   
-      <img class="timeline-image" src="docs/Romagna_geopolitica_v2.webp" style="width:100%;" alt="https://eml.wikipedia.org/w/index.php?curid=42464"></img>
+      <img class="timeline-image" src="docs/Romagna_geopolitica_v2.webp" style="width:100%;" alt="https://eml.wikipedia.org/w/index.php?curid=42464" loading="lazy"></img>
       
       <br>
       <a href="https://thepackagingvalley.com" class="links">Packaging Valley</a>, <a href="https://www.motorvalley.it/en/" class="links">Motor Valley</a>, 
@@ -709,7 +712,7 @@
       setTimeout(() => {
         tooltip.innerHTML = 'Copy my Mail <img src="docs/copy-icon.png" style="height: 1.0em;">'; // Reset after 2s
       }, 2000);
-    }).catch(err => console.error("Copy failed:", err));
+    }).catch(function() {});
   }
 </script>
 
@@ -1061,6 +1064,7 @@ document.addEventListener("DOMContentLoaded", () => {
     var img = document.createElement('img');
     img.src = p.image;
     img.alt = p.title;
+    img.loading = 'lazy';
     var imgSlot;
     if (p.imageFit === 'cover') {
       img.className = 'bento-card-image';

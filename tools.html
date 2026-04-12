@@ -6,6 +6,9 @@
   <link rel="stylesheet" href="typo.css">
   <link rel="icon" href="docs/J-favicon_tech.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="preload" href="docs/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="docs/fonts/InterVariable-Italic.woff2" as="font" type="font/woff2" crossorigin>
   <style>
     @view-transition { navigation: auto; }
     @keyframes vt-fade-in  { from { opacity: 0; transform: translateY(6px); } }
@@ -155,6 +158,7 @@
       .tools-sidebar h3 { width: 100%; }
       .tool-nav-item { width: auto; }
       .tool-card { padding: 1.4em 1.2em; margin-left: 0.3em; margin-right: 0.3em; }
+      .tool-field input, .tool-field select { font-size: 16px; }
     }
   </style>
 </head>
@@ -558,7 +562,7 @@
           <div class="tool-card">
             <div class="tool-header">
               <h2>Currency Converter</h2>
-              <div class="tool-meta">v1.0 · Rates: ECB via frankfurter.app · updated daily</div>
+              <div class="tool-meta">v1.0 · Rates: ECB via frankfurter.dev · updated daily</div>
             </div>
             <div class="tool-row">
               <div class="tool-field">
@@ -725,7 +729,7 @@
             <div class="tool-result" id="col-result" style="margin-top:1em;"></div>
 
             <details style="margin-top:1.2em;">
-              <summary style="cursor:pointer;font-size:0.85em;color:#888;font-weight:500;padding:0.3em 0;">▸ Compare two cities</summary>
+              <summary style="cursor:pointer;font-size:0.85em;color:#888;font-weight:500;padding:0.3em 0;">Compare two cities</summary>
               <div class="tool-row" style="margin-top:0.8em;">
                 <div class="tool-field">
                   <label>City A</label>
@@ -1590,7 +1594,7 @@
     function loadRates() {
       var from = document.getElementById('cur-from').value;
       var to = TARGET_CURRENCIES.filter(function(c){return c!==from;}).join(',');
-      fetch('https://api.frankfurter.app/latest?from=' + from + '&to=' + to)
+      fetch('https://api.frankfurter.dev/v1/latest?from=' + from + '&to=' + to)
         .then(function(r){return r.json();})
         .then(function(data) {
           if (!rates) rates = {};
@@ -1598,7 +1602,7 @@
           rates[from][from] = 1;
           document.getElementById('cur-loading').style.display = 'none';
           document.getElementById('cur-grid').style.display = '';
-          document.getElementById('cur-updated').textContent = 'Rates as of ' + data.date + ' · ECB via frankfurter.app';
+          document.getElementById('cur-updated').textContent = 'Rates as of ' + data.date + ' · ECB via frankfurter.dev';
           render();
         })
         .catch(function() {

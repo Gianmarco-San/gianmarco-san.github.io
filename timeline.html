@@ -12,6 +12,9 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- for responsiveness -->
 
+  <link rel="preload" href="docs/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="docs/fonts/InterVariable-Italic.woff2" as="font" type="font/woff2" crossorigin>
+
 
   <!--
   <style>
@@ -88,7 +91,7 @@
         <p style="white-space: pre;">   2025</p></div>
       <div class="timeline-content">
         <div class="project-header">
-        <img class='logo' src='docs/stealth_logo.jpeg' style='max-width: 40px; max-height: 40px; border-radius: 23%;'/> <!-- round: border-radius: 50%; -->
+        <img class='logo' src='docs/stealth_logo.jpeg' style='max-width: 40px; max-height: 40px; border-radius: 23%;' loading="lazy"/> <!-- round: border-radius: 50%; -->
         <h4><br>Applied AI Advisor – Confidential Startups</h4>
       </div>
 
@@ -135,7 +138,7 @@
         </span>
 
         <br>
-        <img src="docs/CNC.png" alt="Method flow" class="timeline-image show-on-big show-on-middle show-on-small" style="max-width: 90%; display: block; margin: 1em auto;">
+        <img src="docs/CNC.png" alt="Method flow" class="timeline-image show-on-big show-on-middle show-on-small" style="max-width: 90%; display: block; margin: 1em auto;" loading="lazy">
             
         
 
@@ -168,7 +171,7 @@
         <p style="white-space: pre;">   2022</p></div>
       <div class="timeline-content">
         <div class="project-header">
-        <img class='logo' src='docs/startup.png' style='max-width: 40px; max-height: 40px; border-radius: 23%;'/> <!-- round: border-radius: 50%; -->
+        <img class='logo' src='docs/startup.png' style='max-width: 40px; max-height: 40px; border-radius: 23%;' loading="lazy"/> <!-- round: border-radius: 50%; -->
         <h4><br>Side Projects</h4>
       </div>
 
@@ -304,7 +307,7 @@
         <p style="white-space: pre;">   2024</p></div>
       <div class="timeline-content">
         <div class="project-header">
-        <img class='logo' src='docs/J-favicon_tech.png' style='max-width: 40px; max-height: 40px; border-radius: 50%;'/> <!-- docs/MyDuck.png    round: border-radius: 23%; -->
+        <img class='logo' src='docs/J-favicon_tech.png' style='max-width: 40px; max-height: 40px; border-radius: 50%;' loading="lazy"/> <!-- docs/MyDuck.png    round: border-radius: 23%; -->
         <h4><br>My website</h4>
       </div>
 
@@ -339,7 +342,7 @@
     
         <div class="project-header">
           <a href="https://www.micc.unifi.it/" target="_blank" rel="noopener noreferrer" style="display: contents;">
-          <img class='logo' src='docs/logo-micc.webp' style='max-width: 150px;' alt="MICC Logo"/></a>
+          <img class='logo' src='docs/logo-micc.webp' style='max-width: 150px;' alt="MICC Logo" loading="lazy"/></a>
           <h4><br>DeepFake Detection Exploiting Self-Attention Maps</h4>
         </div>
     
@@ -375,40 +378,40 @@
     
         <div class="hidden-content">
           <div class="timeline-text-image" style="place-items: center;">
-            <img src="docs/transformer.webp" alt="Vision Transformer" class="timeline-image show-on-big" style="width: 60%;">
+            <img src="docs/transformer.webp" alt="Vision Transformer" class="timeline-image show-on-big" style="width: 60%;" loading="lazy">
             <div class="timeline-text">
               <p>The Vision Transformer (ViT), pre-trained on face recognition - starting from 
-                <a href="https://github.com/zhongyy/Face-Transformer.git" target="_blank" class="links">Face-Transformer</a> -, 
+                <a href="https://github.com/zhongyy/Face-Transformer.git" target="_blank" rel="noopener noreferrer" class="links">Face-Transformer</a> -, 
                 captures facial features and extracts visual attention maps. <br> Images are split into multiple patches as input-tokens to the transformer encoder.
               </p>
             </div>
-            <img src="docs/transformer.webp" alt="Vision Transformer" class="timeline-image show-on-small show-on-middle">
+            <img src="docs/transformer.webp" alt="Vision Transformer" class="timeline-image show-on-small show-on-middle" loading="lazy">
           </div>
     
           <div class="timeline-text-image" style="place-items: center;">
             <div class="timeline-text" style="text-align: end;">
               <p>These are used to train the convolutional autoencoder - starting from the one developed in 
-                <a href="https://github.com/lcultrera/WildCapture" target="_blank" class="links">WildCapture</a> - only on real images, 
+                <a href="https://github.com/lcultrera/WildCapture" target="_blank" rel="noopener noreferrer" class="links">WildCapture</a> - only on real images, 
                 enhancing out-of-distribution (OOD) detection by expecting higher reconstruction errors for manipulated images.
               </p>
             </div>
-            <img src="docs/autoencoder.webp" alt="Method flow" class="timeline-image">
+            <img src="docs/autoencoder.webp" alt="Method flow" class="timeline-image" loading="lazy">
           </div>
     
           <div class="timeline-text-image" style="place-items: center;">
-            <img src="docs/DF_auroc.webp" alt="Auc-roc mean value among all forgeries tested" class="timeline-image show-on-big">
+            <img src="docs/DF_auroc.webp" alt="Auc-roc mean value among all forgeries tested" class="timeline-image show-on-big" loading="lazy">
             <div class="timeline-text">
               <p>Tested on 5 different forgeries, the method shows an AUROC mean value of 0.60, demonstrating potential for transfer learning and generalizability among potential new forgeries.</p>
             </div>
-            <img src="docs/DF_auroc.webp" alt="Auc-roc mean value among all forgeries tested" class="timeline-image show-on-small show-on-middle">
+            <img src="docs/DF_auroc.webp" alt="Auc-roc mean value among all forgeries tested" class="timeline-image show-on-small show-on-middle" loading="lazy">
           </div>
     
           <div class="show-on-small"><br></div>
           <br>
           Further material:
           <ul class="horiz-ul">
-            <li><a href="docs/DeepFake_Thesis_G.Santoro.pdf" target="_blank" class="links">Thesis.pdf</a></li>
-            <li><a href="docs/DeepFake_G.Santoro.pdf" target="_blank" class="links">Presentation.pdf</a></li>
+            <li><a href="docs/DeepFake_Thesis_G.Santoro.pdf" target="_blank" rel="noopener noreferrer" class="links">Thesis.pdf</a></li>
+            <li><a href="docs/DeepFake_G.Santoro.pdf" target="_blank" rel="noopener noreferrer" class="links">Presentation.pdf</a></li>
             <li>GitHub Repo - I'll publish ASAP</li>
           </ul>
     
@@ -432,7 +435,7 @@
             <li>CUDA</li>
             <li>SSH</li>
             <li>GitHub</li>
-            <li><a href="https://paperswithcode.com/dataset/faceforensics-1" target="_blank" class="links"><i>FF++</i> Dataset</a></li>
+            <li><a href="https://paperswithcode.com/dataset/faceforensics-1" target="_blank" rel="noopener noreferrer" class="links"><i>FF++</i> Dataset</a></li>
           </ul>
 
         
@@ -482,37 +485,37 @@
         <div class="carousel-wrapper">
 
           <div class="carousel-item">
-            <a href="docs/Stat_Santoro.pdf" target="_blank">
-              <img src="docs/salary.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
+            <a href="docs/Stat_Santoro.pdf" target="_blank" rel="noopener noreferrer">
+              <img src="docs/salary.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);" loading="lazy">
               <span class="carousel-description">Statistical Analysis: Salary</span>
             </a>
           </div>
 
           <div class="carousel-item">
-            <a href="https://github.com/Gianmarco-San/Algorithms_Py_-_R.git" target="_blank">
-              <img src="docs/algo.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
+            <a href="https://github.com/Gianmarco-San/Algorithms_Py_-_R.git" target="_blank" rel="noopener noreferrer">
+              <img src="docs/algo.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);" loading="lazy">
               <span class="carousel-description">Algorithms without libraries</span>
             </a>
           </div>
 
 
           <div class="carousel-item">
-            <a href="https://github.com/Gianmarco-San/Policy-Evaluation-Impact-Analysis.git" target="_blank">
-              <img src="docs/vote.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
+            <a href="https://github.com/Gianmarco-San/Policy-Evaluation-Impact-Analysis.git" target="_blank" rel="noopener noreferrer">
+              <img src="docs/vote.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);" loading="lazy">
               <span class="carousel-description">Policy-Impact Analysis</span>
             </a>
           </div>
 
           <div class="carousel-item">
-            <a href="https://github.com/Gianmarco-San/Estimation-of-PM10-Levels.git" target="_blank">
-              <img src="docs/PM10.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
+            <a href="https://github.com/Gianmarco-San/Estimation-of-PM10-Levels.git" target="_blank" rel="noopener noreferrer">
+              <img src="docs/PM10.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);" loading="lazy">
               <span class="carousel-description">Estimation of PM10 levels</span>
             </a>
           </div>
 
           <div class="carousel-item">
-            <a href="https://github.com/Gianmarco-San/Bayesian-Inference_Causal-ML.git" target="_blank">
-              <img src="docs/causal.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
+            <a href="https://github.com/Gianmarco-San/Bayesian-Inference_Causal-ML.git" target="_blank" rel="noopener noreferrer">
+              <img src="docs/causal.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);" loading="lazy">
               <span class="carousel-description">Depression Causal Inference</span>
             </a>
           </div>
@@ -521,38 +524,38 @@
           <!-- Duplicate items again for seamless loop -->
 
           <div class="carousel-item">
-            <a href="docs/Stat_Santoro.pdf" target="_blank">
-              <img src="docs/salary.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
+            <a href="docs/Stat_Santoro.pdf" target="_blank" rel="noopener noreferrer">
+              <img src="docs/salary.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);" loading="lazy">
               <span class="carousel-description">Statistical Analysis: Salary</span>
             </a>
           </div>
 
           <div class="carousel-item">
-            <a href="https://github.com/Gianmarco-San/Algorithms_Py_-_R.git" target="_blank">
-              <img src="docs/algo.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
+            <a href="https://github.com/Gianmarco-San/Algorithms_Py_-_R.git" target="_blank" rel="noopener noreferrer">
+              <img src="docs/algo.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);" loading="lazy">
               <span class="carousel-description">Algorithms without libraries</span>
             </a>
           </div>
 
 
           <div class="carousel-item">
-            <a href="https://github.com/Gianmarco-San/Policy-Evaluation-Impact-Analysis.git" target="_blank">
-              <img src="docs/vote.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
+            <a href="https://github.com/Gianmarco-San/Policy-Evaluation-Impact-Analysis.git" target="_blank" rel="noopener noreferrer">
+              <img src="docs/vote.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);" loading="lazy">
               <span class="carousel-description">Policy-Impact Analysis</span>
             </a>
           </div>
 
 
           <div class="carousel-item">
-            <a href="https://github.com/Gianmarco-San/Estimation-of-PM10-Levels.git" target="_blank">
-              <img src="docs/PM10.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
+            <a href="https://github.com/Gianmarco-San/Estimation-of-PM10-Levels.git" target="_blank" rel="noopener noreferrer">
+              <img src="docs/PM10.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);" loading="lazy">
               <span class="carousel-description">Estimation of PM10 levels</span>
             </a>
           </div>
 
           <div class="carousel-item">
-            <a href="https://github.com/Gianmarco-San/Bayesian-Inference_Causal-ML.git" target="_blank">
-              <img src="docs/causal.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);">
+            <a href="https://github.com/Gianmarco-San/Bayesian-Inference_Causal-ML.git" target="_blank" rel="noopener noreferrer">
+              <img src="docs/causal.webp" alt="Car Sharing" style="border: 1px solid rgba(190, 190, 190, 0.7);" loading="lazy">
               <span class="carousel-description">Depression Causal Inference</span>
             </a>
           </div>

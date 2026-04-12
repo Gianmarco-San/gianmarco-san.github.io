@@ -1,21 +1,27 @@
 @font-face {
   font-family: 'Baskervville';
-  src: url('docs/fonts/Baskervville-Regular.ttf') format('truetype');
+  src: url('docs/fonts/Baskervville-Regular.woff2') format('woff2'),
+       url('docs/fonts/Baskervville-Regular.ttf') format('truetype');
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Inter';
-  src: url('docs/fonts/InterVariable-Italic.ttf') format('truetype');
+  src: url('docs/fonts/InterVariable-Italic.woff2') format('woff2'),
+       url('docs/fonts/InterVariable-Italic.ttf') format('truetype');
   font-style: italic;
   font-weight: 100 900;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Inter';
-  src: url('docs/fonts/InterVariable.ttf') format('truetype');
+  src: url('docs/fonts/InterVariable.woff2') format('woff2'),
+       url('docs/fonts/InterVariable.ttf') format('truetype');
   font-style: normal;
   font-weight: 100 900;
+  font-display: swap;
 }
 
 
@@ -1408,6 +1414,10 @@ nav a {
 nav a:hover .nav-tooltip {
   visibility: visible;
   opacity: 1;
+}
+
+@media (hover: none) {
+  .nav-tooltip { display: none; }
 }
 
 /* Egg widget tooltip */

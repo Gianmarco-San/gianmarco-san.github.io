@@ -72,10 +72,13 @@
     .tool-panel.active { display: block; }
 
     /* ── Tool card wrapper ───────────────────── */
+    /* max-width + auto margin keeps every tool box centered within the content
+       area instead of stretching edge-to-edge on wide screens. */
     .tool-card {
       background: #fafafa; border-radius: 16px;
       box-shadow: 0 0 1px rgba(0,0,0,0.4), 0 2px 12px rgba(0,0,0,0.05);
-      padding: 2em 2.2em 2.4em; margin-bottom: 1.6em;
+      padding: 2em 2.2em 2.4em; margin: 0 auto 1.6em;
+      max-width: 760px;
     }
     .tool-header { margin-bottom: 1.4em; }
     .tool-header h2 { font-size: 1.15em; font-weight: 700; color: #222; margin: 0 0 0.2em; }
@@ -138,16 +141,15 @@
     .contrast-fail { background: #fee2e2; color: #991b1b; }
 
     /* ── Weather ─────────────────────────────── */
-    /* Mobile-first: 1 full-width card per row. Bump to 3 columns only when the
-       viewport is clearly wide enough — avoids the uneven 2-col / lone-3rd-card
-       zone that looked off between 500–900px. */
+    /* Same pattern as currency-grid: flex + justify-center so a partially-filled
+       row (e.g. 3 slots / 2 columns → lonely 3rd) is centered, not left-hugging.
+       Each slot has a max-width so cards never stretch absurdly wide. */
     #tw-grid {
-      display: grid; grid-template-columns: 1fr; gap: 1em;
-    }
-    @media (min-width: 900px) {
-      #tw-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      display: flex; flex-wrap: wrap; justify-content: center;
+      gap: 1em;
     }
     .tw-slot {
+      flex: 1 1 240px; max-width: 360px; min-width: 0;
       background: #f7f7f7; border-radius: 12px; padding: 1em 1.1em;
       border: 1px solid #ebebeb; display: flex; flex-direction: column; gap: 0.15em;
     }
@@ -198,7 +200,9 @@
 
     /* ── Mobile ──────────────────────────────── */
     @media (max-width: 700px) {
-      .tools-page { overflow-x: hidden; padding: 3.8em 0.6em 2.5em; }
+      /* No overflow-x:hidden anymore — if anything escapes the card it should
+         scroll into view rather than being silently clipped on narrow phones. */
+      .tools-page { padding: 3.8em 0.6em 2.5em; }
       .tools-layout { flex-direction: column; gap: 0.8em; }
       .tools-sidebar {
         width: 100%; position: static; display: block; margin-bottom: 0.2em;
@@ -215,8 +219,9 @@
       }
       .tools-sidebar-note br { display: none; } /* collapse the two lines into one on mobile */
       .tool-nav-list { display: none; }
-      /* Tighter card so content fits on narrow viewports without clipping */
-      .tool-card { padding: 1.1em 0.9em; margin: 0 0 1em; }
+      /* Tighter card so content fits on narrow viewports; auto margins keep
+         it centered if the viewport ever exceeds the desktop max-width (760). */
+      .tool-card { padding: 1.1em 0.9em; margin: 0 auto 1em; }
       .tool-row { gap: 0.6em; margin-bottom: 0.8em; }
       .tool-field { min-width: 110px; }
       .tool-result { padding: 0.9em 1em; }
@@ -252,23 +257,34 @@
       }
     }
 
-    /* Narrow phones (iPhone 12 mini = 375px, etc.): force 2 fields per row with
-       `flex: 1 1 calc(50% - 0.25em)`. Three-field rows become 2 + 1, and the
-       lonely last field grows to fill (because flex-grow is 1), so nothing ever
-       overflows the card. */
+    /* Narrow phones (iPhone 12 mini = 375px, etc.). Force 2 fields per row via
+       calc(50% - half-gap); 3-field rows become 2 + 1 (the lonely last field
+       grows to 100% because flex-grow:1). Toggle-bearing fields get their own
+       row since the buttons inside need ~180px side-by-side. */
     @media (max-width: 480px) {
-      .tools-page { padding: 3.2em 0.35em 2.2em; }
-      .tool-card { padding: 1em 0.7em; border-radius: 14px; }
-      .tool-row { gap: 0.5em; margin-bottom: 0.7em; }
+      .tools-page { padding: 3em 0.25em 2em; }
+      .tool-card { padding: 0.9em 0.6em; border-radius: 14px; max-width: 100%; }
+      .tool-row { gap: 0.4em; margin-bottom: 0.6em; }
       .tool-field {
         min-width: 0;
-        flex: 1 1 calc(50% - 0.25em);
+        flex: 1 1 calc(50% - 0.2em);
       }
-      .tool-result { padding: 0.8em 0.85em; }
-      .result-big { font-size: 1.7em; }
-      .tool-header h2 { font-size: 1.05em; }
-      .tool-meta { font-size: 0.7em; }
+      /* Fields that contain a toggle (Rent/Situation in Cost of Living) need
+         the full row so the side-by-side buttons don't overflow. */
+      .tool-field:has(> .tool-toggle) { flex-basis: 100%; }
+      /* Fallback: if :has() isn't supported, let toggle buttons wrap to 2 rows
+         instead of clipping. */
+      .tool-toggle { flex-wrap: wrap; }
+      .tool-result { padding: 0.7em 0.7em; }
+      .result-big { font-size: 1.5em; }
+      .tool-header h2 { font-size: 1em; }
+      .tool-meta { font-size: 0.68em; }
       .currency-cell { flex-basis: calc(50% - 0.35em); padding: 0.7em 0.8em; }
+      .tw-slot { flex-basis: 100%; max-width: 100%; }
+      /* Tables: tighter cells so the wider tables (weekly mileage, FIRE) need
+         far less horizontal scroll inside their overflow-x:auto wrapper. */
+      .tool-table { font-size: 0.72em; }
+      .tool-table th, .tool-table td { padding: 0.35em 0.4em; }
     }
   </style>
 </head>
@@ -355,16 +371,18 @@
                 <label>Speed (km/h)</label>
                 <input type="number" id="run-speed-kmh" min="0.5" max="50" step="0.01" value="12.00" onclick="this.select()">
               </div>
+            </div>
+            <div class="tool-row" style="align-items:flex-end;margin-top:0.2em;">
               <div class="tool-field">
                 <label>Pace (min:sec / mile)</label>
                 <input type="text" id="run-pace-mi" value="8:03" placeholder="8:03" style="font-family:monospace;" onclick="this.select()">
               </div>
-            </div>
-            <div class="tool-row" style="align-items:flex-end;margin-top:0.2em;">
               <div class="tool-field">
                 <label>Split distance</label>
                 <select id="run-split-dist"></select>
               </div>
+            </div>
+            <div class="tool-row" style="align-items:flex-end;margin-top:0.2em;">
               <div class="tool-field">
                 <label>Split time (editable)</label>
                 <input type="text" id="run-split-time" value="25:00" placeholder="mm:ss or h:mm:ss" style="font-family:monospace;" onclick="this.select()">

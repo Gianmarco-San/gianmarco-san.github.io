@@ -86,6 +86,10 @@
     .tool-field { display: flex; flex-direction: column; gap: 0.3em; flex: 1; min-width: 130px; }
     .tool-field label { font-size: 0.78em; color: #888; font-weight: 500; }
     .tool-field input, .tool-field select {
+      /* width:100% + min-width:0 overrides the input's native intrinsic min-width,
+         otherwise a <input type="text/number"> refuses to shrink below ~150-180px
+         and pushes the entire .tool-row past the viewport on narrow phones. */
+      width: 100%; min-width: 0;
       background: #fff; border: 1px solid #d8d8d8; border-radius: 8px;
       padding: 0.5em 0.8em; font-size: 0.9em; font-family: 'Inter', sans-serif;
       color: #333; outline: none; transition: border-color 0.15s;
@@ -134,10 +138,14 @@
     .contrast-fail { background: #fee2e2; color: #991b1b; }
 
     /* ── Weather ─────────────────────────────── */
-    /* auto-fit keeps cells from overlapping their content at mid widths (700–810px)
-       and lets the grid fully collapse to 1 column on narrow screens */
+    /* Mobile-first: 1 full-width card per row. Bump to 3 columns only when the
+       viewport is clearly wide enough — avoids the uneven 2-col / lone-3rd-card
+       zone that looked off between 500–900px. */
     #tw-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1em;
+      display: grid; grid-template-columns: 1fr; gap: 1em;
+    }
+    @media (min-width: 900px) {
+      #tw-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
     .tw-slot {
       background: #f7f7f7; border-radius: 12px; padding: 1em 1.1em;
@@ -156,8 +164,16 @@
     .tw-extra, .tw-uvaqi { font-size: 0.78em; color: #999; line-height: 1.6; }
 
     /* ── Currency ────────────────────────────── */
-    .currency-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.7em; margin-top: 1em; }
-    .currency-cell { background: #f4f4f4; border-radius: 8px; padding: 0.8em 1em; }
+    /* Flex + center so odd-count rows (e.g. a lonely last cell) stay centered
+       instead of hugging the left edge with empty space on the right. */
+    .currency-grid {
+      display: flex; flex-wrap: wrap; justify-content: center;
+      gap: 0.7em; margin-top: 1em;
+    }
+    .currency-cell {
+      flex: 1 1 140px; max-width: 220px;
+      background: #f4f4f4; border-radius: 8px; padding: 0.8em 1em;
+    }
     .currency-cell .cc-code { font-size: 0.72em; color: #aaa; font-weight: 600; letter-spacing: 0.05em; }
     .currency-cell .cc-val { font-size: 1.1em; font-weight: 600; color: #333; margin-top: 0.1em; }
 
@@ -236,17 +252,23 @@
       }
     }
 
-    /* Narrow phones: drop min-width so 2 fields always fit on one row
-       and tables/selects don't get shoved past the viewport. */
+    /* Narrow phones (iPhone 12 mini = 375px, etc.): force 2 fields per row with
+       `flex: 1 1 calc(50% - 0.25em)`. Three-field rows become 2 + 1, and the
+       lonely last field grows to fill (because flex-grow is 1), so nothing ever
+       overflows the card. */
     @media (max-width: 480px) {
-      .tools-page { padding: 3.2em 0.45em 2.2em; }
-      .tool-card { padding: 1em 0.75em; }
-      .tool-field { min-width: 100px; }
+      .tools-page { padding: 3.2em 0.35em 2.2em; }
+      .tool-card { padding: 1em 0.7em; border-radius: 14px; }
       .tool-row { gap: 0.5em; margin-bottom: 0.7em; }
+      .tool-field {
+        min-width: 0;
+        flex: 1 1 calc(50% - 0.25em);
+      }
       .tool-result { padding: 0.8em 0.85em; }
       .result-big { font-size: 1.7em; }
       .tool-header h2 { font-size: 1.05em; }
       .tool-meta { font-size: 0.7em; }
+      .currency-cell { flex-basis: calc(50% - 0.35em); padding: 0.7em 0.8em; }
     }
   </style>
 </head>

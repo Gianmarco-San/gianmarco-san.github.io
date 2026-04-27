@@ -9,6 +9,9 @@
 
   <link rel="preload" href="docs/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="docs/fonts/InterVariable-Italic.woff2" as="font" type="font/woff2" crossorigin>
+
+  <!-- Capture original URL search before any tool script rewrites it (used by share-link restore) -->
+  <script>window.__TOOLS_INIT_QS__ = location.search;</script>
   <style>
     @view-transition { navigation: auto; }
     @keyframes vt-fade-in  { from { opacity: 0; transform: translateY(6px); } }
@@ -109,6 +112,21 @@
     }
     .tool-toggle button.active { background: #fff; color: #333; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 
+    /* Calculate-style button: rgb(128,130,131) base, deepens to #54575A on hover. */
+    .tool-btn {
+      margin-top: 0.5em; padding: 0.5em 1.4em;
+      background: rgb(128,130,131); color: #fff;
+      border: none; border-radius: 8px;
+      cursor: pointer; font-family: inherit; font-size: 0.88em;
+      transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+    }
+    .tool-btn:hover {
+      background: #54575A;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transform: translateY(-1px);
+    }
+    .tool-btn:active { transform: translateY(0); box-shadow: none; }
+
     /* ── Output areas ────────────────────────── */
     .tool-result {
       background: #fff; border: 1px solid #e8e8e8; border-radius: 10px;
@@ -127,6 +145,33 @@
     .tool-table td { padding: 0.55em 0.7em; color: #444; border-bottom: 1px solid #f0f0f0; }
     .tool-table tr.fire-year td { background: #f0fdf4; font-weight: 600; color: #166534; }
     .tool-table tr:last-child td { border-bottom: none; }
+
+    /* ── VO₂max scale diagram ────────────────── */
+    .vo2-scale { position: relative; margin: 1em 0 0.3em; padding-top: 1.9em; }
+    .vo2-bar {
+      display: flex; height: 14px; border-radius: 7px; overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .vo2-bar > div { flex: 1; }
+    .vo2-marker {
+      position: absolute; top: 0; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      pointer-events: none;
+    }
+    .vo2-pin-val {
+      font-size: 0.74em; font-weight: 700; color: #1f2937; background: #fff;
+      padding: 0.1em 0.5em; border-radius: 4px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.12); white-space: nowrap;
+    }
+    .vo2-pin { width: 2px; height: 8px; background: #1f2937; }
+    .vo2-labels { display: flex; margin-top: 0.45em; font-size: 0.62em; color: #999; }
+    .vo2-labels > div { flex: 1; text-align: center; }
+    .vo2-section-label {
+      font-size: 0.78em; color: #888; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      margin-top: 0.6em; margin-bottom: 0.4em;
+    }
+    .vo2-divider { border: none; border-top: 1px dashed #e5e5e5; margin: 1.2em 0 0.4em; }
 
     /* ── Color preview ───────────────────────── */
     .color-preview {
@@ -191,6 +236,19 @@
     .salary-legend .l-net::before  { color: #54575A; }
     .salary-legend .l-tax::before  { color: #d0d0d0; }
     .salary-legend .l-ss::before   { color: #c0c0c0; }
+
+    /* ── Share-link button ───────────────────── */
+    .tool-share-wrap { display: flex; justify-content: center; margin: 0.4em 0 0.2em; }
+    .tool-share {
+      display: inline-flex; align-items: center; gap: 0.4em;
+      padding: 0.4em 0.85em;
+      background: transparent; border: 1px solid #e0e0e0; border-radius: 999px;
+      font-size: 0.74em; color: #888;
+      cursor: pointer; font-family: inherit;
+      transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+    }
+    .tool-share:hover { background: #f0f0f0; color: #333; border-color: #c0c0c0; }
+    .tool-share.copied { background: #dcfce7; color: #166534; border-color: #86efac; }
 
     /* ── Note / disclaimer ───────────────────── */
     .tool-note {
@@ -315,17 +373,26 @@
         <div class="tool-mobile-picker">
           <select id="tool-mobile-select" aria-label="Select a tool">
             <option value="running">🏃  Running Pace</option>
+            <option value="triathlon">🏊  Triathlon</option>
+            <option value="plan">📋  Training Plan</option>
             <option value="fire">🔥  FIRE Calculator</option>
             <option value="salary">💼  Net Salary</option>
             <option value="currency">💱  Currency</option>
             <option value="weather">🌤  Weather</option>
             <option value="color">🎨  Color Tools</option>
             <option value="col">🏙️  Cost of Living</option>
+            <option value="date">📅  Date Calculator</option>
           </select>
         </div>
         <div class="tool-nav-list">
           <button class="tool-nav-item active" data-tool="running">
             <span class="tool-icon">🏃</span> Running Pace
+          </button>
+          <button class="tool-nav-item" data-tool="triathlon">
+            <span class="tool-icon">🏊</span> Triathlon
+          </button>
+          <button class="tool-nav-item" data-tool="plan">
+            <span class="tool-icon">📋</span> Training Plan
           </button>
           <button class="tool-nav-item" data-tool="fire">
             <span class="tool-icon">🔥</span> FIRE Calculator
@@ -344,6 +411,9 @@
           </button>
           <button class="tool-nav-item" data-tool="col">
             <span class="tool-icon">🏙️</span> Cost of Living
+          </button>
+          <button class="tool-nav-item" data-tool="date">
+            <span class="tool-icon">📅</span> Date Calculator
           </button>
         </div>
       </aside>
@@ -399,8 +469,9 @@
           <div class="tool-card">
             <div class="tool-header">
               <h2>VO₂max Estimator</h2>
-              <div class="tool-meta">Jack Daniels &amp; Gilbert (1979) formula · based on race performance</div>
+              <div class="tool-meta">Jack Daniels &amp; Gilbert (1979) formula · works both ways</div>
             </div>
+
             <div class="tool-row" style="align-items:flex-end;">
               <div class="tool-field">
                 <label>Gender</label>
@@ -409,6 +480,10 @@
                   <option value="F">Female</option>
                 </select>
               </div>
+            </div>
+
+            <div class="vo2-section-label">From race time → VO₂max</div>
+            <div class="tool-row" style="align-items:flex-end;">
               <div class="tool-field">
                 <label>Distance</label>
                 <select id="run-vo2-dist">
@@ -426,7 +501,31 @@
                 <input type="text" id="run-vo2-time" value="25:00" placeholder="25:00" style="font-family:monospace;" onclick="this.select()">
               </div>
             </div>
-            <button id="run-vo2-calc" style="margin-top:0.5em;padding:0.5em 1.4em;background:#54575A;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:0.88em;">Calculate VO₂max</button>
+            <button id="run-vo2-calc" class="tool-btn">Calculate VO₂max</button>
+
+            <hr class="vo2-divider">
+
+            <div class="vo2-section-label">From VO₂max → race time</div>
+            <div class="tool-row" style="align-items:flex-end;">
+              <div class="tool-field">
+                <label>Your VO₂max (mL·kg⁻¹·min⁻¹)</label>
+                <input type="number" id="run-vo2-input" min="20" max="90" step="0.1" value="50" onclick="this.select()">
+              </div>
+              <div class="tool-field">
+                <label>Distance</label>
+                <select id="run-vo2-rdist">
+                  <option value="1.5">1500 m</option>
+                  <option value="1.60934">1 mile</option>
+                  <option value="3">3 km</option>
+                  <option value="5" selected>5 km</option>
+                  <option value="10">10 km</option>
+                  <option value="21.0975">½ marathon</option>
+                  <option value="42.195">Marathon</option>
+                </select>
+              </div>
+            </div>
+            <button id="run-vo2-rev-calc" class="tool-btn">Predict race time</button>
+
             <div class="tool-result" id="run-vo2-result" style="display:none;margin-top:1em;"></div>
             <div class="tool-note">%VO₂max = 0.8 + 0.1894·e<sup>−0.012778·t</sup> + 0.2990·e<sup>−0.1933·t</sup> (t in min) · VO₂ = −4.60 + 0.1823·v + 0.000104·v² (v in m/min) · VO₂max = VO₂ / %VO₂max. Classifications are indicative age-adjusted norms.</div>
           </div>
@@ -454,8 +553,12 @@
                 <label>Personal Best time</label>
                 <input type="text" id="run-pred-time" value="25:00" placeholder="25:00" style="font-family:monospace;" onclick="this.select()">
               </div>
+              <div class="tool-field">
+                <label>PB pace (min:sec / km)</label>
+                <input type="text" id="run-pred-pace" value="5:00" placeholder="5:00" style="font-family:monospace;" onclick="this.select()">
+              </div>
             </div>
-            <button id="run-pred-calc" style="margin-top:0.5em;padding:0.5em 1.4em;background:#54575A;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:0.88em;">Predict times</button>
+            <button id="run-pred-calc" class="tool-btn">Predict times</button>
             <div style="overflow-x:auto;margin-top:1em;">
               <table class="tool-table" id="run-pred-table" style="display:none;">
                 <thead><tr><th>Distance</th><th>Predicted time</th><th>Predicted pace /km</th></tr></thead>
@@ -598,7 +701,7 @@
                 <thead>
                   <tr>
                     <th>Year</th><th>Salary</th><th>Net</th>
-                    <th>Savings</th><th>Portfolio</th>
+                    <th>Costs</th><th>Savings</th><th>Portfolio</th>
                     <th>Passive / yr</th><th>Status</th>
                   </tr>
                 </thead>
@@ -802,7 +905,7 @@
               </div>
               <div class="tool-field" style="flex-basis:100%;">
                 <label>RGB paste</label>
-                <input type="text" id="col-rgb-in" placeholder="rgb(84, 87, 90) or 84,87,90" autocomplete="off" spellcheck="false" style="font-family:monospace;">
+                <input type="text" id="col-rgb-in" placeholder="84,87,90 · 84 87 90 · rgb(84/87/90) — any separator" autocomplete="off" spellcheck="false" style="font-family:monospace;">
               </div>
             </div>
             <div class="color-preview" id="col-preview"></div>
@@ -905,6 +1008,286 @@
           </div>
         </div>
 
+        <!-- ════════════════════════════════
+             TRIATHLON
+             ════════════════════════════════ -->
+        <div class="tool-panel" id="tool-triathlon">
+          <div class="tool-card">
+            <div class="tool-header">
+              <h2>Triathlon Calculator</h2>
+              <div class="tool-meta">v1.0 · Apr 2026 — pace, splits, transitions for Sprint → Ironman</div>
+            </div>
+
+            <div class="tool-row" style="align-items:flex-end;">
+              <div class="tool-field">
+                <label>Race format</label>
+                <select id="tri-preset">
+                  <option value="sprint">Sprint (0.75 / 20 / 5 km)</option>
+                  <option value="olympic" selected>Olympic (1.5 / 40 / 10 km)</option>
+                  <option value="t100">T100 (2 / 80 / 18 km)</option>
+                  <option value="half">Half · 70.3 (1.9 / 90 / 21.1 km)</option>
+                  <option value="full">Full Ironman (3.8 / 180 / 42.2 km)</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="vo2-section-label">🏊 Swim</div>
+            <div class="tool-row" style="align-items:flex-end;">
+              <div class="tool-field">
+                <label>Distance (km)</label>
+                <input type="number" id="tri-swim-km" step="0.1" min="0.1" value="1.5" onclick="this.select()">
+              </div>
+              <div class="tool-field">
+                <label>Pace (min:sec / 100 m)</label>
+                <input type="text" id="tri-swim-pace" value="1:50" style="font-family:monospace;" onclick="this.select()">
+              </div>
+              <div class="tool-field">
+                <label>Time</label>
+                <input type="text" id="tri-swim-time" value="27:30" style="font-family:monospace;" onclick="this.select()">
+              </div>
+            </div>
+
+            <div class="vo2-section-label">🔄 T1 (transition)</div>
+            <div class="tool-row" style="align-items:flex-end;">
+              <div class="tool-field">
+                <label>Time (mm:ss)</label>
+                <input type="text" id="tri-t1" value="2:00" style="font-family:monospace;" onclick="this.select()">
+              </div>
+            </div>
+
+            <div class="vo2-section-label">🚴 Bike</div>
+            <div class="tool-row" style="align-items:flex-end;">
+              <div class="tool-field">
+                <label>Distance (km)</label>
+                <input type="number" id="tri-bike-km" step="1" min="1" value="40" onclick="this.select()">
+              </div>
+              <div class="tool-field">
+                <label>Speed (km/h)</label>
+                <input type="number" id="tri-bike-kmh" step="0.1" min="5" value="32" onclick="this.select()">
+              </div>
+              <div class="tool-field">
+                <label>Time</label>
+                <input type="text" id="tri-bike-time" value="1:15:00" style="font-family:monospace;" onclick="this.select()">
+              </div>
+              <div class="tool-field">
+                <label>Power (W) — leave blank to estimate</label>
+                <input type="number" id="tri-bike-w" step="1" min="0" placeholder="auto from speed" onclick="this.select()">
+              </div>
+            </div>
+
+            <div class="vo2-section-label">🔄 T2 (transition)</div>
+            <div class="tool-row" style="align-items:flex-end;">
+              <div class="tool-field">
+                <label>Time (mm:ss)</label>
+                <input type="text" id="tri-t2" value="1:30" style="font-family:monospace;" onclick="this.select()">
+              </div>
+            </div>
+
+            <div class="vo2-section-label">🏃 Run</div>
+            <div class="tool-row" style="align-items:flex-end;">
+              <div class="tool-field">
+                <label>Distance (km)</label>
+                <input type="number" id="tri-run-km" step="0.1" min="0.1" value="10" onclick="this.select()">
+              </div>
+              <div class="tool-field">
+                <label>Pace (min:sec / km)</label>
+                <input type="text" id="tri-run-pace" value="5:00" style="font-family:monospace;" onclick="this.select()">
+              </div>
+              <div class="tool-field">
+                <label>Time</label>
+                <input type="text" id="tri-run-time" value="50:00" style="font-family:monospace;" onclick="this.select()">
+              </div>
+            </div>
+
+            <div class="tool-result" id="tri-result" style="margin-top:1em;"></div>
+            <div class="tool-note">Pace ↔ time fields auto-update each other given the leg distance. Picking a preset fills standard distances. <strong>Power estimate</strong> (when W is blank) uses a flat-road model: P = (½·ρ·CdA·v³ + C<sub>rr</sub>·m·g·v) / η, with ρ=1.225 kg/m³, CdA≈0.32 m², m≈80 kg, C<sub>rr</sub>=0.005, η=0.97. Real-world output varies with aero position, weight, terrain, wind and drafting — enter your own number for accuracy.</div>
+          </div>
+
+          <div class="tool-card">
+            <div class="tool-header">
+              <h2>Triathlon Race Predictor</h2>
+              <div class="tool-meta">Riegel formula applied per leg — T₂ = T₁ × (D₂/D₁)<sup>1.06</sup></div>
+            </div>
+            <div class="tool-row" style="align-items:flex-end;">
+              <div class="tool-field">
+                <label>Reference race</label>
+                <select id="tri-pred-ref">
+                  <option value="sprint">Sprint</option>
+                  <option value="olympic" selected>Olympic</option>
+                  <option value="t100">T100</option>
+                  <option value="half">Half · 70.3</option>
+                  <option value="full">Full Ironman</option>
+                </select>
+              </div>
+              <div class="tool-field">
+                <label>Swim time</label>
+                <input type="text" id="tri-pred-swim" value="27:30" style="font-family:monospace;" onclick="this.select()">
+              </div>
+              <div class="tool-field">
+                <label>Bike time</label>
+                <input type="text" id="tri-pred-bike" value="1:15:00" style="font-family:monospace;" onclick="this.select()">
+              </div>
+              <div class="tool-field">
+                <label>Run time</label>
+                <input type="text" id="tri-pred-run" value="50:00" style="font-family:monospace;" onclick="this.select()">
+              </div>
+            </div>
+            <button id="tri-pred-calc" class="tool-btn">Predict all distances</button>
+            <div style="overflow-x:auto;margin-top:1em;">
+              <table class="tool-table" id="tri-pred-table" style="display:none;">
+                <thead><tr><th>Race</th><th>Swim</th><th>T1</th><th>Bike</th><th>T2</th><th>Run</th><th>Total</th></tr></thead>
+                <tbody id="tri-pred-tbody"></tbody>
+              </table>
+            </div>
+            <div class="tool-note">Riegel works best within ~3× distance jumps; predictions for very different formats (Sprint → Ironman) are indicative only. Transitions held constant from your reference.</div>
+          </div>
+        </div>
+
+        <!-- ════════════════════════════════
+             TRAINING PLAN
+             ════════════════════════════════ -->
+        <div class="tool-panel" id="tool-plan">
+          <div class="tool-card">
+            <div class="tool-header">
+              <h2>Training Plan Builder</h2>
+              <div class="tool-meta">v1.0 · Apr 2026 — weekly plan + strength · 3 philosophies · 100% client-side</div>
+            </div>
+
+            <div class="tool-row" style="align-items:flex-end;">
+              <div class="tool-field">
+                <label>Goal race</label>
+                <select id="plan-race">
+                  <option value="5k">5 km</option>
+                  <option value="10k" selected>10 km</option>
+                  <option value="half">½ marathon</option>
+                  <option value="marathon">Marathon</option>
+                  <option value="ultra">Ultra (50 km)</option>
+                </select>
+              </div>
+              <div class="tool-field">
+                <label>Weeks until race</label>
+                <input type="number" id="plan-weeks" min="4" max="32" value="12" onclick="this.select()">
+              </div>
+              <div class="tool-field">
+                <label>Days / week</label>
+                <input type="number" id="plan-days" min="3" max="7" value="5" onclick="this.select()">
+              </div>
+            </div>
+
+            <div class="tool-row" style="align-items:flex-end;">
+              <div class="tool-field">
+                <label>Current weekly km</label>
+                <input type="number" id="plan-current-km" min="0" step="1" value="25" onclick="this.select()">
+              </div>
+              <div class="tool-field">
+                <label>Goal pace (min:sec / km, optional)</label>
+                <input type="text" id="plan-goal-pace" placeholder="e.g. 5:00" style="font-family:monospace;" onclick="this.select()">
+              </div>
+              <div class="tool-field">
+                <label>Philosophy</label>
+                <select id="plan-philosophy">
+                  <option value="polarized" selected>Polarized (80/20 easy/hard)</option>
+                  <option value="daniels">Daniels (threshold-heavy)</option>
+                  <option value="lydiard">Lydiard (base-build, volume-first)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="tool-row" style="align-items:flex-end;">
+              <div class="tool-field">
+                <label>Strength / gym?</label>
+                <div class="tool-toggle" id="plan-strength-toggle">
+                  <button class="active" data-strength="yes">Yes (1–2 / wk)</button>
+                  <button data-strength="no">No</button>
+                </div>
+              </div>
+            </div>
+
+            <button id="plan-generate" class="tool-btn">Generate plan</button>
+            <div class="tool-result" id="plan-result" style="display:none;margin-top:1em;"></div>
+            <div class="tool-note">
+              <strong>The three philosophies</strong>
+              <ul style="margin:0.4em 0 0.8em;padding-left:1.3em;line-height:1.55;">
+                <li><strong>Polarized (80/20)</strong> — ~80% of weekly volume very easy, ~20% hard (intervals). Very little moderate "grey-zone" work. Based on Stephen Seiler's research on elite endurance athletes; emphasises high aerobic volume + a small dose of high-intensity stimulus.</li>
+                <li><strong>Daniels (threshold-heavy)</strong> — Jack Daniels' VDOT system. Pace zones (Easy · Marathon · Threshold · Interval · Repetition) are derived from a recent race. Lactate-threshold (T) running is the cornerstone, training sustainable race pace efficiently.</li>
+                <li><strong>Lydiard (base-build)</strong> — Arthur Lydiard's classic structure. A long aerobic base phase first (heavy easy mileage), then hills, then anaerobic intervals only as the race approaches. Volume drives improvement; intensity comes late.</li>
+              </ul>
+              ⚠ <strong>General guidance — not medical, nutritional, or coaching advice.</strong> Listen to your body, take recovery weeks when fatigued, and consult a professional for injury, illness, or significant performance goals. Hydration / nutrition tips are generic. No data leaves your browser.
+            </div>
+          </div>
+        </div>
+
+        <!-- ════════════════════════════════
+             DATE CALCULATOR
+             ════════════════════════════════ -->
+        <div class="tool-panel" id="tool-date">
+          <div class="tool-card">
+            <div class="tool-header">
+              <h2>Date Calculator</h2>
+              <div class="tool-meta">v1.0 · Apr 2026 — between · until/since · ± offset · Gregorian</div>
+            </div>
+
+            <div class="tool-row" style="align-items:flex-end;">
+              <div class="tool-field">
+                <label>Mode</label>
+                <div class="tool-toggle" id="date-mode-toggle">
+                  <button class="active" data-mode="between">Between two dates</button>
+                  <button data-mode="until">Until / since a date</button>
+                  <button data-mode="add">Date ± offset</button>
+                </div>
+              </div>
+            </div>
+
+            <div id="date-mode-between" class="date-mode-block">
+              <div class="tool-row" style="align-items:flex-end;">
+                <div class="tool-field">
+                  <label>Start date</label>
+                  <input type="date" id="date-a">
+                </div>
+                <div class="tool-field">
+                  <label>End date</label>
+                  <input type="date" id="date-b">
+                </div>
+              </div>
+            </div>
+
+            <div id="date-mode-until" class="date-mode-block" style="display:none;">
+              <div class="tool-row" style="align-items:flex-end;">
+                <div class="tool-field">
+                  <label>Target date</label>
+                  <input type="date" id="date-target">
+                </div>
+              </div>
+            </div>
+
+            <div id="date-mode-add" class="date-mode-block" style="display:none;">
+              <div class="tool-row" style="align-items:flex-end;">
+                <div class="tool-field">
+                  <label>Reference date</label>
+                  <input type="date" id="date-ref">
+                </div>
+                <div class="tool-field">
+                  <label>Offset (use − to go back)</label>
+                  <input type="number" id="date-offset" value="100" step="1" onclick="this.select()">
+                </div>
+                <div class="tool-field">
+                  <label>Unit</label>
+                  <select id="date-unit">
+                    <option value="day" selected>days</option>
+                    <option value="week">weeks</option>
+                    <option value="month">months</option>
+                    <option value="year">years</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="tool-result" id="date-result" style="display:none;margin-top:1em;"></div>
+            <div class="tool-note">All calculations use the proleptic Gregorian calendar. Working days = Mon–Fri inclusive. Holiday counts are Gregorian-only (no country-specific public holidays). Easter Sunday computed via the Anonymous Gregorian algorithm.</div>
+          </div>
+        </div>
+
       </main>
     </div>
   </div>
@@ -945,21 +1328,26 @@
   (function () {
     var KM_PER_MI = 1.60934;
     var DISTANCES = [
-      { label: '100 m',      km: 0.1      },
-      { label: '200 m',      km: 0.2      },
-      { label: '400 m',      km: 0.4      },
-      { label: '800 m',      km: 0.8      },
-      { label: '1 km',       km: 1.0      },
-      { label: '1500 m',     km: 1.5      },
-      { label: '1 mile',     km: 1.60934  },
-      { label: '3 km',       km: 3.0      },
-      { label: '5 km',       km: 5.0      },
-      { label: '10 km',      km: 10.0     },
-      { label: '15 km',      km: 15.0     },
-      { label: '20 km',      km: 20.0     },
-      { label: '½ marathon', km: 21.0975  },
-      { label: '30 km',      km: 30.0     },
-      { label: 'Marathon',   km: 42.195   }
+      { label: '100 m',       km: 0.1      },
+      { label: '200 m',       km: 0.2      },
+      { label: '300 m',       km: 0.3      },
+      { label: '400 m',       km: 0.4      },
+      { label: '500 m',       km: 0.5      },
+      { label: '800 m',       km: 0.8      },
+      { label: '1 km',        km: 1.0      },
+      { label: '1500 m',      km: 1.5      },
+      { label: '1 mile',      km: 1.60934  },
+      { label: '3 km',        km: 3.0      },
+      { label: '5 km',        km: 5.0      },
+      { label: '10 km',       km: 10.0     },
+      { label: '15 km',       km: 15.0     },
+      { label: '10 miles',    km: 16.0934  },
+      { label: '20 km',       km: 20.0     },
+      { label: '½ marathon',  km: 21.0975  },
+      { label: '30 km',       km: 30.0     },
+      { label: 'Marathon',    km: 42.195   },
+      { label: '50 km',       km: 50.0     },
+      { label: 'Ultra 100 km', km: 100.0   }
     ];
 
     function fmtPace(secPerKm) {
@@ -1002,6 +1390,23 @@
       }
       return null;
     }
+
+    // Auto-insert ":" while typing — strips non-digits and rebuilds mm:ss / h:mm:ss
+    function autoFmtTime(el, allowHours) {
+      var maxDigits = allowHours ? 6 : 4;
+      var d = (el.value || '').replace(/\D/g, '').slice(0, maxDigits);
+      var out;
+      if (d.length <= 2)      out = d;
+      else if (d.length <= 4) out = d.slice(0, d.length - 2) + ':' + d.slice(-2);
+      else                    out = d.slice(0, d.length - 4) + ':' + d.slice(-4, -2) + ':' + d.slice(-2);
+      el.value = out;
+    }
+    [['run-pace-km', false], ['run-pace-mi', false],
+     ['run-split-time', true], ['run-vo2-time', true], ['run-pred-time', true]
+    ].forEach(function (pair) {
+      var el = document.getElementById(pair[0]);
+      if (el) el.addEventListener('input', function () { autoFmtTime(el, pair[1]); });
+    });
 
     // Populate split distance selector
     var distSel = document.getElementById('run-split-dist');
@@ -1063,39 +1468,124 @@
     updateFromSecPerKm(300, null); // init 5:00 /km
 
     // ── VO2max ──────────────────────────────────────────────
+    // Shared math: VO₂max from (distance, time, gender) using Daniels-Gilbert (1979).
+    function calcVO2maxFromRace(distKm, timeSec) {
+      var timeMin = timeSec / 60;
+      var vel     = distKm * 1000 / timeSec * 60; // m/min
+      var pctVO2  = 0.8 + 0.1894393 * Math.exp(-0.012778 * timeMin) + 0.2989558 * Math.exp(-0.1932605 * timeMin);
+      var VO2     = -4.60 + 0.182258 * vel + 0.000104 * vel * vel;
+      return VO2 / pctVO2;
+    }
+    // Reverse: solve for race time given VO₂max + distance via bisection.
+    // calcVO2maxFromRace is monotonically decreasing in time (slower race ⇒ lower
+    // VO₂max needed), so bisection converges cleanly.
+    function predictTimeFromVO2max(VO2max, distKm) {
+      var lo = 0.5 * 60, hi = 600 * 60; // bounds in seconds: 30 s … 10 h
+      for (var i = 0; i < 60; i++) {
+        var mid = (lo + hi) / 2;
+        if (calcVO2maxFromRace(distKm, mid) > VO2max) lo = mid; else hi = mid;
+      }
+      return (lo + hi) / 2;
+    }
+    function vo2NormsFor(gender) {
+      return gender === 'M'
+        ? [{lbl:'Poor',hi:30},{lbl:'Below avg',hi:40},{lbl:'Average',hi:48},{lbl:'Good',hi:56},{lbl:'Excellent',hi:65},{lbl:'Elite',hi:75}]
+        : [{lbl:'Poor',hi:24},{lbl:'Below avg',hi:31},{lbl:'Average',hi:38},{lbl:'Good',hi:46},{lbl:'Excellent',hi:55},{lbl:'Elite',hi:70}];
+    }
+    function vo2Classification(VO2max, gender) {
+      var norms = vo2NormsFor(gender);
+      for (var i = 0; i < norms.length - 1; i++) {
+        if (VO2max < norms[i].hi) return norms[i].lbl;
+      }
+      return norms[norms.length - 1].lbl;
+    }
+    function buildVO2Scale(VO2max, gender) {
+      var norms  = vo2NormsFor(gender);
+      var colors = ['#fca5a5','#fcd34d','#fde68a','#86efac','#4ade80','#16a34a'];
+      var pos = 0;
+      for (var i = 0; i < norms.length; i++) {
+        var lo = i === 0 ? 0 : norms[i-1].hi;
+        var hi = norms[i].hi;
+        if (VO2max <= hi) {
+          var frac = Math.max(0, Math.min(1, (VO2max - lo) / (hi - lo)));
+          pos = ((i + frac) / norms.length) * 100;
+          break;
+        }
+        if (i === norms.length - 1) pos = 100;
+      }
+      var bar = norms.map(function (_, i) {
+        return '<div style="background:' + colors[i] + ';"></div>';
+      }).join('');
+      var labels = norms.map(function (z) { return '<div>' + z.lbl + '</div>'; }).join('');
+      return '<div class="vo2-scale">'
+        +   '<div class="vo2-marker" style="left:' + pos.toFixed(1) + '%;">'
+        +     '<div class="vo2-pin-val">' + VO2max.toFixed(1) + '</div>'
+        +     '<div class="vo2-pin"></div>'
+        +   '</div>'
+        +   '<div class="vo2-bar">' + bar + '</div>'
+        +   '<div class="vo2-labels">' + labels + '</div>'
+        + '</div>';
+    }
+    function renderVO2Result(VO2max, gender, predictedTimeSec) {
+      var el = document.getElementById('run-vo2-result');
+      var cls = vo2Classification(VO2max, gender);
+      var html = '<div style="display:flex;gap:2em;flex-wrap:wrap;">'
+        + '<div><div class="result-big">' + VO2max.toFixed(1) + '</div><div class="result-label">mL · kg⁻¹ · min⁻¹</div></div>'
+        + '<div><div class="result-big">' + cls + '</div><div class="result-label">Classification (' + (gender === 'M' ? 'male' : 'female') + ')</div></div>';
+      if (predictedTimeSec != null) {
+        html += '<div><div class="result-big">' + fmtTime(predictedTimeSec) + '</div><div class="result-label">Predicted race time</div></div>';
+      }
+      html += '</div>' + buildVO2Scale(VO2max, gender);
+      el.style.display = '';
+      el.innerHTML = html;
+    }
+
     document.getElementById('run-vo2-calc').addEventListener('click', function () {
       var distKm  = parseFloat(document.getElementById('run-vo2-dist').value) || 0;
       var timeSec = parseTime(document.getElementById('run-vo2-time').value);
       var gender  = document.getElementById('run-vo2-gender').value;
       var el = document.getElementById('run-vo2-result');
-      if (!distKm || !timeSec || timeSec <= 0) { el.style.display='none'; return; }
+      if (!distKm || !timeSec || timeSec <= 0) { el.style.display = 'none'; return; }
+      renderVO2Result(calcVO2maxFromRace(distKm, timeSec), gender, null);
+    });
 
-      var timeMin = timeSec / 60;
-      var vel     = distKm * 1000 / timeSec * 60; // m/min
-      var pctVO2  = 0.8 + 0.1894393 * Math.exp(-0.012778 * timeMin) + 0.2989558 * Math.exp(-0.1932605 * timeMin);
-      var VO2     = -4.60 + 0.182258 * vel + 0.000104 * vel * vel;
-      var VO2max  = VO2 / pctVO2;
-
-      // Classification norms (ml/kg/min)
-      var norms = gender === 'M'
-        ? [[30,'Poor'],[40,'Below average'],[48,'Average'],[56,'Good'],[65,'Excellent'],[Infinity,'Elite']]
-        : [[24,'Poor'],[31,'Below average'],[38,'Average'],[46,'Good'],[55,'Excellent'],[Infinity,'Elite']];
-      var cls = 'Elite';
-      for (var i = 0; i < norms.length; i++) {
-        if (VO2max < norms[i][0]) { cls = norms[i][1]; break; }
-      }
-
-      el.style.display = '';
-      el.innerHTML = '<div style="display:flex;gap:2em;flex-wrap:wrap;">'
-        + '<div><div class="result-big">' + VO2max.toFixed(1) + '</div><div class="result-label">mL · kg⁻¹ · min⁻¹</div></div>'
-        + '<div><div class="result-big">' + cls + '</div><div class="result-label">Classification (' + (gender==='M'?'male':'female') + ')</div></div>'
-        + '</div>';
+    document.getElementById('run-vo2-rev-calc').addEventListener('click', function () {
+      var VO2max = parseFloat(document.getElementById('run-vo2-input').value) || 0;
+      var distKm = parseFloat(document.getElementById('run-vo2-rdist').value) || 0;
+      var gender = document.getElementById('run-vo2-gender').value;
+      var el = document.getElementById('run-vo2-result');
+      if (!VO2max || !distKm || VO2max < 10 || VO2max > 100) { el.style.display = 'none'; return; }
+      renderVO2Result(VO2max, gender, predictTimeFromVO2max(VO2max, distKm));
     });
 
     // ── Race Predictor (Riegel) ──────────────────────────────
+    // Bidirectional time ↔ pace sync at the selected PB distance.
+    var pTimeEl = document.getElementById('run-pred-time');
+    var pPaceEl = document.getElementById('run-pred-pace');
+    var pDistEl = document.getElementById('run-pred-dist');
+    var _pLock  = false;
+    function syncPredFromTime() {
+      if (_pLock) return;
+      var sec = parseTime(pTimeEl.value);
+      var km  = parseFloat(pDistEl.value) || 0;
+      if (sec > 0 && km > 0) { _pLock = true; pPaceEl.value = fmtPace(sec / km); _pLock = false; }
+    }
+    function syncPredFromPace() {
+      if (_pLock) return;
+      var sec = parsePace(pPaceEl.value);
+      var km  = parseFloat(pDistEl.value) || 0;
+      if (sec > 0 && km > 0) { _pLock = true; pTimeEl.value = fmtTime(sec * km); _pLock = false; }
+    }
+    pTimeEl.addEventListener('change', syncPredFromTime);
+    pPaceEl.addEventListener('change', syncPredFromPace);
+    pDistEl.addEventListener('change', syncPredFromTime);
+    // also auto-format the new pace input as you type (mm:ss only, no hours)
+    pPaceEl.addEventListener('input', function () { autoFmtTime(pPaceEl, false); });
+    syncPredFromTime();
+
     document.getElementById('run-pred-calc').addEventListener('click', function () {
-      var refKm  = parseFloat(document.getElementById('run-pred-dist').value) || 0;
-      var refSec = parseTime(document.getElementById('run-pred-time').value);
+      var refKm  = parseFloat(pDistEl.value) || 0;
+      var refSec = parseTime(pTimeEl.value);
       if (!refKm || !refSec || refSec <= 0) return;
 
       var tbody = document.getElementById('run-pred-tbody');
@@ -1165,6 +1655,7 @@
         tr.innerHTML = '<td>Y' + (y + 1) + '</td>'
           + '<td>' + fmt(salary, cur) + '</td>'
           + '<td>' + fmt(netIncome, cur) + '</td>'
+          + '<td>' + fmt(livingCost, cur) + '</td>'
           + '<td>' + fmt(savings, cur) + '</td>'
           + '<td>' + fmt(portfolio, cur) + '</td>'
           + '<td>' + fmt(passive, cur) + '</td>'
@@ -1181,8 +1672,8 @@
         var fireRow = rows[fireYear - 1];
         if (fireRow) {
           var cells = fireRow.querySelectorAll('td');
-          document.getElementById('fire-portfolio-display').textContent = cells[4].textContent;
-          document.getElementById('fire-passive-display').textContent = cells[5].textContent;
+          document.getElementById('fire-portfolio-display').textContent = cells[5].textContent;
+          document.getElementById('fire-passive-display').textContent = cells[6].textContent;
         }
       } else {
         summary.style.display = 'none';
@@ -1992,9 +2483,10 @@
       this.style.borderColor = '';
     });
 
-    // RGB paste input → parse rgb(r,g,b) or r,g,b or r g b
+    // RGB paste input → accepts any non-digit separator (commas, spaces, slashes,
+    // semicolons, pipes, etc.), with or without an rgb(...) wrapper.
     document.getElementById('col-rgb-in').addEventListener('input', function () {
-      var m = this.value.match(/(\d+)[,\s]+(\d+)[,\s]+(\d+)/);
+      var m = this.value.match(/(\d{1,3})\D+(\d{1,3})\D+(\d{1,3})/);
       if (!m) { this.style.borderColor = this.value.trim() ? '#f87171' : ''; return; }
       var r=clamp(+m[1]), g=clamp(+m[2]), b=clamp(+m[3]);
       this.style.borderColor = '#4ade80';
@@ -2136,6 +2628,696 @@
     document.getElementById('col-cmp-b').addEventListener('change', renderCompare);
 
     render();
+  })();
+  </script>
+
+  <script>
+  // ── Date Calculator ───────────────────────────────────────
+  (function () {
+    var modeBtns = document.querySelectorAll('#date-mode-toggle button');
+    var current  = 'between';
+    var blocks   = ['between', 'until', 'add'];
+
+    function pad(n) { return n < 10 ? '0' + n : '' + n; }
+    function isoDate(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+    function parseISO(s) {
+      var p = (s || '').split('-');
+      if (p.length !== 3) return null;
+      var y = +p[0], m = +p[1], d = +p[2];
+      var dt = new Date(y, m - 1, d);
+      if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== d) return null;
+      return dt;
+    }
+    function diffDays(a, b) { return Math.round((b - a) / 86400000); }
+    function workDays(a, b) {
+      if (a > b) { var t = a; a = b; b = t; }
+      var d = new Date(a), c = 0;
+      while (d <= b) {
+        var w = d.getDay();
+        if (w !== 0 && w !== 6) c++;
+        d.setDate(d.getDate() + 1);
+      }
+      return c;
+    }
+    function isLeap(y) { return (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0; }
+    // Anonymous Gregorian computus for Easter Sunday
+    function easterSunday(year) {
+      var a = year % 19, b = Math.floor(year / 100), c = year % 100;
+      var d = Math.floor(b / 4), e = b % 4;
+      var f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3);
+      var h = (19 * a + b - d - g + 15) % 30;
+      var i = Math.floor(c / 4), k = c % 4;
+      var l = (32 + 2 * e + 2 * i - h - k) % 7;
+      var m = Math.floor((a + 11 * h + 22 * l) / 451);
+      var month = Math.floor((h + l - 7 * m + 114) / 31);
+      var day = ((h + l - 7 * m + 114) % 31) + 1;
+      return new Date(year, month - 1, day);
+    }
+    function countInRange(a, b, fnPerYear) {
+      if (a > b) { var t = a; a = b; b = t; }
+      var n = 0;
+      for (var y = a.getFullYear(); y <= b.getFullYear(); y++) {
+        var ev = fnPerYear(y);
+        if (ev && ev >= a && ev <= b) n++;
+      }
+      return n;
+    }
+    function holidayCounts(a, b) {
+      return [
+        { e: '🎉', l: 'New Year (1 Jan)',     n: countInRange(a, b, function (y) { return new Date(y, 0, 1); }) },
+        { e: '💝', l: "Valentine's (14 Feb)",  n: countInRange(a, b, function (y) { return new Date(y, 1, 14); }) },
+        { e: '🌍', l: 'Leap days (29 Feb)',   n: countInRange(a, b, function (y) { return isLeap(y) ? new Date(y, 1, 29) : null; }) },
+        { e: '🐣', l: 'Easter Sunday',        n: countInRange(a, b, easterSunday) },
+        { e: '🎃', l: 'Halloween (31 Oct)',   n: countInRange(a, b, function (y) { return new Date(y, 9, 31); }) },
+        { e: '🎄', l: 'Christmas (25 Dec)',   n: countInRange(a, b, function (y) { return new Date(y, 11, 25); }) }
+      ];
+    }
+    function fmtDateLong(d) {
+      return d.toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    }
+    function renderRange(a, b) {
+      var d = Math.abs(diffDays(a, b));
+      var w = (d / 7).toFixed(1);
+      var months = Math.abs((b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth()) + (b.getDate() - a.getDate()) / 30);
+      var y = (d / 365.25).toFixed(2);
+      var wd = workDays(a, b);
+      var hols = holidayCounts(a, b).filter(function (h) { return h.n > 0; });
+      var holHtml = hols.map(function (h) {
+        return '<div class="result-cell" title="' + h.l + '"><div class="rc-val">' + h.e + ' ' + h.n + '</div><div class="rc-lbl">' + h.l + '</div></div>';
+      }).join('');
+      return '<div style="display:flex;gap:1.5em;flex-wrap:wrap;">'
+        + '<div><div class="result-big">' + d + '</div><div class="result-label">days</div></div>'
+        + '<div><div class="result-big">' + w + '</div><div class="result-label">weeks</div></div>'
+        + '<div><div class="result-big">' + months.toFixed(1) + '</div><div class="result-label">months (~30 d)</div></div>'
+        + '<div><div class="result-big">' + y + '</div><div class="result-label">years</div></div>'
+        + '<div><div class="result-big">' + wd + '</div><div class="result-label">working days</div></div>'
+        + '</div>'
+        + (holHtml ? '<div style="font-size:0.78em;color:#888;margin:1em 0 0.4em;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">In window</div>' : '')
+        + (holHtml ? '<div class="result-grid">' + holHtml + '</div>' : '');
+    }
+
+    function compute() {
+      var el = document.getElementById('date-result');
+      if (current === 'between') {
+        var a = parseISO(document.getElementById('date-a').value);
+        var b = parseISO(document.getElementById('date-b').value);
+        if (!a || !b) { el.style.display = 'none'; return; }
+        el.style.display = '';
+        el.innerHTML = '<div style="font-size:0.85em;color:#666;margin-bottom:0.7em;">'
+          + '<strong>' + fmtDateLong(a) + '</strong> → <strong>' + fmtDateLong(b) + '</strong></div>'
+          + renderRange(a, b);
+      } else if (current === 'until') {
+        var t = parseISO(document.getElementById('date-target').value);
+        if (!t) { el.style.display = 'none'; return; }
+        var today = new Date(); today.setHours(0, 0, 0, 0);
+        var diff = diffDays(today, t);
+        var dir  = diff > 0 ? 'until' : (diff < 0 ? 'since' : 'is');
+        el.style.display = '';
+        var head = '<div style="font-size:0.85em;color:#666;margin-bottom:0.7em;">'
+          + 'Today: <strong>' + fmtDateLong(today) + '</strong><br>Target: <strong>' + fmtDateLong(t) + '</strong></div>';
+        var summary = '<div style="display:flex;gap:1.5em;flex-wrap:wrap;margin-bottom:0.6em;">'
+          + '<div><div class="result-big">' + Math.abs(diff) + '</div><div class="result-label">days ' + dir + '</div></div>'
+          + '</div>';
+        el.innerHTML = head + summary + (diff !== 0 ? renderRange(today, t) : '');
+      } else if (current === 'add') {
+        var ref  = parseISO(document.getElementById('date-ref').value);
+        var off  = parseInt(document.getElementById('date-offset').value, 10);
+        var unit = document.getElementById('date-unit').value;
+        if (!ref || isNaN(off)) { el.style.display = 'none'; return; }
+        var r = new Date(ref);
+        if (unit === 'day')        r.setDate(r.getDate() + off);
+        else if (unit === 'week')  r.setDate(r.getDate() + off * 7);
+        else if (unit === 'month') r.setMonth(r.getMonth() + off);
+        else if (unit === 'year')  r.setFullYear(r.getFullYear() + off);
+        el.style.display = '';
+        var unitLbl = unit + (Math.abs(off) === 1 ? '' : 's');
+        el.innerHTML = '<div style="font-size:0.85em;color:#666;margin-bottom:0.7em;">'
+          + '<strong>' + fmtDateLong(ref) + '</strong> ' + (off >= 0 ? '+ ' : '− ') + Math.abs(off) + ' ' + unitLbl + '</div>'
+          + '<div style="display:flex;gap:1.5em;flex-wrap:wrap;margin-bottom:0.6em;">'
+          +   '<div><div class="result-big" style="font-size:1.4em;">' + fmtDateLong(r) + '</div><div class="result-label">Result</div></div>'
+          + '</div>'
+          + renderRange(ref, r);
+      }
+    }
+
+    modeBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        modeBtns.forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        current = btn.dataset.mode;
+        blocks.forEach(function (m) {
+          document.getElementById('date-mode-' + m).style.display = (m === current ? '' : 'none');
+        });
+        compute();
+      });
+    });
+
+    // Defaults: today → today+1y for between/until; today as ref for add
+    var today = new Date();
+    var oneYr = new Date(today); oneYr.setFullYear(oneYr.getFullYear() + 1);
+    document.getElementById('date-a').value      = isoDate(today);
+    document.getElementById('date-b').value      = isoDate(oneYr);
+    document.getElementById('date-target').value = isoDate(oneYr);
+    document.getElementById('date-ref').value    = isoDate(today);
+
+    ['date-a', 'date-b', 'date-target', 'date-ref', 'date-offset', 'date-unit'].forEach(function (id) {
+      var el = document.getElementById(id);
+      el.addEventListener('change', compute);
+      el.addEventListener('input',  compute);
+    });
+
+    compute();
+  })();
+  </script>
+
+  <script>
+  // ── Triathlon ─────────────────────────────────────────────
+  (function () {
+    function parsePace(str) {
+      var p = (str || '').trim().split(':');
+      if (p.length !== 2) return null;
+      var m = parseInt(p[0], 10), s = parseFloat(p[1]);
+      if (isNaN(m) || isNaN(s) || m < 0 || s < 0) return null;
+      return m * 60 + s;
+    }
+    function parseTime(str) {
+      var p = (str || '').trim().split(':');
+      if (p.length === 3) {
+        var h = +p[0], m = +p[1], s = parseFloat(p[2]);
+        if (isNaN(h) || isNaN(m) || isNaN(s)) return null;
+        return h * 3600 + m * 60 + s;
+      }
+      if (p.length === 2) {
+        var m2 = +p[0], s2 = parseFloat(p[1]);
+        if (isNaN(m2) || isNaN(s2)) return null;
+        return m2 * 60 + s2;
+      }
+      return null;
+    }
+    function fmtPace(sec) {
+      if (!sec || sec <= 0 || !isFinite(sec)) return '—';
+      var m = Math.floor(sec / 60), s = Math.round(sec % 60);
+      if (s === 60) { s = 0; m++; }
+      return m + ':' + (s < 10 ? '0' + s : s);
+    }
+    function fmtTime(sec) {
+      if (!sec || sec <= 0 || !isFinite(sec)) return '—';
+      var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = Math.round(sec % 60);
+      if (s === 60) { s = 0; m++; }
+      if (m === 60) { m = 0; h++; }
+      var mm = m < 10 ? '0' + m : m, ss = s < 10 ? '0' + s : s;
+      return h > 0 ? h + ':' + mm + ':' + ss : m + ':' + ss;
+    }
+    // Auto-format colon while typing for any time/pace field below
+    function autoFmt(el, allowH) {
+      var max = allowH ? 6 : 4;
+      var d = (el.value || '').replace(/\D/g, '').slice(0, max);
+      el.value = d.length <= 2 ? d
+        : d.length <= 4 ? d.slice(0, d.length - 2) + ':' + d.slice(-2)
+        : d.slice(0, d.length - 4) + ':' + d.slice(-4, -2) + ':' + d.slice(-2);
+    }
+
+    var PRESETS = {
+      sprint:  { swim: 0.75, bike: 20,  run: 5      },
+      olympic: { swim: 1.5,  bike: 40,  run: 10     },
+      t100:    { swim: 2.0,  bike: 80,  run: 18     },
+      half:    { swim: 1.9,  bike: 90,  run: 21.0975 },
+      full:    { swim: 3.8,  bike: 180, run: 42.195 }
+    };
+
+    // Per-leg sync: paceLen = how many "pace units" make up the distance.
+    // Swim: pace per 100 m → unitCount = km × 10
+    // Run: pace per km     → unitCount = km
+    function legUnits(leg, km) {
+      if (leg === 'swim') return km * 10;
+      if (leg === 'run')  return km;
+      return km;
+    }
+    var _lock = false;
+    function syncLeg(leg, source) {
+      if (_lock) return;
+      var kmEl   = document.getElementById('tri-' + leg + '-km');
+      var paceEl = document.getElementById('tri-' + leg + '-pace');
+      var timeEl = document.getElementById('tri-' + leg + '-time');
+      var km = parseFloat(kmEl.value) || 0;
+      if (km <= 0) return;
+      _lock = true;
+      if (source === 'pace') {
+        var p = parsePace(paceEl.value);
+        if (p > 0) timeEl.value = fmtTime(p * legUnits(leg, km));
+      } else if (source === 'time') {
+        var t = parseTime(timeEl.value);
+        if (t > 0) paceEl.value = fmtPace(t / legUnits(leg, km));
+      } else { // km changed → keep pace, update time
+        var pp = parsePace(paceEl.value);
+        if (pp > 0) timeEl.value = fmtTime(pp * legUnits(leg, km));
+      }
+      _lock = false;
+      updateTotal();
+      if (document.getElementById('tri-preset').value !== 'custom') {
+        // distance edits don't break preset matching only if value matches
+        var preset = PRESETS[document.getElementById('tri-preset').value];
+        if (!preset || Math.abs(km - preset[leg]) > 0.01) {
+          document.getElementById('tri-preset').value = 'custom';
+        }
+      }
+    }
+    function syncBike(source) {
+      if (_lock) return;
+      var kmEl   = document.getElementById('tri-bike-km');
+      var kmhEl  = document.getElementById('tri-bike-kmh');
+      var timeEl = document.getElementById('tri-bike-time');
+      var km = parseFloat(kmEl.value) || 0;
+      if (km <= 0) return;
+      _lock = true;
+      if (source === 'kmh') {
+        var v = parseFloat(kmhEl.value);
+        if (v > 0) timeEl.value = fmtTime(km / v * 3600);
+      } else if (source === 'time') {
+        var t = parseTime(timeEl.value);
+        if (t > 0) kmhEl.value = (km / (t / 3600)).toFixed(2);
+      } else {
+        var vv = parseFloat(kmhEl.value);
+        if (vv > 0) timeEl.value = fmtTime(km / vv * 3600);
+      }
+      _lock = false;
+      updateTotal();
+      var preset = PRESETS[document.getElementById('tri-preset').value];
+      if (preset && Math.abs(km - preset.bike) > 0.01) {
+        document.getElementById('tri-preset').value = 'custom';
+      }
+    }
+
+    // Flat-road power estimate: P = (½·ρ·CdA·v³ + Crr·m·g·v) / η
+    // Defaults: ρ=1.225 kg/m³, CdA≈0.32 m² (typical road position),
+    // m≈80 kg (rider+bike), Crr≈0.005, η=0.97 (drivetrain).
+    function estimateBikeWatts(kmh) {
+      if (!kmh || kmh <= 0) return 0;
+      var v = kmh / 3.6;
+      var pAero = 0.5 * 1.225 * 0.32 * v * v * v;
+      var pRoll = 0.005 * 80 * 9.81 * v;
+      return (pAero + pRoll) / 0.97;
+    }
+
+    function updateTotal() {
+      var sw = parseTime(document.getElementById('tri-swim-time').value) || 0;
+      var t1 = parseTime(document.getElementById('tri-t1').value)        || 0;
+      var bk = parseTime(document.getElementById('tri-bike-time').value) || 0;
+      var t2 = parseTime(document.getElementById('tri-t2').value)        || 0;
+      var rn = parseTime(document.getElementById('tri-run-time').value)  || 0;
+      var total = sw + t1 + bk + t2 + rn;
+      var wInput = parseFloat(document.getElementById('tri-bike-w').value);
+      var kmh    = parseFloat(document.getElementById('tri-bike-kmh').value);
+      var wIsEst = !(wInput > 0);
+      var w      = wIsEst ? estimateBikeWatts(kmh) : wInput;
+      var wHtml  = (w > 0)
+        ? '<div><div class="result-big">' + Math.round(w) + ' W</div>'
+          + '<div class="result-label">Bike power' + (wIsEst ? ' (est.)' : '') + '</div></div>'
+        : '';
+      document.getElementById('tri-result').innerHTML =
+        '<div style="display:flex;gap:1.6em;flex-wrap:wrap;">'
+        + '<div><div class="result-big">' + fmtTime(total) + '</div><div class="result-label">Total race time</div></div>'
+        + '<div><div class="result-big">' + fmtTime(sw) + '</div><div class="result-label">Swim</div></div>'
+        + '<div><div class="result-big">' + fmtTime(t1) + '</div><div class="result-label">T1</div></div>'
+        + '<div><div class="result-big">' + fmtTime(bk) + '</div><div class="result-label">Bike</div></div>'
+        + '<div><div class="result-big">' + fmtTime(t2) + '</div><div class="result-label">T2</div></div>'
+        + '<div><div class="result-big">' + fmtTime(rn) + '</div><div class="result-label">Run</div></div>'
+        + wHtml
+        + '</div>';
+    }
+
+    // Wire each leg
+    ['swim', 'run'].forEach(function (leg) {
+      document.getElementById('tri-' + leg + '-km').addEventListener('input',  function () { syncLeg(leg, 'km'); });
+      document.getElementById('tri-' + leg + '-pace').addEventListener('input', function () { autoFmt(this, false); });
+      document.getElementById('tri-' + leg + '-pace').addEventListener('change', function () { syncLeg(leg, 'pace'); });
+      document.getElementById('tri-' + leg + '-time').addEventListener('input', function () { autoFmt(this, true); });
+      document.getElementById('tri-' + leg + '-time').addEventListener('change', function () { syncLeg(leg, 'time'); });
+    });
+    document.getElementById('tri-bike-km').addEventListener('input',  function () { syncBike('km'); });
+    document.getElementById('tri-bike-kmh').addEventListener('input', function () { syncBike('kmh'); });
+    document.getElementById('tri-bike-time').addEventListener('input', function () { autoFmt(this, true); });
+    document.getElementById('tri-bike-time').addEventListener('change', function () { syncBike('time'); });
+    document.getElementById('tri-bike-w').addEventListener('input', updateTotal);
+    document.getElementById('tri-t1').addEventListener('input', function () { autoFmt(this, false); updateTotal(); });
+    document.getElementById('tri-t2').addEventListener('input', function () { autoFmt(this, false); updateTotal(); });
+
+    // Preset switcher: fill standard distances, then re-sync each leg to recompute time from pace
+    document.getElementById('tri-preset').addEventListener('change', function () {
+      var p = PRESETS[this.value];
+      if (!p) return; // 'custom' → no fill
+      _lock = true;
+      document.getElementById('tri-swim-km').value = p.swim;
+      document.getElementById('tri-bike-km').value = p.bike;
+      document.getElementById('tri-run-km').value  = p.run;
+      _lock = false;
+      syncLeg('swim', 'km');
+      syncBike('km');
+      syncLeg('run',  'km');
+    });
+
+    // Init
+    updateTotal();
+
+    // ── Triathlon Race Predictor (Riegel per leg) ──────────────
+    document.getElementById('tri-pred-swim').addEventListener('input', function () { autoFmt(this, true); });
+    document.getElementById('tri-pred-bike').addEventListener('input', function () { autoFmt(this, true); });
+    document.getElementById('tri-pred-run').addEventListener('input',  function () { autoFmt(this, true); });
+
+    document.getElementById('tri-pred-calc').addEventListener('click', function () {
+      var ref = PRESETS[document.getElementById('tri-pred-ref').value];
+      var sw = parseTime(document.getElementById('tri-pred-swim').value);
+      var bk = parseTime(document.getElementById('tri-pred-bike').value);
+      var rn = parseTime(document.getElementById('tri-pred-run').value);
+      if (!ref || !sw || !bk || !rn) return;
+      var t1 = parseTime(document.getElementById('tri-t1').value) || 120;
+      var t2 = parseTime(document.getElementById('tri-t2').value) || 90;
+      var labels = { sprint: 'Sprint', olympic: 'Olympic', t100: 'T100', half: 'Half · 70.3', full: 'Full Ironman' };
+      var tbody = document.getElementById('tri-pred-tbody');
+      tbody.innerHTML = '';
+      Object.keys(PRESETS).forEach(function (key) {
+        var p = PRESETS[key];
+        var pSw = sw * Math.pow(p.swim / ref.swim, 1.06);
+        var pBk = bk * Math.pow(p.bike / ref.bike, 1.06);
+        var pRn = rn * Math.pow(p.run  / ref.run,  1.06);
+        var total = pSw + t1 + pBk + t2 + pRn;
+        var tr = document.createElement('tr');
+        if (key === document.getElementById('tri-pred-ref').value) tr.style.fontWeight = '700';
+        tr.innerHTML = '<td>' + labels[key] + '</td>'
+          + '<td>' + fmtTime(pSw) + '</td>'
+          + '<td>' + fmtTime(t1)  + '</td>'
+          + '<td>' + fmtTime(pBk) + '</td>'
+          + '<td>' + fmtTime(t2)  + '</td>'
+          + '<td>' + fmtTime(pRn) + '</td>'
+          + '<td><strong>' + fmtTime(total) + '</strong></td>';
+        tbody.appendChild(tr);
+      });
+      document.getElementById('tri-pred-table').style.display = '';
+    });
+  })();
+  </script>
+
+  <script>
+  // ── Training Plan Builder ─────────────────────────────────
+  (function () {
+    var GOALS = {
+      '5k':       { peak: 50,  base: 30, longCap: 12 },
+      '10k':      { peak: 65,  base: 40, longCap: 18 },
+      'half':     { peak: 80,  base: 55, longCap: 26 },
+      'marathon': { peak: 95,  base: 65, longCap: 36 },
+      'ultra':    { peak: 120, base: 80, longCap: 45 }
+    };
+    var DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+    function templateFor(phil) {
+      // 7-day base templates (idx: 0=Mon … 6=Sun)
+      if (phil === 'polarized') return ['easy', 'easy',      'interval', 'easy', 'rest', 'long', 'recovery'];
+      if (phil === 'daniels')   return ['easy', 'threshold', 'easy',     'interval', 'rest', 'long', 'recovery'];
+      return                            ['easy', 'easy',      'steady',   'easy', 'easy', 'long', 'rest'];      // lydiard
+    }
+    function adjustForPhase(template, phase, phil) {
+      var t = template.slice();
+      if (phase === 'Base') {
+        // soften quality early
+        for (var i = 0; i < t.length; i++) {
+          if (t[i] === 'interval' || t[i] === 'threshold') t[i] = 'tempo';
+        }
+      } else if (phase === 'Build' && phil === 'lydiard') {
+        t[2] = 'interval'; // Lydiard: intervals appear in Build
+      } else if (phase === 'Taper') {
+        for (var j = 0; j < t.length; j++) {
+          if (t[j] === 'interval' || t[j] === 'threshold' || t[j] === 'tempo') t[j] = 'easy';
+        }
+      }
+      return t;
+    }
+    function adjustForDays(template, days) {
+      var t = template.slice();
+      var current = t.filter(function (x) { return x !== 'rest'; }).length;
+      // Convert easy/recovery → rest if too many days; insert easy if too few.
+      var removeOrder = [3, 1, 6, 4, 2, 0, 5]; // Thu, Tue, Sun, Fri, Wed, Mon, Sat
+      var addOrder    = [4, 2, 1, 3, 6, 0, 5];
+      while (current > days) {
+        var found = false;
+        for (var i = 0; i < removeOrder.length; i++) {
+          var idx = removeOrder[i];
+          if (t[idx] === 'easy' || t[idx] === 'recovery') {
+            t[idx] = 'rest'; current--; found = true; break;
+          }
+        }
+        if (!found) break;
+      }
+      while (current < days) {
+        var added = false;
+        for (var k = 0; k < addOrder.length; k++) {
+          if (t[addOrder[k]] === 'rest') {
+            t[addOrder[k]] = 'easy'; current++; added = true; break;
+          }
+        }
+        if (!added) break;
+      }
+      return t;
+    }
+    var WEIGHTS = { easy: 1, recovery: 0.6, tempo: 1.2, threshold: 1.3, interval: 1.2, steady: 1.5, rest: 0, gym: 0 };
+    function distributeKm(template, totalKm, longCap) {
+      var longIdx = template.indexOf('long');
+      var longKm  = Math.min(longCap, Math.round(totalKm * 0.30));
+      var rem     = Math.max(0, totalKm - longKm);
+      var sumW    = 0;
+      for (var i = 0; i < template.length; i++) {
+        if (i !== longIdx) sumW += (WEIGHTS[template[i]] || 0);
+      }
+      return template.map(function (t, i) {
+        if (i === longIdx) return longKm;
+        if (t === 'rest' || t === 'gym' || sumW === 0) return 0;
+        return Math.round(rem * (WEIGHTS[t] || 0) / sumW);
+      });
+    }
+    // Replace up to 2 rest days with gym sessions, preferring days farther from
+    // the long run so strength doesn't compete with the hardest aerobic day.
+    function placeGymOnRestDays(template) {
+      var longIdx = template.indexOf('long');
+      var rests   = [];
+      for (var i = 0; i < template.length; i++) {
+        if (template[i] === 'rest') rests.push(i);
+      }
+      rests.sort(function (a, b) {
+        return Math.abs(b - longIdx) - Math.abs(a - longIdx);
+      });
+      var n = Math.min(2, rests.length);
+      for (var g = 0; g < n; g++) template[rests[g]] = 'gym';
+      return template;
+    }
+    function workoutLabel(t) {
+      var L = { easy: 'Easy', recovery: 'Recovery', tempo: 'Tempo', threshold: 'Threshold',
+        interval: 'Intervals', steady: 'Steady', long: 'Long run', rest: 'Rest', gym: '💪 Gym' };
+      return L[t] || t;
+    }
+
+    function generate() {
+      var race    = document.getElementById('plan-race').value;
+      var weeks   = Math.max(4, Math.min(32, parseInt(document.getElementById('plan-weeks').value, 10) || 12));
+      var days    = Math.max(3, Math.min(7,  parseInt(document.getElementById('plan-days').value, 10) || 5));
+      var startKm = Math.max(0, parseFloat(document.getElementById('plan-current-km').value) || 25);
+      var phil    = document.getElementById('plan-philosophy').value;
+      var strength = document.querySelector('#plan-strength-toggle button.active').dataset.strength === 'yes';
+      var goalPace = document.getElementById('plan-goal-pace').value.trim();
+      var goal    = GOALS[race];
+
+      var taperWks = weeks >= 16 ? 2 : 1;
+      var nonTaper = weeks - taperWks;
+      var baseWks  = Math.round(nonTaper * 0.5);
+      var buildWks = Math.round(nonTaper * 0.3);
+      var peakWks  = nonTaper - baseWks - buildWks;
+
+      function phaseAt(w) {
+        if (w < baseWks) return 'Base';
+        if (w < baseWks + buildWks) return 'Build';
+        if (w < baseWks + buildWks + peakWks) return 'Peak';
+        return 'Taper';
+      }
+      function weekKm(w) {
+        var ph = phaseAt(w);
+        if (ph === 'Taper') {
+          var since = w - (weeks - taperWks);
+          return Math.round(goal.peak * (since === 0 ? 0.7 : 0.5));
+        }
+        var progress = (w + 1) / (weeks - taperWks);
+        return Math.round(startKm + (goal.peak - startKm) * progress);
+      }
+
+      var thead = '<thead><tr><th>Wk</th><th>Phase</th>'
+        + DAYS.map(function (d) { return '<th>' + d + '</th>'; }).join('')
+        + '<th>Total</th></tr></thead>';
+      var rows = '';
+      for (var w = 0; w < weeks; w++) {
+        var ph = phaseAt(w);
+        var total = weekKm(w);
+        var template = adjustForDays(adjustForPhase(templateFor(phil), ph, phil), days);
+        // Place gym on running-free days when the user opted in; race week skips
+        // strength entirely (taper logic).
+        if (strength && ph !== 'Taper') template = placeGymOnRestDays(template);
+        var kms = distributeKm(template, total, goal.longCap);
+        var actualTotal = kms.reduce(function (a, b) { return a + b; }, 0);
+        rows += '<tr>'
+          + '<td><strong>' + (w + 1) + '</strong></td>'
+          + '<td><span style="color:#666;font-size:0.85em;">' + ph + '</span></td>'
+          + template.map(function (t, i) {
+              if (t === 'rest') return '<td style="color:#ccc;">—</td>';
+              if (t === 'gym')  return '<td>' + workoutLabel(t) + '<br><span style="color:#888;font-size:0.85em;">~30 min</span></td>';
+              return '<td>' + workoutLabel(t) + '<br><span style="color:#888;font-size:0.85em;">' + kms[i] + ' km</span></td>';
+            }).join('')
+          + '<td><strong>' + actualTotal + ' km</strong></td>'
+          + '</tr>';
+      }
+
+      var strengthBlock = strength
+        ? '<h3 style="margin:1.4em 0 0.3em;font-size:0.95em;">💪 Strength &amp; injury prevention (1–2 / week)</h3>'
+        + '<ul style="font-size:0.86em;color:#555;line-height:1.55;margin:0;padding-left:1.4em;">'
+        +   '<li><strong>Posterior chain</strong>: deadlifts (or RDL), hip thrusts, hamstring curls — 3×6–10.</li>'
+        +   '<li><strong>Single-leg work</strong>: split squats, step-ups, lunges — 3×8 each side.</li>'
+        +   '<li><strong>Calf &amp; foot</strong>: heel raises (single-leg, slow eccentric) — 3×12.</li>'
+        +   '<li><strong>Core</strong>: plank variations, dead bugs, side planks — 2–3 sets to fatigue.</li>'
+        +   '<li>Place strength sessions ≥6 h before / after hard runs. Skip in race week.</li>'
+        + '</ul>' : '';
+
+      var nutritionBlock =
+          '<h3 style="margin:1.4em 0 0.3em;font-size:0.95em;">🥗 Fuelling &amp; recovery (general)</h3>'
+        + '<ul style="font-size:0.86em;color:#555;line-height:1.55;margin:0;padding-left:1.4em;">'
+        +   '<li><strong>Daily</strong>: balanced plate (carbs + protein + veg + healthy fat). Aim ~1.4–1.8 g protein / kg body weight.</li>'
+        +   '<li><strong>Hydration</strong>: 30–35 mL / kg body weight per day baseline; more in heat or after long runs (replace ~1.5× sweat loss).</li>'
+        +   '<li><strong>Long run / quality day</strong>: carb-rich meal 2–3 h before; sip fluids during; refuel within 30–60 min after (carbs + ~20–30 g protein).</li>'
+        +   '<li><strong>Race week</strong>: ↑ carbs 2–3 days before; reduce fibre &amp; novel foods; nothing new on race day.</li>'
+        +   '<li><strong>Sleep</strong>: 7–9 h. Recovery happens overnight, not in your shoes.</li>'
+        + '</ul>';
+
+      var head = '<div style="font-size:0.85em;color:#666;margin-bottom:0.7em;">'
+        + 'Plan: <strong>' + race + '</strong> · ' + weeks + ' weeks · ' + days + ' days/wk · '
+        + 'philosophy <strong>' + phil + '</strong>'
+        + (goalPace ? ' · goal pace <strong>' + goalPace + '</strong> /km' : '')
+        + '</div>';
+
+      document.getElementById('plan-result').style.display = '';
+      document.getElementById('plan-result').innerHTML = head
+        + '<div style="overflow-x:auto;"><table class="tool-table">' + thead + '<tbody>' + rows + '</tbody></table></div>'
+        + strengthBlock
+        + nutritionBlock;
+    }
+
+    // Toggle wiring
+    document.querySelectorAll('#plan-strength-toggle button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        document.querySelectorAll('#plan-strength-toggle button').forEach(function (x) { x.classList.remove('active'); });
+        b.classList.add('active');
+      });
+    });
+    document.getElementById('plan-generate').addEventListener('click', generate);
+  })();
+  </script>
+
+  <script>
+  // ── Shareable links ──────────────────────────────────────
+  // Per-tool serialization of input/select/toggle state into URL params, so
+  // a user can copy a link and the recipient lands on the same configured tool.
+  // 100% client-side, no backend, no storage.
+  (function () {
+    function panelToggles(panel) {
+      return Array.prototype.slice.call(panel.querySelectorAll('.tool-toggle[id]'));
+    }
+    function panelFields(panel) {
+      return Array.prototype.slice.call(panel.querySelectorAll('input[id], select[id]'));
+    }
+    function readState(panel) {
+      var state = {};
+      panelFields(panel).forEach(function (el) {
+        if (el.type === 'checkbox' || el.type === 'radio') {
+          if (el.checked) state[el.id] = '1';
+        } else if (el.value != null && el.value !== '') {
+          state[el.id] = el.value;
+        }
+      });
+      panelToggles(panel).forEach(function (group) {
+        var active = group.querySelector('button.active');
+        if (!active) return;
+        // store the first data-* attribute as the toggle's chosen value
+        for (var i = 0; i < active.attributes.length; i++) {
+          var a = active.attributes[i];
+          if (a.name.indexOf('data-') === 0) { state[group.id] = a.value; return; }
+        }
+      });
+      return state;
+    }
+    function applyState(panel, params) {
+      panelFields(panel).forEach(function (el) {
+        if (!params.has(el.id)) return;
+        var v = params.get(el.id);
+        if (el.type === 'checkbox' || el.type === 'radio') {
+          el.checked = (v === '1');
+        } else {
+          el.value = v;
+        }
+        el.dispatchEvent(new Event('input',  { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      panelToggles(panel).forEach(function (group) {
+        if (!params.has(group.id)) return;
+        var v = params.get(group.id);
+        var btns = group.querySelectorAll('button');
+        for (var i = 0; i < btns.length; i++) {
+          for (var j = 0; j < btns[i].attributes.length; j++) {
+            var a = btns[i].attributes[j];
+            if (a.name.indexOf('data-') === 0 && a.value === v) {
+              btns[i].click(); return;
+            }
+          }
+        }
+      });
+    }
+
+    var panels = document.querySelectorAll('.tool-panel');
+    panels.forEach(function (panel) {
+      var toolId = panel.id.replace(/^tool-/, '');
+
+      // Inject share button at the end of the panel (wrapped for centering)
+      var wrap = document.createElement('div');
+      wrap.className = 'tool-share-wrap';
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tool-share';
+      btn.innerHTML = '🔗 Copy share link';
+      btn.addEventListener('click', function () {
+        var state = readState(panel);
+        var params = new URLSearchParams();
+        params.set('tool', toolId);
+        Object.keys(state).forEach(function (k) { params.set(k, state[k]); });
+        var url = location.origin + location.pathname + '?' + params.toString();
+        var done = function () {
+          var orig = btn.innerHTML;
+          btn.classList.add('copied');
+          btn.innerHTML = '✓ Copied';
+          setTimeout(function () {
+            btn.classList.remove('copied');
+            btn.innerHTML = orig;
+          }, 1600);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(done, function () { prompt('Copy this link:', url); });
+        } else {
+          prompt('Copy this link:', url);
+        }
+      });
+      wrap.appendChild(btn);
+      panel.appendChild(wrap);
+    });
+
+    // Apply URL params to the matching tool on load. Read from the captured
+    // initial query string because the nav script has already rewritten the URL.
+    var params = new URLSearchParams(window.__TOOLS_INIT_QS__ || location.search);
+    var targetTool = params.get('tool');
+    if (targetTool) {
+      var targetPanel = document.getElementById('tool-' + targetTool);
+      if (targetPanel) applyState(targetPanel, params);
+    }
   })();
   </script>
 

@@ -1618,7 +1618,15 @@
   <script>
   // ── FIRE Calculator ───────────────────────────────────────
   (function () {
+    var CURRENCY_SYMBOLS = { CHF: '₣', EUR: '€', USD: '$', GBP: '£' };
+
     function fmt(n, cur) {
+      var sign = n < 0 ? '-' : '';
+      var abs = Math.abs(n) / 1000;
+      return sign + 'k' + (cur || '') + abs.toFixed(1).replace('.', ',');
+    }
+
+    function fmtFull(n, cur) {
       return (cur || '') + Math.round(n).toLocaleString('en-CH');
     }
 
@@ -1636,12 +1644,15 @@
       var oneoff       = parseFloat(document.getElementById('fire-oneoff').value) || 0;
       var years        = Math.min(parseInt(document.getElementById('fire-years').value) || 20, 50);
       var mode         = document.getElementById('fire-mode').value;
-      var cur          = document.getElementById('fire-currency').value + ' ';
+      var curCode      = document.getElementById('fire-currency').value;
+      var cur          = (CURRENCY_SYMBOLS[curCode] || curCode) + ' ';
       var colMultiplier = mode === 'couple' ? 1.6 : 1; // couple shares fixed costs ~60% more
 
       var portfolio = oneoff;
       var inflFactor = 1;
       var fireYear = null;
+      var firePortfolio = 0;
+      var firePassive = 0;
       var tbody = document.getElementById('fire-tbody');
       tbody.innerHTML = '';
 
@@ -1658,7 +1669,11 @@
         var required    = livingCost * (1 + safety);
         var isFire      = passive >= required && portfolio > 0;
 
-        if (isFire && fireYear === null) fireYear = y + 1;
+        if (isFire && fireYear === null) {
+          fireYear = y + 1;
+          firePortfolio = portfolio;
+          firePassive = passive;
+        }
 
         var tr = document.createElement('tr');
         if (isFire) tr.className = 'fire-year';
@@ -1677,14 +1692,8 @@
       if (fireYear) {
         summary.style.display = '';
         document.getElementById('fire-year-display').textContent = 'Year ' + fireYear;
-        // re-calculate portfolio at fire year for display
-        var rows = tbody.querySelectorAll('tr');
-        var fireRow = rows[fireYear - 1];
-        if (fireRow) {
-          var cells = fireRow.querySelectorAll('td');
-          document.getElementById('fire-portfolio-display').textContent = cells[5].textContent;
-          document.getElementById('fire-passive-display').textContent = cells[6].textContent;
-        }
+        document.getElementById('fire-portfolio-display').textContent = fmtFull(firePortfolio, cur);
+        document.getElementById('fire-passive-display').textContent = fmtFull(firePassive, cur);
       } else {
         summary.style.display = 'none';
       }

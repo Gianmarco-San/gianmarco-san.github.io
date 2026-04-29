@@ -1408,6 +1408,16 @@
       if (el) el.addEventListener('input', function () { autoFmtTime(el, pair[1]); });
     });
 
+    // Mobile fix: when an `input` handler programmatically rewrites el.value
+    // (autoFmtTime), iOS Safari clears the "user-edited" flag and `change` may
+    // not fire on blur. Bind the same handler to both `change` and `blur` so
+    // focus-out always commits.
+    function onCommit(el, fn) {
+      if (!el) return;
+      el.addEventListener('change', fn);
+      el.addEventListener('blur',   fn);
+    }
+
     // Populate split distance selector
     var distSel = document.getElementById('run-split-dist');
     DISTANCES.forEach(function (d) {
@@ -1443,7 +1453,7 @@
       _lock = false;
     }
 
-    document.getElementById('run-pace-km').addEventListener('change', function () {
+    onCommit(document.getElementById('run-pace-km'), function () {
       var sec = parsePace(this.value);
       if (sec && sec > 0) updateFromSecPerKm(sec, 'pace-km');
     });
@@ -1451,11 +1461,11 @@
       var kmh = parseFloat(this.value);
       if (kmh && kmh > 0) updateFromSecPerKm(3600 / kmh, 'speed');
     });
-    document.getElementById('run-pace-mi').addEventListener('change', function () {
+    onCommit(document.getElementById('run-pace-mi'), function () {
       var sec = parsePace(this.value);
       if (sec && sec > 0) updateFromSecPerKm(sec / KM_PER_MI, 'pace-mi');
     });
-    document.getElementById('run-split-time').addEventListener('change', function () {
+    onCommit(document.getElementById('run-split-time'), function () {
       var totalSec = parseTime(this.value);
       var distKm = parseFloat(distSel.value) || 5.0;
       if (totalSec && totalSec > 0 && distKm > 0) updateFromSecPerKm(totalSec / distKm, 'split');
@@ -1576,8 +1586,8 @@
       var km  = parseFloat(pDistEl.value) || 0;
       if (sec > 0 && km > 0) { _pLock = true; pTimeEl.value = fmtTime(sec * km); _pLock = false; }
     }
-    pTimeEl.addEventListener('change', syncPredFromTime);
-    pPaceEl.addEventListener('change', syncPredFromPace);
+    onCommit(pTimeEl, syncPredFromTime);
+    onCommit(pPaceEl, syncPredFromPace);
     pDistEl.addEventListener('change', syncPredFromTime);
     // also auto-format the new pace input as you type (mm:ss only, no hours)
     pPaceEl.addEventListener('input', function () { autoFmtTime(pPaceEl, false); });
@@ -2836,6 +2846,14 @@
         : d.length <= 4 ? d.slice(0, d.length - 2) + ':' + d.slice(-2)
         : d.slice(0, d.length - 4) + ':' + d.slice(-4, -2) + ':' + d.slice(-2);
     }
+    // Mobile fix: programmatic value writes during `input` (autoFmt) can prevent
+    // `change` from firing on blur in iOS Safari. Bind both events so focus-out
+    // always commits.
+    function onCommit(el, fn) {
+      if (!el) return;
+      el.addEventListener('change', fn);
+      el.addEventListener('blur',   fn);
+    }
 
     var PRESETS = {
       sprint:  { swim: 0.75, bike: 20,  run: 5      },
@@ -2950,14 +2968,14 @@
     ['swim', 'run'].forEach(function (leg) {
       document.getElementById('tri-' + leg + '-km').addEventListener('input',  function () { syncLeg(leg, 'km'); });
       document.getElementById('tri-' + leg + '-pace').addEventListener('input', function () { autoFmt(this, false); });
-      document.getElementById('tri-' + leg + '-pace').addEventListener('change', function () { syncLeg(leg, 'pace'); });
+      onCommit(document.getElementById('tri-' + leg + '-pace'), function () { syncLeg(leg, 'pace'); });
       document.getElementById('tri-' + leg + '-time').addEventListener('input', function () { autoFmt(this, true); });
-      document.getElementById('tri-' + leg + '-time').addEventListener('change', function () { syncLeg(leg, 'time'); });
+      onCommit(document.getElementById('tri-' + leg + '-time'), function () { syncLeg(leg, 'time'); });
     });
     document.getElementById('tri-bike-km').addEventListener('input',  function () { syncBike('km'); });
     document.getElementById('tri-bike-kmh').addEventListener('input', function () { syncBike('kmh'); });
     document.getElementById('tri-bike-time').addEventListener('input', function () { autoFmt(this, true); });
-    document.getElementById('tri-bike-time').addEventListener('change', function () { syncBike('time'); });
+    onCommit(document.getElementById('tri-bike-time'), function () { syncBike('time'); });
     document.getElementById('tri-bike-w').addEventListener('input', updateTotal);
     document.getElementById('tri-t1').addEventListener('input', function () { autoFmt(this, false); updateTotal(); });
     document.getElementById('tri-t2').addEventListener('input', function () { autoFmt(this, false); updateTotal(); });

@@ -94,11 +94,23 @@
     .tool-field input, .tool-field select {
       /* width:100% + min-width:0 overrides the input's native intrinsic min-width,
          otherwise a <input type="text/number"> refuses to shrink below ~150-180px
-         and pushes the entire .tool-row past the viewport on narrow phones. */
+         and pushes the entire .tool-row past the viewport on narrow phones.
+         box-sizing:border-box keeps padding inside the flex-allocated width so
+         inputs never push the row past its container. */
+      box-sizing: border-box;
       width: 100%; min-width: 0;
       background: #fff; border: 1px solid #d8d8d8; border-radius: 8px;
       padding: 0.5em 0.8em; font-size: 0.9em; font-family: 'Inter', sans-serif;
       color: #333; outline: none; transition: border-color 0.15s;
+    }
+    /* iOS Safari gives <input type="date"> a native chevron/spinner that imposes
+       an intrinsic min-width and ignores width:100%, causing the field to spill
+       past its flex parent. -webkit-appearance:none strips the native chrome
+       while leaving the date picker functional on focus. */
+    .tool-field input[type="date"] {
+      -webkit-appearance: none;
+      appearance: none;
+      max-width: 100%;
     }
     .tool-field input:focus, .tool-field select:focus { border-color: #5D6063; }
     .tool-toggle {
@@ -333,6 +345,11 @@
       /* Fallback: if :has() isn't supported, let toggle buttons wrap to 2 rows
          instead of clipping. */
       .tool-toggle { flex-wrap: wrap; }
+      /* Date Calculator: 3 long labels (“Between two dates”, “Until / since a
+         date”, “Date ± offset”) wrap into an uneven 2+1 layout on iPhone-width
+         screens. Stack them vertically so each mode gets its own full-width row. */
+      #date-mode-toggle { flex-direction: column; width: 100%; }
+      #date-mode-toggle button { width: 100%; text-align: center; padding: 0.5em 0.9em; }
       .tool-result { padding: 0.7em 0.7em; }
       .result-big { font-size: 1.5em; }
       .tool-header h2 { font-size: 1em; }

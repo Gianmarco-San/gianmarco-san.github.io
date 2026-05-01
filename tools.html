@@ -717,9 +717,14 @@
               <table class="tool-table" id="fire-table">
                 <thead>
                   <tr>
-                    <th>Year</th><th>Salary</th><th>Net</th>
-                    <th>Costs</th><th>Savings</th><th>Portfolio</th>
-                    <th>Passive / yr</th><th>Status</th>
+                    <th>Year</th>
+                    <th data-fire-money>Salary</th>
+                    <th data-fire-money>Net</th>
+                    <th data-fire-money>Costs</th>
+                    <th data-fire-money>Savings</th>
+                    <th data-fire-money>Portfolio</th>
+                    <th data-fire-money>Passive / yr</th>
+                    <th>Status</th>
                   </tr>
                 </thead>
                 <tbody id="fire-tbody"></tbody>
@@ -1637,10 +1642,10 @@
   (function () {
     var CURRENCY_SYMBOLS = { CHF: '₣', EUR: '€', USD: '$', GBP: '£' };
 
-    function fmt(n, cur) {
+    function fmt(n) {
       var sign = n < 0 ? '-' : '';
       var abs = Math.abs(n) / 1000;
-      return sign + 'k' + (cur || '') + abs.toFixed(1).replace('.', ',');
+      return sign + abs.toFixed(1).replace('.', ',');
     }
 
     function fmtFull(n, cur) {
@@ -1662,7 +1667,13 @@
       var years        = Math.min(parseInt(document.getElementById('fire-years').value) || 20, 50);
       var mode         = document.getElementById('fire-mode').value;
       var curCode      = document.getElementById('fire-currency').value;
-      var cur          = (CURRENCY_SYMBOLS[curCode] || curCode) + ' ';
+      var curSym       = CURRENCY_SYMBOLS[curCode] || curCode;
+      var cur          = curSym + ' ';
+      var unitSuffix   = ' [k' + curSym + ']';
+      document.querySelectorAll('#fire-table th[data-fire-money]').forEach(function (th) {
+        if (!th.dataset.base) th.dataset.base = th.textContent;
+        th.textContent = th.dataset.base + unitSuffix;
+      });
       var colMultiplier = mode === 'couple' ? 1.6 : 1; // couple shares fixed costs ~60% more
 
       var portfolio = oneoff;
@@ -1695,12 +1706,12 @@
         var tr = document.createElement('tr');
         if (isFire) tr.className = 'fire-year';
         tr.innerHTML = '<td>Y' + (y + 1) + '</td>'
-          + '<td>' + fmt(salary, cur) + '</td>'
-          + '<td>' + fmt(netIncome, cur) + '</td>'
-          + '<td>' + fmt(livingCost, cur) + '</td>'
-          + '<td>' + fmt(savings, cur) + '</td>'
-          + '<td>' + fmt(portfolio, cur) + '</td>'
-          + '<td>' + fmt(passive, cur) + '</td>'
+          + '<td>' + fmt(salary) + '</td>'
+          + '<td>' + fmt(netIncome) + '</td>'
+          + '<td>' + fmt(livingCost) + '</td>'
+          + '<td>' + fmt(savings) + '</td>'
+          + '<td>' + fmt(portfolio) + '</td>'
+          + '<td>' + fmt(passive) + '</td>'
           + '<td>' + (isFire ? '🔥 FIRE' : '💻 keep going') + '</td>';
         tbody.appendChild(tr);
       }

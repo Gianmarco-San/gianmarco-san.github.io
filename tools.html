@@ -352,6 +352,36 @@
       padding: 0.8em 1em; margin-top: 0.3em;
     }
 
+    /* ── Tri fuelling / hydration ─────────────── */
+    .tri-fuel-details { margin: 0.4em 0 0.9em; }
+    .tri-fuel-details > summary {
+      cursor: pointer; font-size: 0.92em; color: #777; font-weight: 500;
+      padding: 0.4em 0; list-style: none; user-select: none;
+    }
+    .tri-fuel-details > summary::-webkit-details-marker { display: none; }
+    .tri-fuel-details > summary::before {
+      content: '🥤'; display: inline-block; font-size: 1.05em;
+      opacity: 0.85; margin-right: 0.5em; vertical-align: -0.05em;
+    }
+    .tri-fuel-details > summary::after {
+      content: '▸'; display: inline-block; font-size: 0.95em;
+      opacity: 0.55; margin-left: 0.55em; transition: transform 0.18s ease;
+    }
+    .tri-fuel-details[open] > summary::after { transform: rotate(90deg); }
+    .tri-fuel-details[open] > summary { color: #444; }
+    .tri-fuel-grid {
+      background: #fafafa; border: 1px solid #eee; border-radius: 8px;
+      padding: 0.8em 1em; margin-top: 0.3em;
+    }
+    .tri-fuel-table { width: 100%; border-collapse: collapse; margin-top: 0.6em; font-size: 0.86em; }
+    .tri-fuel-table th, .tri-fuel-table td {
+      padding: 0.42em 0.55em; text-align: left; border-bottom: 1px solid #eee;
+      font-variant-numeric: tabular-nums;
+    }
+    .tri-fuel-table th { color: #888; font-weight: 600; font-size: 0.92em; }
+    .tri-fuel-table td:first-child { font-weight: 600; color: #444; }
+    .tri-fuel-tot { background: #f4f6f8; font-weight: 600; }
+
     /* ── Plan → Builder edit link ─────────────── */
     .plan-edit-link {
       background: none; border: none; cursor: pointer;
@@ -795,7 +825,7 @@
             <button id="run-vo2-hr-calc" class="tool-btn">Estimate from HR</button>
 
             <div class="tool-result" id="run-vo2-result" style="display:none;margin-top:1em;"></div>
-            <div class="tool-note">%VO₂max = 0.8 + 0.1894·e<sup>−0.012778·t</sup> + 0.2990·e<sup>−0.1933·t</sup> (t in min) · VO₂ = −4.60 + 0.1823·v + 0.000104·v² (v in m/min). HR-based: <strong>VO₂max ≈ 15.3 · HR<sub>max</sub> / HR<sub>rest</sub></strong> (Uth, Sørensen, Overgaard, Pedersen 2004). Age-graded line uses a simplified decline of ~0.5 % per year past 30 (rough WMA-style factor — not the official table).</div>
+            <div class="tool-note">%VO₂max = 0.8 + 0.1894·e<sup>−0.012778·t</sup> + 0.2990·e<sup>−0.1933·t</sup> (t in min) · VO₂ = −4.60 + 0.1823·v + 0.000104·v² (v in m/min). HR-based: <strong>VO₂max ≈ 15.3 · HR<sub>max</sub> / HR<sub>rest</sub></strong> (Uth, Sørensen, Overgaard, Pedersen 2004). Age-graded value uses <strong>WMA 2010 road-running age factors</strong> (5 km, gender-specific) as a VO₂max-decline proxy — non-linear, accelerates past age 50. Reference age = 30.</div>
           </div>
 
           <!-- Race Time Predictor -->
@@ -1575,6 +1605,40 @@
             </div>
 
             <div class="tool-result" id="tri-result" style="margin-top:1em;"></div>
+
+            <details class="tri-fuel-details" id="tri-fuel-details">
+              <summary>Fuelling &amp; hydration plan <span style="color:#aaa;font-weight:400;font-size:0.92em;">— per-leg kcal · carbs · fluids · sodium</span></summary>
+              <div class="tri-fuel-grid">
+                <div class="tool-row">
+                  <div class="tool-field">
+                    <label>Body weight (kg)</label>
+                    <input type="number" id="tri-fuel-mass" step="1" min="35" max="150" value="70" onclick="this.select()">
+                  </div>
+                  <div class="tool-field">
+                    <label>Sweat rate (mL/h)</label>
+                    <input type="number" id="tri-fuel-sweat" step="50" min="200" max="2500" value="800" onclick="this.select()">
+                  </div>
+                  <div class="tool-field">
+                    <label>Conditions</label>
+                    <select id="tri-fuel-cond">
+                      <option value="mild">Mild (&lt;20 °C)</option>
+                      <option value="warm" selected>Warm (20–28 °C)</option>
+                      <option value="hot">Hot (&gt;28 °C)</option>
+                    </select>
+                  </div>
+                  <div class="tool-field">
+                    <label>Carb tolerance</label>
+                    <select id="tri-fuel-tol">
+                      <option value="low">Low — 30–60 g/h</option>
+                      <option value="med" selected>Medium — 60–80 g/h</option>
+                      <option value="high">High — 80–120 g/h (gut-trained)</option>
+                    </select>
+                  </div>
+                </div>
+                <div id="tri-fuel-result" style="margin-top:0.4em;"></div>
+              </div>
+            </details>
+
             <div class="tool-note">
               Pace ↔ time fields auto-update each other given the leg distance. Picking a preset fills standard distances.
               <br><br>
@@ -2194,12 +2258,50 @@
         +   '<div class="vo2-labels">' + labels + '</div>'
         + '</div>';
     }
-    // Simplified WMA-style age decline: ~0.5 % per year past age 30 (linear-floor).
-    // Returns the equivalent VO₂max if the person were 30 years old.
-    function ageGradedVO2(VO2max, age) {
+    // WMA-style age-grading factors (5 km road, normalised so age 30 = 1.000).
+    // Sourced from WMA 2010 road age-grading tables; used here as a proxy for VO₂max
+    // decline since VO₂max scales linearly with distance-running performance
+    // (Daniels-Gilbert). Gender-specific curves; linear interpolation between brackets.
+    var WMA_VO2_FACTORS = {
+      // age: [male, female]
+      20: [1.000, 1.000],
+      25: [1.000, 1.000],
+      30: [1.000, 1.000],
+      35: [0.984, 0.978],
+      40: [0.955, 0.946],
+      45: [0.917, 0.906],
+      50: [0.876, 0.860],
+      55: [0.829, 0.808],
+      60: [0.772, 0.748],
+      65: [0.708, 0.680],
+      70: [0.640, 0.605],
+      75: [0.568, 0.526],
+      80: [0.495, 0.443],
+      85: [0.420, 0.358],
+      90: [0.345, 0.275]
+    };
+    function wmaVO2Factor(age, gender) {
+      if (!age || age <= 30) return 1.0;
+      var idx = gender === 'F' ? 1 : 0;
+      var keys = [20,25,30,35,40,45,50,55,60,65,70,75,80,85,90];
+      for (var i = 0; i < keys.length - 1; i++) {
+        if (age >= keys[i] && age <= keys[i+1]) {
+          var lo = keys[i], hi = keys[i+1];
+          var fLo = WMA_VO2_FACTORS[lo][idx], fHi = WMA_VO2_FACTORS[hi][idx];
+          return fLo + (fHi - fLo) * (age - lo) / (hi - lo);
+        }
+      }
+      // age > 90: linear extrapolation of last slope (clamped)
+      var rate = (WMA_VO2_FACTORS[90][idx] - WMA_VO2_FACTORS[85][idx]) / 5;
+      return Math.max(0.05, WMA_VO2_FACTORS[90][idx] + rate * (age - 90));
+    }
+    // Age-grading: returns the equivalent VO₂max if the person were 30 y old,
+    // i.e. their measured value divided by the WMA decline factor for their age.
+    function ageGradedVO2(VO2max, age, gender) {
       if (!age || age <= 30) return null;
-      var factor = 1 - Math.min(0.5, 0.005 * (age - 30));
-      return VO2max / factor;
+      var f = wmaVO2Factor(age, gender);
+      if (f >= 0.999) return null;
+      return VO2max / f;
     }
     function renderVO2Result(VO2max, gender, predictedTimeSec, source) {
       var el = document.getElementById('run-vo2-result');
@@ -2211,9 +2313,10 @@
       if (predictedTimeSec != null) {
         html += '<div><div class="result-big">' + fmtTime(predictedTimeSec) + '</div><div class="result-label">Predicted race time</div></div>';
       }
-      var graded = ageGradedVO2(VO2max, age);
+      var graded = ageGradedVO2(VO2max, age, gender);
       if (graded != null) {
-        html += '<div><div class="result-big">' + graded.toFixed(1) + '</div><div class="result-label">Age-graded (vs 30 y)</div></div>';
+        var pct = Math.round((1 - wmaVO2Factor(age, gender)) * 100);
+        html += '<div><div class="result-big">' + graded.toFixed(1) + '</div><div class="result-label">Age-graded (vs 30 y) · +' + pct + '%</div></div>';
       }
       html += '</div>' + buildVO2Scale(VO2max, gender);
       el.style.display = '';
@@ -3983,8 +4086,9 @@
     function renderPalette(hsl) {
       var host = document.getElementById('col-palette');
       if (!host) return;
+      var schemes = paletteSchemes(hsl);
       var html = '';
-      paletteSchemes(hsl).forEach(function (sch) {
+      schemes.forEach(function (sch) {
         html += '<div style="flex:1 1 100%;display:flex;flex-wrap:wrap;gap:0.4em;align-items:center;">'
           + '<div style="font-size:0.74em;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;flex-basis:130px;">' + sch.name + '</div>';
         sch.hexes.forEach(function (hx) {
@@ -3994,6 +4098,13 @@
         });
         html += '</div>';
       });
+      // Export buttons: copy whole palette as Tailwind / SCSS / CSS
+      html += '<div style="flex:1 1 100%;display:flex;flex-wrap:wrap;gap:0.45em;align-items:center;margin-top:0.6em;padding-top:0.7em;border-top:1px solid #eee;">'
+        +   '<div style="font-size:0.74em;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;flex-basis:130px;">Export palette</div>'
+        +   '<button type="button" class="col-pal-export tool-btn" data-fmt="tailwind" style="font-size:0.78em;padding:0.32em 0.85em;">⎘ Tailwind</button>'
+        +   '<button type="button" class="col-pal-export tool-btn" data-fmt="scss"     style="font-size:0.78em;padding:0.32em 0.85em;">⎘ SCSS</button>'
+        +   '<button type="button" class="col-pal-export tool-btn" data-fmt="css"      style="font-size:0.78em;padding:0.32em 0.85em;">⎘ CSS vars</button>'
+        + '</div>';
       host.innerHTML = html;
       host.querySelectorAll('.col-pal-swatch').forEach(function (sw) {
         sw.addEventListener('click', function () {
@@ -4003,6 +4114,40 @@
           setTimeout(function () { sw.textContent = prev; }, 1100);
         });
       });
+      host.querySelectorAll('.col-pal-export').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var fmt = btn.dataset.fmt;
+          var text = formatPaletteExport(schemes, fmt);
+          if (navigator.clipboard) navigator.clipboard.writeText(text);
+          var prev = btn.textContent;
+          btn.textContent = '✓ copied';
+          setTimeout(function () { btn.textContent = prev; }, 1300);
+        });
+      });
+    }
+
+    // Build Tailwind / SCSS / CSS-vars export from the schemes list.
+    // Naming: kebab-case scheme + 1-based index — e.g. analogous-1, complementary-2.
+    function formatPaletteExport(schemes, fmt) {
+      var entries = []; // [{ name: 'analogous-1', hex: '#abc' }, ...]
+      schemes.forEach(function (sch) {
+        var base = sch.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        sch.hexes.forEach(function (hx, i) { entries.push({ name: base + '-' + (i + 1), hex: hx }); });
+      });
+      if (fmt === 'tailwind') {
+        var lines = entries.map(function (e) { return "    '" + e.name + "': '" + e.hex + "',"; });
+        return '// tailwind.config.js — paste into theme.extend.colors\n'
+          + 'colors: {\n' + lines.join('\n') + '\n}';
+      }
+      if (fmt === 'scss') {
+        return '// SCSS palette variables\n'
+          + entries.map(function (e) { return '$' + e.name + ': ' + e.hex + ';'; }).join('\n');
+      }
+      // css
+      return '/* CSS custom properties — paste into :root or a theme block */\n'
+        + ':root {\n'
+        + entries.map(function (e) { return '  --' + e.name + ': ' + e.hex + ';'; }).join('\n')
+        + '\n}';
     }
 
     // ── Colour-blind simulation ─────────────────────────────
@@ -4734,6 +4879,121 @@
         + '<div><div class="result-big">' + fmtTime(rn) + '</div><div class="result-label">Run</div></div>'
         + wHtml
         + '</div>';
+      renderFuel(sw, bk, rn, w);
+    }
+
+    // ── Fuelling & hydration model ────────────────────────────
+    // kcal estimates per leg (metabolic, gross):
+    //   • Swim   ≈ 9 kcal/min at moderate continuous pace (well-trained ~600 kcal/h)
+    //   • Bike   ≈ Watts × 3.6 (assumes ~24% gross efficiency: 1 W mech → ~3.6 kcal/h metabolic)
+    //   • Run    ≈ body_weight (kg) × distance (km) — classic ~1 kcal/kg/km approximation
+    // Carb / fluid / sodium guidance follows current sports-science consensus
+    // (Burke 2019, Jeukendrup 2014, ACSM 2016) — generic, not medical advice.
+    function renderFuel(swSec, bkSec, rnSec, watts) {
+      var host = document.getElementById('tri-fuel-result');
+      if (!host) return;
+      var mass  = parseFloat(document.getElementById('tri-fuel-mass').value)  || 70;
+      var sweat = parseFloat(document.getElementById('tri-fuel-sweat').value) || 800;
+      var cond  = (document.getElementById('tri-fuel-cond')  || { value: 'warm' }).value;
+      var tol   = (document.getElementById('tri-fuel-tol')   || { value: 'med'  }).value;
+      var rnKm  = parseFloat(document.getElementById('tri-run-km').value) || 0;
+
+      // Sodium baseline (mg/L sweat) by acclimatisation/conditions; multiplier on sweat loss
+      var naPerL = cond === 'hot' ? 1100 : cond === 'mild' ? 600 : 800;
+      // Sweat rate scales with conditions (heat = +20%, cold = −15%)
+      var sweatScale = cond === 'hot' ? 1.2 : cond === 'mild' ? 0.85 : 1.0;
+      var sweatPerH = sweat * sweatScale; // mL/h actually losing
+
+      // Carb target (g/h). Below 60 min event = 0–30 optional, 1–2.5 h = 30–60, >2.5 h = 60–90.
+      // Tolerance bumps the ceiling. We pick a single number per leg by leg duration.
+      function carbGperHour(legSec) {
+        var h = legSec / 3600;
+        var base;
+        if (h < 0.5) base = 0;
+        else if (h < 1) base = 30;
+        else if (h < 2.5) base = 60;
+        else base = 80;
+        if (tol === 'low')  base = Math.min(base, 60);
+        if (tol === 'high' && h >= 1) base += 20;
+        return base;
+      }
+
+      // Per-leg metabolic kcal
+      var swKcal = (swSec / 60) * 9;                    // ~9 kcal/min swim
+      var bkKcal = (watts > 0 ? watts * 3.6 : 0) * (bkSec / 3600); // W × 3.6 × hours
+      var rnKcal = mass * rnKm;                          // kg × km
+
+      function row(name, sec, kcal, includeSwim) {
+        if (sec <= 0) return '';
+        var hrs = sec / 3600;
+        // Swimming: no in-race fuelling realistic (open-water short legs); show kcal only
+        var carbsH = includeSwim ? 0 : carbGperHour(sec);
+        var carbsTot = carbsH * hrs;
+        var fluidsTot = includeSwim ? 0 : sweatPerH * 0.7 * hrs; // replace ~70% on the move
+        var naTot = (fluidsTot / 1000) * naPerL;
+        return '<tr>'
+          + '<td>' + name + '</td>'
+          + '<td>' + fmtTime(sec) + '</td>'
+          + '<td>' + Math.round(kcal) + ' kcal</td>'
+          + '<td>' + (includeSwim ? '<span style="color:#bbb;">— in race</span>'
+                                  : carbsH + ' g/h <span style="color:#aaa;">(' + Math.round(carbsTot) + ' g)</span>') + '</td>'
+          + '<td>' + (includeSwim ? '<span style="color:#bbb;">—</span>'
+                                  : Math.round(sweatPerH * 0.7) + ' mL/h <span style="color:#aaa;">(' + Math.round(fluidsTot) + ' mL)</span>') + '</td>'
+          + '<td>' + (includeSwim ? '<span style="color:#bbb;">—</span>'
+                                  : Math.round((sweatPerH * 0.7 / 1000) * naPerL) + ' mg/h <span style="color:#aaa;">(' + Math.round(naTot) + ' mg)</span>') + '</td>'
+          + '</tr>';
+      }
+
+      var totSec = swSec + bkSec + rnSec;
+      if (totSec <= 0) { host.innerHTML = '<div style="color:#aaa;font-size:0.86em;">Enter leg times above to see your race-day fuelling plan.</div>'; return; }
+
+      var totKcal = swKcal + bkKcal + rnKcal;
+      // Aggregated post-swim: bike + run portion
+      var movingSec = bkSec + rnSec;
+      var avgCarbsH = (movingSec > 0) ? Math.round(((carbGperHour(bkSec) * bkSec) + (carbGperHour(rnSec) * rnSec)) / movingSec) : 0;
+      var totCarbs  = (carbGperHour(bkSec) * bkSec / 3600) + (carbGperHour(rnSec) * rnSec / 3600);
+      var totFluid  = sweatPerH * 0.7 * (movingSec / 3600);
+      var totNa     = (totFluid / 1000) * naPerL;
+
+      var rows = '<table class="tri-fuel-table">'
+        + '<thead><tr><th>Leg</th><th>Time</th><th>Energy</th><th>Carbs</th><th>Fluids</th><th>Sodium</th></tr></thead><tbody>'
+        + row('Swim', swSec, swKcal, true)
+        + row('Bike', bkSec, bkKcal, false)
+        + row('Run',  rnSec, rnKcal, false)
+        + '<tr class="tri-fuel-tot">'
+        +   '<td>Total</td>'
+        +   '<td>' + fmtTime(totSec) + '</td>'
+        +   '<td>' + Math.round(totKcal) + ' kcal</td>'
+        +   '<td>' + (movingSec > 0 ? '~' + avgCarbsH + ' g/h <span style="color:#888;">(' + Math.round(totCarbs) + ' g)</span>' : '—') + '</td>'
+        +   '<td>' + (movingSec > 0 ? '~' + Math.round(sweatPerH * 0.7) + ' mL/h <span style="color:#888;">(' + Math.round(totFluid) + ' mL)</span>' : '—') + '</td>'
+        +   '<td>' + (movingSec > 0 ? '~' + Math.round(sweatPerH * 0.7 / 1000 * naPerL) + ' mg/h <span style="color:#888;">(' + Math.round(totNa) + ' mg)</span>' : '—') + '</td>'
+        + '</tr>'
+        + '</tbody></table>';
+
+      // Pre-race + practical guidance
+      var totH = totSec / 3600;
+      var preRace = '';
+      if (totH >= 2) {
+        preRace = '<div style="font-size:0.82em;color:#666;margin-top:0.7em;line-height:1.55;">'
+          + '<strong>Carb-loading (race ≥ 2 h):</strong> 8–10 g/kg body weight per day for 2–3 days before — about <strong>' + Math.round(mass * 9) + ' g carbs/day</strong> for you. '
+          + '<strong>Pre-race meal</strong> (3–4 h before): 1–2 g/kg carbs + low fibre + low fat.'
+          + '</div>';
+      } else if (totH >= 1) {
+        preRace = '<div style="font-size:0.82em;color:#666;margin-top:0.7em;line-height:1.55;">'
+          + '<strong>Pre-race meal</strong> (3 h before): ~' + Math.round(mass * 1.5) + ' g carbs (1.5 g/kg), low fibre + low fat. No need for extended carb-loading at this duration.'
+          + '</div>';
+      } else {
+        preRace = '<div style="font-size:0.82em;color:#666;margin-top:0.7em;line-height:1.55;">'
+          + '<strong>Pre-race</strong>: small carb snack 60–90 min before is enough at this duration. In-race fuelling optional.'
+          + '</div>';
+      }
+      var tips = '<div style="font-size:0.78em;color:#888;margin-top:0.5em;line-height:1.55;">'
+        + 'Numbers are <strong>training targets</strong>, not prescriptions. Practise your race-day plan in long sessions — never try anything new on race day. '
+        + 'Heat (&gt;28 °C) raises sweat &amp; sodium losses ~20 %; cold lowers them. Caffeine 3 mg/kg ~30 min pre-start is well-supported. '
+        + 'Bike feeding is easier than run — front-load carbs there if your gut allows it.'
+        + '</div>';
+
+      host.innerHTML = rows + preRace + tips;
     }
 
     // Wire each leg
@@ -4778,6 +5038,12 @@
     bindPmPreset('tri-pm-crr-preset', 'tri-pm-crr');
     ['tri-pm-mass','tri-pm-eta','tri-pm-slope','tri-pm-wind','tri-pm-rho'].forEach(function (id) {
       document.getElementById(id).addEventListener('input', updateTotal);
+    });
+    // Fuelling panel inputs → re-render fuelling table
+    ['tri-fuel-mass','tri-fuel-sweat','tri-fuel-cond','tri-fuel-tol'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('input', updateTotal);
+      if (el) el.addEventListener('change', updateTotal);
     });
     var chartXSel = document.getElementById('tri-pm-chart-x');
     if (chartXSel) chartXSel.addEventListener('change', renderPowerChart);

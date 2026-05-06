@@ -40,6 +40,8 @@
       <div id="w-description">Loading…</div>
       <div id="w-extra"></div>
       <div id="w-uv-aqi"></div>
+      <div id="w-sun-moon"></div>
+      <div id="w-forecast"></div>
       <select id="w-city-select"></select>
     </div>
   </div>
@@ -80,7 +82,22 @@
     #weather-widget:hover #weather-details { display: block; }
     #w-description { font-weight: 500; margin-bottom: 0.2em; }
     #w-extra  { opacity: 0.8; font-size: 0.9em; }
-    #w-uv-aqi { opacity: 0.8; font-size: 0.9em; margin-bottom: 0.5em; }
+    #w-uv-aqi { opacity: 0.8; font-size: 0.9em; margin-bottom: 0.4em; }
+    #w-sun-moon { opacity: 0.8; font-size: 0.9em; margin-bottom: 0.45em; }
+    #w-forecast {
+      display: flex; gap: 0.3em; margin: 0.35em 0 0.55em;
+      padding: 0.45em 0.25em; background: rgba(255,255,255,0.06);
+      border-radius: 0.6em; border: 1px solid rgba(255,255,255,0.12);
+    }
+    .w-day {
+      flex: 1 1 0; min-width: 0; text-align: center;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 0.05em; font-size: 0.78em; line-height: 1.2;
+    }
+    .w-day-name { opacity: 0.7; font-size: 0.85em; }
+    .w-day-emoji { font-size: 1.05em; margin: 0.05em 0; }
+    .w-day-hi { font-weight: 600; }
+    .w-day-lo { opacity: 0.6; font-size: 0.88em; }
     #w-city-select {
       background: rgba(255,255,255,0.12);
       color: #f0f0f0;
@@ -225,11 +242,41 @@
         return v + ' Extreme ⚫';
       }
 
+      // Moon phase via Conway (1985) — returns lunar age fraction [0, 1):
+      // 0 = new moon, 0.5 = full moon. Average error ≈ 1 day, plenty for an emoji label.
+      function moonPhaseFraction(date) {
+        var y = date.getFullYear(), m = date.getMonth() + 1, d = date.getDate();
+        if (m < 3) { y--; m += 12; }
+        m++;
+        var jd = Math.floor(365.25 * y) + Math.floor(30.6 * m) + d - 694039.09;
+        jd /= 29.5305882; // synodic month
+        var f = jd - Math.floor(jd);
+        return f < 0 ? f + 1 : f;
+      }
+      function moonLabel(f) {
+        if (f < 0.03 || f >= 0.97) return { emoji: '🌑', name: 'New Moon' };
+        if (f < 0.22)              return { emoji: '🌒', name: 'Waxing Crescent' };
+        if (f < 0.28)              return { emoji: '🌓', name: 'First Quarter' };
+        if (f < 0.47)              return { emoji: '🌔', name: 'Waxing Gibbous' };
+        if (f < 0.53)              return { emoji: '🌕', name: 'Full Moon' };
+        if (f < 0.72)              return { emoji: '🌖', name: 'Waning Gibbous' };
+        if (f < 0.78)              return { emoji: '🌗', name: 'Last Quarter' };
+        return                            { emoji: '🌘', name: 'Waning Crescent' };
+      }
+      function fmtHHMM(iso) {
+        // Open-Meteo daily sunrise/sunset are returned in the city's local timezone (we asked &timezone=auto).
+        // The string looks like "2026-05-06T05:42" — slice the time portion directly.
+        if (!iso || typeof iso !== 'string') return '—';
+        var t = iso.split('T')[1];
+        return t ? t.slice(0, 5) : '—';
+      }
+
       async function fetchWeather(cityKey) {
         const c = CITIES[cityKey];
         const wxUrl = `https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lon}`
           + `&current_weather=true&hourly=relativehumidity_2m,apparent_temperature,uv_index`
-          + `&timezone=auto&forecast_days=1`;
+          + `&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset,weathercode,precipitation_probability_max`
+          + `&timezone=auto&forecast_days=7`;
         const aqUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${c.lat}&longitude=${c.lon}`
           + `&hourly=european_aqi&timezone=auto&forecast_days=1`;
         try {
@@ -258,6 +305,41 @@
             `Feels like ${feelsLike} &nbsp;·&nbsp; 💨 ${wind} &nbsp;·&nbsp; 💧 ${humidity}%`;
           document.getElementById('w-uv-aqi').innerHTML =
             `☀️ UV ${uvLabel(uv)} &nbsp;·&nbsp; 🌬️ AQI …`;
+
+          // Sunrise / sunset (today, in city's local timezone) + moon phase (today, observer-side)
+          const daily = d.daily || {};
+          const sunrise = fmtHHMM(daily.sunrise && daily.sunrise[0]);
+          const sunset  = fmtHHMM(daily.sunset  && daily.sunset[0]);
+          const moon = moonLabel(moonPhaseFraction(now));
+          document.getElementById('w-sun-moon').innerHTML =
+            `🌅 ${sunrise} &nbsp;·&nbsp; 🌇 ${sunset} &nbsp;·&nbsp; ${moon.emoji} ${moon.name}`;
+
+          // 7-day forecast strip
+          const fc = document.getElementById('w-forecast');
+          const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+          const times = daily.time || [];
+          const tMax  = daily.temperature_2m_max || [];
+          const tMin  = daily.temperature_2m_min || [];
+          const codes = daily.weathercode || [];
+          const pop   = daily.precipitation_probability_max || [];
+          let fcHtml = '';
+          for (let i = 0; i < times.length; i++) {
+            const dt = new Date(times[i] + 'T12:00');
+            const lbl = i === 0 ? 'Today' : dayNames[dt.getDay()];
+            const em  = EMOJI[codes[i]] ?? '🌡️';
+            const hi  = tMax[i] != null ? Math.round(tMax[i]) + '°' : '—';
+            const lo  = tMin[i] != null ? Math.round(tMin[i]) + '°' : '—';
+            const desc = WMO[codes[i]] ?? 'Unknown';
+            const popN = (typeof pop[i] === 'number') ? pop[i] : null;
+            const tip = `${dt.toLocaleDateString(undefined, { weekday:'long', month:'short', day:'numeric' })} — ${desc}` + (popN != null ? ` · ${popN}% precip.` : '');
+            fcHtml += `<div class="w-day" title="${tip}">`
+                   +    `<div class="w-day-name">${lbl}</div>`
+                   +    `<div class="w-day-emoji">${em}</div>`
+                   +    `<div class="w-day-hi">${hi}</div>`
+                   +    `<div class="w-day-lo">${lo}</div>`
+                   +  `</div>`;
+          }
+          fc.innerHTML = fcHtml;
 
           fetch(aqUrl).then(r => r.json()).then(aq => {
             const aqi = aq.hourly?.european_aqi?.[hour] ?? null;

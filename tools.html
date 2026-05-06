@@ -232,9 +232,30 @@
     .currency-cell {
       flex: 1 1 140px; max-width: 220px;
       background: #f4f4f4; border-radius: 8px; padding: 0.8em 1em;
+      cursor: pointer; position: relative;
+      transition: background 0.18s ease, transform 0.12s ease;
+      border: 1px solid transparent;
     }
+    .currency-cell:hover { background: #ececec; border-color: #e0e0e0; }
+    .currency-cell:active { transform: scale(0.985); }
+    .currency-cell.copied { background: #dcfce7; border-color: #86efac; }
     .currency-cell .cc-code { font-size: 0.72em; color: #aaa; font-weight: 600; letter-spacing: 0.05em; }
     .currency-cell .cc-val { font-size: 1.1em; font-weight: 600; color: #333; margin-top: 0.1em; }
+    .currency-cell .cc-spark {
+      display: flex; align-items: center; gap: 0.45em; margin-top: 0.35em;
+      font-size: 0.66em; font-weight: 600; line-height: 1; min-height: 14px;
+    }
+    .currency-cell .cc-spark svg { display: block; }
+    .currency-cell .cc-delta-up   { color: #166534; }
+    .currency-cell .cc-delta-down { color: #991b1b; }
+    .currency-cell .cc-delta-flat { color: #999; }
+    .currency-cell .cc-copy-tip {
+      position: absolute; top: 0.4em; right: 0.55em;
+      font-size: 0.66em; color: #888; opacity: 0; transition: opacity 0.18s ease;
+      pointer-events: none; font-weight: 500; letter-spacing: 0.02em;
+    }
+    .currency-cell:hover .cc-copy-tip { opacity: 0.6; }
+    .currency-cell.copied .cc-copy-tip { opacity: 1; color: #166534; }
 
     /* ── Salary breakdown bar ────────────────── */
     .salary-bar { height: 12px; border-radius: 6px; overflow: hidden; display: flex; margin: 0.8em 0; }
@@ -268,6 +289,194 @@
       margin-top: 1em; padding-top: 0.8em; border-top: 1px solid #f0f0f0;
     }
 
+    /* ── Salary calculation details ──────────── */
+    .sal-details { margin-top: 1.2em; }
+    .sal-details > summary {
+      cursor: pointer; font-size: 0.92em; color: #555; font-weight: 500;
+      padding: 0.5em 0; list-style: none; user-select: none;
+    }
+    .sal-details > summary::-webkit-details-marker { display: none; }
+    .sal-details > summary::before {
+      content: '📊'; display: inline-block; font-size: 1.05em;
+      opacity: 0.7; margin-right: 0.5em; vertical-align: -0.05em;
+    }
+    .sal-details > summary::after {
+      content: '▸'; display: inline-block; font-size: 0.95em;
+      opacity: 0.55; margin-left: 0.55em; transition: transform 0.18s ease;
+    }
+    .sal-details[open] > summary::after { transform: rotate(90deg); }
+    .sal-details[open] > summary { color: #222; border-bottom: 1px solid #eee; margin-bottom: 0.6em; }
+    .sal-detail-block { margin: 0.4em 0 1.1em; }
+    .sal-detail-block h4 {
+      font-size: 0.74em; font-weight: 600; color: #888;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      margin: 0 0 0.5em;
+    }
+    .sal-trace {
+      background: #fafafa; border: 1px solid #eee; border-radius: 8px;
+      padding: 0.7em 0.9em; font-family: ui-monospace, 'Menlo', monospace;
+      font-size: 0.74em; line-height: 1.7; color: #555;
+      overflow-x: auto;
+    }
+    .sal-trace .step-eq { color: #888; }
+    .sal-trace .step-val { color: #166534; font-weight: 600; }
+    .sal-trace .step-final { border-top: 1px solid #ddd; margin-top: 0.4em; padding-top: 0.4em; color: #166534; font-weight: 700; }
+    .sal-fund-list, .sal-caveat-list {
+      font-size: 0.82em; line-height: 1.55; color: #555;
+      padding-left: 1.1em; margin: 0;
+    }
+    .sal-fund-list li, .sal-caveat-list li { margin: 0.2em 0; }
+    .sal-source { font-size: 0.78em; color: #888; }
+    .sal-source a { color: #54575A; text-decoration: underline; text-decoration-color: #ccc; }
+    .sal-source a:hover { text-decoration-color: #54575A; }
+
+    /* ── Tri advanced power model ─────────────── */
+    .tri-power-details { margin: 0.4em 0 0.9em; }
+    .tri-power-details > summary {
+      cursor: pointer; font-size: 0.92em; color: #777; font-weight: 500;
+      padding: 0.4em 0; list-style: none; user-select: none;
+    }
+    .tri-power-details > summary::-webkit-details-marker { display: none; }
+    .tri-power-details > summary::before {
+      content: '⚙'; display: inline-block; font-size: 1.15em;
+      opacity: 0.65; margin-right: 0.5em; vertical-align: -0.05em;
+    }
+    .tri-power-details > summary::after {
+      content: '▸'; display: inline-block; font-size: 0.95em;
+      opacity: 0.55; margin-left: 0.55em; transition: transform 0.18s ease;
+    }
+    .tri-power-details[open] > summary::after { transform: rotate(90deg); }
+    .tri-power-details[open] > summary { color: #444; }
+    .tri-power-grid {
+      background: #fafafa; border: 1px solid #eee; border-radius: 8px;
+      padding: 0.8em 1em; margin-top: 0.3em;
+    }
+
+    /* ── Plan → Builder edit link ─────────────── */
+    .plan-edit-link {
+      background: none; border: none; cursor: pointer;
+      color: #aaa; font-size: 0.85em; padding: 0 0.18em; line-height: 1;
+      vertical-align: 0; transition: color 0.18s ease, transform 0.12s ease;
+    }
+    .plan-edit-link:hover { color: #5D6063; transform: scale(1.15); }
+
+    /* ── Training Session Builder ─────────────── */
+    .session-segment {
+      display: flex; flex-wrap: wrap; gap: 0.5em; align-items: flex-end;
+      padding: 0.55em 0.7em; background: #f7f7f7; border-radius: 8px;
+      margin-bottom: 0.45em; border-left: 3px solid #888;
+      transition: opacity 0.15s ease, transform 0.15s ease, background 0.15s ease;
+    }
+    .session-segment.recovery { border-left-color: #c8d3d8; background: #f0f3f5; }
+    .session-segment.dragging { opacity: 0.4; }
+    .session-segment.drag-over { outline: 2px dashed #5D6063; outline-offset: -2px; }
+    .session-segment .seg-handle {
+      flex: 0 0 auto; cursor: grab; user-select: none;
+      color: #b0b0b0; font-size: 1.1em; padding: 0 0.3em; line-height: 1;
+      align-self: center;
+    }
+    .session-segment .seg-handle:hover { color: #666; }
+    .session-segment .seg-handle:active { cursor: grabbing; }
+    .session-segment .seg-move {
+      flex: 0 0 auto; display: flex; flex-direction: column; gap: 0.05em;
+      align-self: center;
+    }
+    .session-segment .seg-move button {
+      background: transparent; border: none; cursor: pointer; color: #b0b0b0;
+      padding: 0; font-size: 0.7em; line-height: 1; height: 0.9em; width: 1.2em;
+    }
+    .session-segment .seg-move button:hover { color: #5D6063; }
+    .session-segment .seg-move button:disabled { opacity: 0.3; cursor: default; }
+    .session-segment .seg-idx {
+      flex: 0 0 auto; font-size: 0.74em; font-weight: 700;
+      color: #aaa; padding-bottom: 0.5em; min-width: 1.6em; text-align: center;
+    }
+    .session-segment .seg-cell {
+      display: flex; flex-direction: column; gap: 0.2em;
+      flex: 1 1 100px; min-width: 80px;
+    }
+    .session-segment .seg-cell .seg-lbl {
+      font-size: 0.66em; color: #888; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .session-segment input,
+    .session-segment select {
+      background: #fff; border: 1px solid #d8d8d8; border-radius: 6px;
+      padding: 0.42em 0.6em; font-size: 0.86em; font-family: 'Inter', sans-serif;
+      width: 100%; min-width: 0; box-sizing: border-box; color: #333; outline: none;
+    }
+    .session-segment input:focus, .session-segment select:focus { border-color: #5D6063; }
+    .session-segment .seg-rm {
+      flex: 0 0 auto; background: transparent; border: none; cursor: pointer;
+      font-size: 1.1em; color: #c0a8a8; padding: 0.2em 0.4em;
+      align-self: center; line-height: 1;
+    }
+    .session-segment .seg-rm:hover { color: #991b1b; }
+
+    .session-toolbar {
+      display: flex; flex-wrap: wrap; gap: 0.5em; margin: 0.5em 0 1em;
+      align-items: center;
+    }
+    .session-add-row, .session-action {
+      display: inline-flex; align-items: center; gap: 0.35em;
+      padding: 0.42em 0.85em; background: #fff; border: 1px dashed #c8c8c8;
+      border-radius: 8px; font-size: 0.82em; color: #666; cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .session-action { border-style: solid; }
+    .session-add-row:hover, .session-action:hover { border-color: #888; color: #222; background: #f7f7f7; }
+
+    .session-summary-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.7em;
+    }
+
+    .session-saved-list { list-style: none; padding: 0; margin: 0.4em 0 0; }
+    .session-saved-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.4em 0.7em; background: #f4f4f4; border-radius: 6px;
+      margin-bottom: 0.3em; font-size: 0.84em; color: #444;
+      gap: 0.5em; flex-wrap: wrap;
+    }
+    .session-saved-item .ssi-name { font-weight: 600; flex: 1 1 auto; }
+    .session-saved-item .ssi-meta { font-size: 0.78em; color: #888; }
+    .session-saved-item .ssi-actions { display: flex; gap: 0.3em; flex-wrap: wrap; }
+    .session-saved-item button {
+      background: #fff; border: 1px solid #d8d8d8; border-radius: 5px;
+      padding: 0.22em 0.55em; font-size: 0.74em; cursor: pointer; color: #555;
+      font-family: inherit;
+    }
+    .session-saved-item button:hover { background: #efefef; }
+    .session-saved-item button.del { color: #991b1b; border-color: #f1c4c4; }
+    .session-saved-item button.del:hover { background: #fee2e2; }
+
+    .session-hr-zones {
+      font-size: 0.78em; color: #555; line-height: 1.55;
+      background: #f7f7f7; border-radius: 8px; padding: 0.7em 0.95em;
+      margin-top: 0.6em;
+    }
+    .session-hr-zones table { width: 100%; border-collapse: collapse; }
+    .session-hr-zones th, .session-hr-zones td {
+      padding: 0.25em 0.45em; text-align: left; border-bottom: 1px solid #eee;
+      font-size: 0.94em;
+    }
+    .session-hr-zones th { color: #888; font-weight: 600; font-size: 0.86em; }
+    .session-hr-zones tr:last-child td { border-bottom: none; }
+    .session-hr-zones .hr-col-z {
+      font-weight: 700; color: #fff; padding: 0.1em 0.5em;
+      border-radius: 4px; font-size: 0.86em; display: inline-block;
+    }
+    .hr-z1 { background: #6b9bd1; }
+    .hr-z2 { background: #66a766; }
+    .hr-z3 { background: #d6b143; }
+    .hr-z4 { background: #d68043; }
+    .hr-z5 { background: #c64a4a; }
+
+    @media (max-width: 600px) {
+      .session-segment .seg-cell { flex: 1 1 calc(50% - 0.3em); }
+    }
+
     /* ── Mobile ──────────────────────────────── */
     @media (max-width: 700px) {
       /* No overflow-x:hidden anymore — if anything escapes the card it should
@@ -296,8 +505,12 @@
       .tool-field { min-width: 110px; }
       .tool-result { padding: 0.9em 1em; }
       .result-big { font-size: 1.9em; }
-      /* iOS: inputs below 16px auto-zoom on focus — force 16px site-wide on this page */
-      input, textarea, select { font-size: 16px; }
+      /* iOS: inputs below 16px auto-zoom on focus — force 16px site-wide on this page.
+         Use higher specificity to win over rules like `.session-segment input { font-size: 0.86em }`.
+         Two layers cover any nested input under any tool card / panel / segment. */
+      input, textarea, select,
+      .tool-card input, .tool-card textarea, .tool-card select,
+      .session-segment input, .session-segment select { font-size: 16px; }
 
       .tool-mobile-picker {
         display: block; width: 100%; margin-top: 0.2em; text-align: center;
@@ -392,13 +605,13 @@
             <option value="running">🏃  Running Pace</option>
             <option value="triathlon">🏊  Triathlon</option>
             <option value="plan">📋  Training Plan</option>
-            <option value="fire">🔥  FIRE Calculator</option>
-            <option value="salary">💼  Net Salary</option>
-            <option value="currency">💱  Currency</option>
             <option value="weather">🌤  Weather</option>
-            <option value="color">🎨  Color Tools</option>
-            <option value="col">🏙️  Cost of Living</option>
             <option value="date">📅  Date Calculator</option>
+            <option value="currency">💱  Currency</option>
+            <option value="salary">💼  Net Salary</option>
+            <option value="col">🏙️  Cost of Living</option>
+            <option value="fire">🔥  FIRE Calculator</option>
+            <option value="color">🎨  Color Tools</option>
           </select>
         </div>
         <div class="tool-nav-list">
@@ -411,26 +624,26 @@
           <button class="tool-nav-item" data-tool="plan">
             <span class="tool-icon">📋</span> Training Plan
           </button>
-          <button class="tool-nav-item" data-tool="fire">
-            <span class="tool-icon">🔥</span> FIRE Calculator
+          <button class="tool-nav-item" data-tool="weather">
+            <span class="tool-icon">🌤</span> Weather
           </button>
-          <button class="tool-nav-item" data-tool="salary">
-            <span class="tool-icon">💼</span> Net Salary
+          <button class="tool-nav-item" data-tool="date">
+            <span class="tool-icon">📅</span> Date Calculator
           </button>
           <button class="tool-nav-item" data-tool="currency">
             <span class="tool-icon">💱</span> Currency
           </button>
-          <button class="tool-nav-item" data-tool="weather">
-            <span class="tool-icon">🌤</span> Weather
-          </button>
-          <button class="tool-nav-item" data-tool="color">
-            <span class="tool-icon">🎨</span> Color Tools
+          <button class="tool-nav-item" data-tool="salary">
+            <span class="tool-icon">💼</span> Net Salary
           </button>
           <button class="tool-nav-item" data-tool="col">
             <span class="tool-icon">🏙️</span> Cost of Living
           </button>
-          <button class="tool-nav-item" data-tool="date">
-            <span class="tool-icon">📅</span> Date Calculator
+          <button class="tool-nav-item" data-tool="fire">
+            <span class="tool-icon">🔥</span> FIRE Calculator
+          </button>
+          <button class="tool-nav-item" data-tool="color">
+            <span class="tool-icon">🎨</span> Color Tools
           </button>
         </div>
       </aside>
@@ -479,6 +692,25 @@
               <div style="font-size:0.8em;color:#aaa;margin-bottom:0.6em;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">All splits</div>
               <div class="result-grid" id="run-splits"></div>
             </div>
+
+            <details style="margin-top:1.1em;">
+              <summary style="cursor:pointer;font-size:0.85em;color:#888;font-weight:500;padding:0.3em 0;">Grade-Adjusted Pace (GAP)</summary>
+              <div class="tool-row" style="align-items:flex-end;margin-top:0.6em;">
+                <div class="tool-field">
+                  <label>Distance (km)</label>
+                  <input type="number" id="run-gap-km" min="0.1" step="0.1" value="10" onclick="this.select()">
+                </div>
+                <div class="tool-field">
+                  <label>Elevation gain (m)</label>
+                  <input type="number" id="run-gap-elev" min="0" step="1" value="200" onclick="this.select()">
+                </div>
+              </div>
+              <div class="tool-result" id="run-gap-result" style="margin-top:0.7em;display:none;"></div>
+              <div style="font-size:0.72em;color:#aaa;line-height:1.5;margin-top:0.6em;">
+                Equivalent flat pace using a Strava-style cost curve: <code>cost(g) ≈ 1 + 0.0327·g + 0.034·g²</code> with grade <em>g</em> in % (positive only — descents not modelled). Uses the pace from the field above.
+              </div>
+            </details>
+
             <div class="tool-note">Edit any field — all others update automatically (pace fields update on Enter / focus-out). 1 mile = 1.60934 km.</div>
           </div>
 
@@ -496,6 +728,10 @@
                   <option value="M">Male</option>
                   <option value="F">Female</option>
                 </select>
+              </div>
+              <div class="tool-field">
+                <label>Age (optional)</label>
+                <input type="number" id="run-vo2-age" min="10" max="100" step="1" placeholder="e.g. 30" onclick="this.select()">
               </div>
             </div>
 
@@ -543,8 +779,23 @@
             </div>
             <button id="run-vo2-rev-calc" class="tool-btn">Predict race time</button>
 
+            <hr class="vo2-divider">
+
+            <div class="vo2-section-label">From heart rate → VO₂max (Uth-Sørensen)</div>
+            <div class="tool-row" style="align-items:flex-end;">
+              <div class="tool-field">
+                <label>HR<sub>max</sub> (bpm)</label>
+                <input type="number" id="run-vo2-hrmax" min="120" max="230" step="1" placeholder="e.g. 190" onclick="this.select()">
+              </div>
+              <div class="tool-field">
+                <label>HR<sub>rest</sub> (bpm)</label>
+                <input type="number" id="run-vo2-hrrest" min="30" max="100" step="1" placeholder="e.g. 50" onclick="this.select()">
+              </div>
+            </div>
+            <button id="run-vo2-hr-calc" class="tool-btn">Estimate from HR</button>
+
             <div class="tool-result" id="run-vo2-result" style="display:none;margin-top:1em;"></div>
-            <div class="tool-note">%VO₂max = 0.8 + 0.1894·e<sup>−0.012778·t</sup> + 0.2990·e<sup>−0.1933·t</sup> (t in min) · VO₂ = −4.60 + 0.1823·v + 0.000104·v² (v in m/min) · VO₂max = VO₂ / %VO₂max. Classifications are indicative age-adjusted norms.</div>
+            <div class="tool-note">%VO₂max = 0.8 + 0.1894·e<sup>−0.012778·t</sup> + 0.2990·e<sup>−0.1933·t</sup> (t in min) · VO₂ = −4.60 + 0.1823·v + 0.000104·v² (v in m/min). HR-based: <strong>VO₂max ≈ 15.3 · HR<sub>max</sub> / HR<sub>rest</sub></strong> (Uth, Sørensen, Overgaard, Pedersen 2004). Age-graded line uses a simplified decline of ~0.5 % per year past 30 (rough WMA-style factor — not the official table).</div>
           </div>
 
           <!-- Race Time Predictor -->
@@ -694,6 +945,27 @@
                   <option value="GBP">GBP</option>
                 </select>
               </div>
+              <div class="tool-field">
+                <label>Projection</label>
+                <div class="tool-toggle" id="fire-mode-toggle">
+                  <button class="active" data-fmode="simple">Simple</button>
+                  <button data-fmode="mc">Monte Carlo</button>
+                </div>
+              </div>
+            </div>
+            <div class="tool-row" id="fire-mc-params" style="display:none;">
+              <div class="tool-field">
+                <label>Return volatility σ (%)</label>
+                <input type="number" id="fire-mc-vol" value="15" step="0.5" min="0" max="50">
+              </div>
+              <div class="tool-field">
+                <label>Simulated paths</label>
+                <select id="fire-mc-runs">
+                  <option value="500">500 (fastest)</option>
+                  <option value="1000" selected>1 000</option>
+                  <option value="2000">2 000</option>
+                </select>
+              </div>
             </div>
 
             <div class="tool-result" id="fire-summary" style="display:none;">
@@ -712,6 +984,8 @@
                 </div>
               </div>
             </div>
+
+            <div id="fire-mc-chart" style="display:none;background:#fff;border:1px solid #ececec;border-radius:8px;padding:0.5em;margin-top:1em;"></div>
 
             <div style="overflow-x:auto;margin-top:1em;">
               <table class="tool-table" id="fire-table">
@@ -741,7 +1015,7 @@
           <div class="tool-card">
             <div class="tool-header">
               <h2>Net Salary Calculator</h2>
-              <div class="tool-meta">v1.0 · Mar 2026 — approximations, not financial/tax advice</div>
+              <div class="tool-meta">v1.1 · May 2026 — 14 countries · per-country formula trace, sources, caveats</div>
             </div>
 
             <div class="tool-row">
@@ -817,8 +1091,54 @@
                   <tbody id="sal-tbody"></tbody>
                 </table>
               </div>
+              <div class="tool-row" style="align-items:flex-end;margin-top:0.8em;">
+                <div class="tool-field">
+                  <label>Convert net to</label>
+                  <select id="sal-fx-to">
+                    <option value="">— pick a currency —</option>
+                    <option value="EUR">EUR — Euro</option>
+                    <option value="USD">USD — US Dollar</option>
+                    <option value="CHF">CHF — Swiss Franc</option>
+                    <option value="GBP">GBP — British Pound</option>
+                    <option value="JPY">JPY — Japanese Yen</option>
+                    <option value="SEK">SEK — Swedish Krona</option>
+                    <option value="NOK">NOK — Norwegian Krone</option>
+                    <option value="DKK">DKK — Danish Krone</option>
+                    <option value="CAD">CAD — Canadian Dollar</option>
+                    <option value="AUD">AUD — Australian Dollar</option>
+                  </select>
+                </div>
+                <div class="tool-field" style="flex:2 1 240px;">
+                  <label>Equivalent</label>
+                  <div id="sal-fx-result" style="font-size:0.95em;color:#444;padding:0.5em 0.2em;line-height:1.3;">—</div>
+                </div>
+              </div>
             </div>
-            <div class="tool-note" id="sal-note">Figures are approximations. Tax brackets updated for 2024/2025 where available. Does not account for individual deductions, bonuses, or specific circumstances. Switzerland: cantonal/municipal rates vary; major cantons included. US: federal + FICA only.</div>
+            <details class="sal-details" id="sal-details">
+              <summary>Calculation details — formulas, sources, what taxes fund</summary>
+
+              <div class="sal-detail-block">
+                <h4>Tax year &amp; source</h4>
+                <div class="sal-source" id="sal-source">—</div>
+              </div>
+
+              <div class="sal-detail-block">
+                <h4>Step-by-step trace</h4>
+                <div class="sal-trace" id="sal-trace">—</div>
+              </div>
+
+              <div class="sal-detail-block">
+                <h4>What this funds</h4>
+                <ul class="sal-fund-list" id="sal-funds"></ul>
+              </div>
+
+              <div class="sal-detail-block">
+                <h4>Caveats &amp; what's not modeled</h4>
+                <ul class="sal-caveat-list" id="sal-caveats"></ul>
+              </div>
+            </details>
+
+            <div class="tool-note" id="sal-note">Figures are approximations using brackets for tax years 2024 / 2024-25. Open the <strong>Calculation details</strong> panel for the exact formula trace, source, what each tax funds, and country-specific caveats. Does not account for individual deductions, family situation, bonuses, or local surcharges. Switzerland: BVG simplified at 7 %; cantonal/municipal rates use a country-average curve. US: federal + FICA only — no state tax. Not financial or tax advice.</div>
           </div>
         </div>
 
@@ -858,6 +1178,7 @@
             <div id="cur-loading" style="color:#aaa;font-size:0.88em;margin-top:0.8em;">Loading rates…</div>
             <div class="currency-grid" id="cur-grid" style="display:none;"></div>
             <div class="tool-note" id="cur-updated"></div>
+            <div class="tool-note" style="margin-top:0.4em;border-top:none;padding-top:0;">Tap any cell to copy the converted amount. The small SVG line shows the rate trajectory over the last ~30 calendar days (≈ 25 ECB trading days — weekends and ECB holidays are excluded). The % next to it is the change from the first to the last point. Hover the line for the exact date range.</div>
           </div>
         </div>
 
@@ -953,6 +1274,22 @@
                 </div>
               </div>
             </div>
+
+            <details style="margin-top:1.2em;">
+              <summary style="cursor:pointer;font-size:0.85em;color:#888;font-weight:500;padding:0.3em 0;">Palette generator</summary>
+              <div style="font-size:0.78em;color:#aaa;margin-top:0.3em;line-height:1.5;">
+                Schemes derived from the current color via HSL hue rotation. Click any swatch to copy its HEX.
+              </div>
+              <div id="col-palette" style="display:flex;flex-wrap:wrap;gap:0.55em;margin-top:0.7em;"></div>
+            </details>
+
+            <details style="margin-top:0.7em;">
+              <summary style="cursor:pointer;font-size:0.85em;color:#888;font-weight:500;padding:0.3em 0;">Colour-blind simulation</summary>
+              <div style="font-size:0.78em;color:#aaa;margin-top:0.3em;line-height:1.5;">
+                How this colour appears to people with the three main colour-vision deficiencies (Brettel/Vienot 1997 transforms, simplified). The largest swatch is your colour as you see it.
+              </div>
+              <div id="col-cb" style="display:flex;flex-wrap:wrap;gap:0.55em;margin-top:0.7em;"></div>
+            </details>
           </div>
         </div>
 
@@ -1026,6 +1363,44 @@
               <div style="overflow-x:auto;margin-top:0.6em;" id="col-cmp-result"></div>
             </details>
 
+            <details style="margin-top:0.7em;">
+              <summary style="cursor:pointer;font-size:0.85em;color:#888;font-weight:500;padding:0.3em 0;">Match purchasing power across cities</summary>
+              <div class="tool-row" style="margin-top:0.8em;align-items:flex-end;">
+                <div class="tool-field">
+                  <label>From city</label>
+                  <select id="col-pp-from">
+                    <option value="milan">🇮🇹 Milan</option>
+                    <option value="zurich" selected>🇨🇭 Zürich</option>
+                    <option value="munich">🇩🇪 München</option>
+                    <option value="london">🇬🇧 London</option>
+                    <option value="paris">🇫🇷 Paris</option>
+                    <option value="malaga">🇪🇸 Malaga</option>
+                    <option value="amsterdam">🇳🇱 Amsterdam</option>
+                  </select>
+                </div>
+                <div class="tool-field">
+                  <label>Monthly net there</label>
+                  <input type="number" id="col-pp-net" min="0" step="100" value="6000" onclick="this.select()">
+                </div>
+                <div class="tool-field">
+                  <label>To city</label>
+                  <select id="col-pp-to">
+                    <option value="milan" selected>🇮🇹 Milan</option>
+                    <option value="zurich">🇨🇭 Zürich</option>
+                    <option value="munich">🇩🇪 München</option>
+                    <option value="london">🇬🇧 London</option>
+                    <option value="paris">🇫🇷 Paris</option>
+                    <option value="malaga">🇪🇸 Malaga</option>
+                    <option value="amsterdam">🇳🇱 Amsterdam</option>
+                  </select>
+                </div>
+              </div>
+              <div id="col-pp-result" style="margin-top:0.7em;font-size:0.92em;color:#444;line-height:1.55;">—</div>
+              <div style="font-size:0.72em;color:#aaa;line-height:1.5;margin-top:0.4em;">
+                Required net = ratio × cost-of-living(B), where ratio = net(A) / cost-of-living(A). Currency converted via the live ECB rate. Result is a same-purchasing-power equivalent — actual relocation also depends on tax, housing market, lifestyle, and personal expenses.
+              </div>
+            </details>
+
             <div class="tool-note">Monthly estimates. Significant variation depending on lifestyle, neighbourhood, and individual choices. Zürich costs in CHF (approx. parity to EUR). Data: Numbeo &amp; local sources, 2024/2025.</div>
           </div>
         </div>
@@ -1047,8 +1422,8 @@
                   <option value="sprint">Sprint (0.75 / 20 / 5 km)</option>
                   <option value="olympic" selected>Olympic (1.5 / 40 / 10 km)</option>
                   <option value="t100">T100 (2 / 80 / 18 km)</option>
-                  <option value="half">Half · 70.3 (1.9 / 90 / 21.1 km)</option>
-                  <option value="full">Full Ironman (3.8 / 180 / 42.2 km)</option>
+                  <option value="half">Half Ironman • 70.3 (1.9 / 90 / 21.1 km)</option>
+                  <option value="full">Ironman (3.8 / 180 / 42.2 km)</option>
                   <option value="custom">Custom</option>
                 </select>
               </div>
@@ -1093,10 +1468,87 @@
                 <input type="text" id="tri-bike-time" value="1:15:00" style="font-family:monospace;" onclick="this.select()">
               </div>
               <div class="tool-field">
-                <label>Power (W) — leave blank to estimate</label>
+                <label>Power (W) <span style="color:#aaa;font-weight:400;">— Edit parameters below to refine</span> <span id="tri-bike-w-est-badge" style="display:inline-block;margin-left:0.4em;padding:0.05em 0.5em;background:#f4f6f8;border:1px solid #e3e7eb;border-radius:10px;font-size:0.78em;color:#666;font-weight:500;font-variant-numeric:tabular-nums;">est <span id="tri-bike-w-est">— W</span></span></label>
                 <input type="number" id="tri-bike-w" step="1" min="0" placeholder="auto from speed" onclick="this.select()">
               </div>
             </div>
+
+            <details class="tri-power-details" id="tri-power-details">
+              <summary>Power model parameters</summary>
+              <div class="tri-power-grid">
+                <div class="tool-row" style="align-items:flex-end;">
+                  <div class="tool-field">
+                    <label>Mass — rider + bike (kg)</label>
+                    <input type="number" id="tri-pm-mass" step="0.5" min="30" max="150" value="80" onclick="this.select()">
+                  </div>
+                  <div class="tool-field">
+                    <label>CdA preset</label>
+                    <select id="tri-pm-cda-preset">
+                      <option value="0.20">TT / aero bars (0.20)</option>
+                      <option value="0.25">Drops (0.25)</option>
+                      <option value="0.32" selected>Hoods / road (0.32)</option>
+                      <option value="0.40">Tops / upright (0.40)</option>
+                      <option value="custom">Custom…</option>
+                    </select>
+                  </div>
+                  <div class="tool-field">
+                    <label>CdA value (m²)</label>
+                    <input type="number" id="tri-pm-cda" step="0.01" min="0.15" max="0.6" value="0.32" onclick="this.select()">
+                  </div>
+                </div>
+                <div class="tool-row" style="align-items:flex-end;">
+                  <div class="tool-field">
+                    <label>Crr preset</label>
+                    <select id="tri-pm-crr-preset">
+                      <option value="0.003">Race tubular (0.003)</option>
+                      <option value="0.004">Fast clincher (0.004)</option>
+                      <option value="0.005" selected>Training tyre (0.005)</option>
+                      <option value="0.008">Gravel / wet (0.008)</option>
+                      <option value="custom">Custom…</option>
+                    </select>
+                  </div>
+                  <div class="tool-field">
+                    <label>Crr value</label>
+                    <input type="number" id="tri-pm-crr" step="0.0005" min="0.002" max="0.02" value="0.005" onclick="this.select()">
+                  </div>
+                  <div class="tool-field">
+                    <label>Drivetrain η (%)</label>
+                    <input type="number" id="tri-pm-eta" step="0.5" min="90" max="100" value="97" onclick="this.select()">
+                  </div>
+                </div>
+                <div class="tool-row" style="align-items:flex-end;">
+                  <div class="tool-field">
+                    <label>Slope (%)</label>
+                    <input type="number" id="tri-pm-slope" step="0.1" min="-15" max="20" value="0" onclick="this.select()">
+                  </div>
+                  <div class="tool-field">
+                    <label>Headwind (km/h, − = tailwind)</label>
+                    <input type="number" id="tri-pm-wind" step="0.5" min="-30" max="50" value="0" onclick="this.select()">
+                  </div>
+                  <div class="tool-field">
+                    <label>Air density ρ (kg/m³)</label>
+                    <input type="number" id="tri-pm-rho" step="0.01" min="0.8" max="1.4" value="1.225" onclick="this.select()">
+                  </div>
+                </div>
+                <div style="font-size:0.74em;color:#888;line-height:1.55;margin-top:0.3em;">
+                  ρ at sea level &amp; 15 °C ≈ 1.225 · 1500 m ≈ 1.06 · 2500 m ≈ 0.96. Hot/dry days drop ρ a few percent.
+                </div>
+                <div class="tri-power-chart-wrap" style="margin-top:1em;">
+                  <div style="display:flex;align-items:center;gap:0.6em;flex-wrap:wrap;font-size:0.8em;color:#666;margin-bottom:0.4em;">
+                    <strong style="font-weight:600;">Power vs</strong>
+                    <select id="tri-pm-chart-x" style="font-size:0.92em;padding:0.25em 0.45em;">
+                      <option value="speed" selected>Speed (km/h)</option>
+                      <option value="slope">Slope (%)</option>
+                      <option value="wind">Headwind (km/h)</option>
+                      <option value="cda">CdA (m²)</option>
+                      <option value="mass">Mass (kg)</option>
+                    </select>
+                    <span style="color:#aaa;">— ● = your current value</span>
+                  </div>
+                  <div id="tri-pm-chart" style="background:#fff;border:1px solid #ececec;border-radius:8px;padding:0.4em;"></div>
+                </div>
+              </div>
+            </details>
 
             <div class="vo2-section-label">🔄 T2 (transition)</div>
             <div class="tool-row" style="align-items:flex-end;">
@@ -1123,7 +1575,13 @@
             </div>
 
             <div class="tool-result" id="tri-result" style="margin-top:1em;"></div>
-            <div class="tool-note">Pace ↔ time fields auto-update each other given the leg distance. Picking a preset fills standard distances. <strong>Power estimate</strong> (when W is blank) uses a flat-road model: P = (½·ρ·CdA·v³ + C<sub>rr</sub>·m·g·v) / η, with ρ=1.225 kg/m³, CdA≈0.32 m², m≈80 kg, C<sub>rr</sub>=0.005, η=0.97. Real-world output varies with aero position, weight, terrain, wind and drafting — enter your own number for accuracy.</div>
+            <div class="tool-note">
+              Pace ↔ time fields auto-update each other given the leg distance. Picking a preset fills standard distances.
+              <br><br>
+              <strong>Power estimate</strong> (when W is blank) uses a full road-cycling model:
+              <br><code style="font-size:0.94em;">P = ( ½·ρ·CdA·(v + v<sub>wind</sub>)<sup>2</sup>·v &nbsp;+&nbsp; C<sub>rr</sub>·m·g·cos(θ)·v &nbsp;+&nbsp; m·g·sin(θ)·v ) / η</code>
+              <br>where v = ground speed (m/s), v<sub>wind</sub> = headwind (m/s, + opposing), ρ = air density, CdA = drag area, C<sub>rr</sub> = rolling resistance, m = total mass, g = 9.81, θ = slope angle (atan(grade)), η = drivetrain efficiency. The three terms are aero drag, rolling resistance, and gravity (climbing/descending). Drafting is not modeled — peloton riders typically save 25–40 % aero. Open the panel above to tune any parameter.
+            </div>
           </div>
 
           <div class="tool-card">
@@ -1138,8 +1596,8 @@
                   <option value="sprint">Sprint</option>
                   <option value="olympic" selected>Olympic</option>
                   <option value="t100">T100</option>
-                  <option value="half">Half · 70.3</option>
-                  <option value="full">Full Ironman</option>
+                  <option value="half">Half Ironman • 70.3</option>
+                  <option value="full">Ironman</option>
                 </select>
               </div>
               <div class="tool-field">
@@ -1238,6 +1696,96 @@
               ⚠ <strong>General guidance — not medical, nutritional, or coaching advice.</strong> Listen to your body, take recovery weeks when fatigued, and consult a professional for injury, illness, or significant performance goals. Hydration / nutrition tips are generic. No data leaves your browser.
             </div>
           </div>
+
+          <!-- ── Session Builder ─────────────── -->
+          <div class="tool-card">
+            <div class="tool-header">
+              <h2>Training Session Builder</h2>
+              <div class="tool-meta">v1.0 · May 2026 — intervals · fartlek · progressive · tempo · long · TCX export for Garmin</div>
+            </div>
+
+            <div class="tool-row" style="align-items:flex-end;">
+              <div class="tool-field">
+                <label>Session type</label>
+                <select id="ses-type">
+                  <option value="intervals" selected>Intervals (active + recovery)</option>
+                  <option value="fartlek">Fartlek (varied segments)</option>
+                  <option value="progressive">Progressive (each split faster)</option>
+                  <option value="tempo">Tempo (sustained at target)</option>
+                  <option value="long">Long run (with target paces)</option>
+                </select>
+              </div>
+              <div class="tool-field">
+                <label>Session name</label>
+                <input type="text" id="ses-name" placeholder="e.g. Tuesday 6×800" autocomplete="off">
+              </div>
+              <div class="tool-field">
+                <label>Quick preset</label>
+                <select id="ses-preset">
+                  <option value="">— pick to fill —</option>
+                  <option value="6x400">Intervals · 6 × 400 m @ 1:30 + 200 m jog</option>
+                  <option value="5x1k">Intervals · 5 × 1 km @ 4:00 + 90 s jog</option>
+                  <option value="pyramid">Intervals · Pyramid 200/400/800/400/200</option>
+                  <option value="prog5k">Progressive · 5 × 1 km descending 5:30 → 4:30</option>
+                  <option value="tempo20">Tempo · 20 min @ 4:30 (+ 10 min w/u, 10 min c/d)</option>
+                  <option value="long15">Long · 15 km easy with last 3 km at MP</option>
+                  <option value="fartlek30">Fartlek · 30 min, 1 min hard / 1 min easy</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="ses-segments"></div>
+
+            <div class="session-toolbar">
+              <button type="button" class="session-add-row" id="ses-add-active">+ Active segment</button>
+              <button type="button" class="session-add-row" id="ses-add-recovery">+ Recovery</button>
+              <button type="button" class="session-add-row" id="ses-clear">⌫ Clear all</button>
+            </div>
+
+            <div class="tool-result" id="ses-result"></div>
+
+            <div class="session-toolbar" style="margin-top:0.6em;">
+              <button type="button" class="session-action" id="ses-save">💾 Save session</button>
+              <button type="button" class="session-action" id="ses-export-tcx">⬇ Export TCX (Garmin)</button>
+              <button type="button" class="session-action" id="ses-export-json">{ } Export JSON</button>
+            </div>
+
+            <div id="ses-saved-wrap" style="margin-top:1em;display:none;">
+              <div style="font-size:0.78em;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.3em;">Saved sessions (this browser only)</div>
+              <ul class="session-saved-list" id="ses-saved-list"></ul>
+            </div>
+
+            <details style="margin-top:1.2em;">
+              <summary style="cursor:pointer;font-size:0.84em;color:#666;font-weight:600;padding:0.4em 0;">Heart-rate zones reference</summary>
+              <div class="session-hr-zones">
+                <table>
+                  <thead><tr><th>Zone</th><th>%HR<sub>max</sub></th><th>%HRR / %LTHR</th><th>Effort &amp; purpose</th></tr></thead>
+                  <tbody>
+                    <tr><td><span class="hr-col-z hr-z1">Z1</span></td><td>50–60 %</td><td>50–60 %</td><td><strong>Recovery / very easy.</strong> Conversational. Fat oxidation, capillary density, recovery between hard days.</td></tr>
+                    <tr><td><span class="hr-col-z hr-z2">Z2</span></td><td>60–70 %</td><td>60–75 %</td><td><strong>Aerobic / easy.</strong> Still able to talk in full sentences. Bulk of weekly volume — mitochondrial, capillary, stroke-volume adaptations.</td></tr>
+                    <tr><td><span class="hr-col-z hr-z3">Z3</span></td><td>70–80 %</td><td>75–87 %</td><td><strong>Marathon / steady "grey zone".</strong> Phrases, not full sentences. Builds aerobic ceiling but high-cost; polarized models avoid it.</td></tr>
+                    <tr><td><span class="hr-col-z hr-z4">Z4</span></td><td>80–90 %</td><td>87–95 %</td><td><strong>Threshold / hard.</strong> Few words at a time. Sustainable ~30–60 min. Lactate-clearance and tempo work live here.</td></tr>
+                    <tr><td><span class="hr-col-z hr-z5">Z5</span></td><td>90–100 %</td><td>95–100 %</td><td><strong>VO₂max / max effort.</strong> Cannot speak. 3–5 min reps; develops top-end aerobic power and neuromuscular drive.</td></tr>
+                  </tbody>
+                </table>
+                <div style="font-size:0.74em;color:#888;margin-top:0.5em;line-height:1.55;">
+                  HR<sub>max</sub> ≈ 220 − age (rough). HRR (Karvonen) = HR<sub>max</sub> − HR<sub>rest</sub>. LTHR (lactate-threshold HR) is more accurate than %HR<sub>max</sub> if known. Best practice: tag each segment with the intended zone, then verify against your watch after the run.
+                </div>
+              </div>
+            </details>
+
+            <div class="tool-note">
+              <strong>How averages are computed.</strong>
+              For each segment we know distance <em>d</em> (km) and pace <em>p</em> (s/km), or time <em>t</em> (s) — whichever is supplied — and derive the missing one as <em>t = d·p</em>.
+              <br>· <strong>Active total</strong>: sum of <em>d</em> and <em>t</em> over rows tagged <em>active</em>; average pace = Σt<sub>active</sub> / Σd<sub>active</sub>.
+              <br>· <strong>Session total</strong>: sum across <strong>all</strong> rows (active + recovery); average pace = Σt<sub>all</sub> / Σd<sub>all</sub>.
+              <br>For a progressive run, drop all rows into "active" and the average pace falls out as the distance-weighted mean of the splits.
+              <br><br>
+              <strong>TCX export.</strong> Generates a Garmin Connect-compatible Training Center XML file with one Course / Workout block. Open Garmin Connect → "Training" → "Workouts" → "Import workout" and pick the file; from there it syncs to your watch. <em>Apple Watch is not supported</em> (no public import format); a third-party app like HealthFit or RunGap would be needed to convert TCX → HealthKit.
+              <br><br>
+              <strong>Saved sessions</strong> live only in this browser's <code>localStorage</code> (no server). Clearing site data wipes them.
+            </div>
+          </div>
         </div>
 
         <!-- ════════════════════════════════
@@ -1257,6 +1805,7 @@
                   <button class="active" data-mode="between">Between two dates</button>
                   <button data-mode="until">Until / since a date</button>
                   <button data-mode="add">Date ± offset</button>
+                  <button data-mode="recur">Recurrence</button>
                 </div>
               </div>
             </div>
@@ -1279,6 +1828,32 @@
                 <div class="tool-field">
                   <label>Target date</label>
                   <input type="date" id="date-target">
+                </div>
+              </div>
+            </div>
+
+            <div id="date-mode-recur" class="date-mode-block" style="display:none;">
+              <div class="tool-row" style="align-items:flex-end;">
+                <div class="tool-field">
+                  <label>Start date</label>
+                  <input type="date" id="date-recur-start">
+                </div>
+                <div class="tool-field">
+                  <label>Every</label>
+                  <input type="number" id="date-recur-n" value="2" min="1" step="1" onclick="this.select()">
+                </div>
+                <div class="tool-field">
+                  <label>Unit</label>
+                  <select id="date-recur-unit">
+                    <option value="day">days</option>
+                    <option value="week" selected>weeks</option>
+                    <option value="month">months</option>
+                    <option value="year">years</option>
+                  </select>
+                </div>
+                <div class="tool-field">
+                  <label>Show next</label>
+                  <input type="number" id="date-recur-count" value="6" min="1" max="24" step="1" onclick="this.select()">
                 </div>
               </div>
             </div>
@@ -1342,6 +1917,36 @@
     var params = new URLSearchParams(window.location.search);
     var initial = params.get('tool') || 'running';
     showTool(initial);
+  })();
+  </script>
+
+  <script>
+  // ── iOS auto-zoom guard ─────────────────────────────────
+  // Belt-and-braces: the CSS rule forcing 16px on inputs at ≤700 px already
+  // prevents iOS Safari from auto-zooming on focus. This adds a JS fallback
+  // that briefly disables zoom on input focus and forces a viewport recompute
+  // on blur — so even if a stray un-styled field triggered zoom, releasing
+  // the field returns the page to scale 1.0. Pinch-zoom remains available
+  // outside editing.
+  (function () {
+    if (!/iPhone|iPad|iPod/i.test(navigator.userAgent)) return;
+    var meta = document.querySelector('meta[name="viewport"]');
+    if (!meta) return;
+    var BASE   = 'width=device-width, initial-scale=1.0';
+    var LOCKED = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0';
+    var EDITABLE = { INPUT: 1, TEXTAREA: 1, SELECT: 1 };
+    document.addEventListener('focusin', function (e) {
+      var t = e.target;
+      if (t && EDITABLE[t.tagName]) meta.setAttribute('content', LOCKED);
+    });
+    document.addEventListener('focusout', function (e) {
+      var t = e.target;
+      if (t && EDITABLE[t.tagName]) {
+        // Force iOS to re-evaluate scale on the next frame, then unlock zoom.
+        meta.setAttribute('content', LOCKED);
+        setTimeout(function () { meta.setAttribute('content', BASE); }, 50);
+      }
+    });
   })();
   </script>
 
@@ -1499,6 +2104,37 @@
 
     updateFromSecPerKm(300, null); // init 5:00 /km
 
+    // ── Grade-Adjusted Pace ─────────────────────────────────
+    // Strava-style cost curve: relative metabolic cost vs. flat at grade g (%).
+    // cost(g) ≈ 1 + 0.0327·g + 0.034·g²   (positive grade only)
+    // GAP = current pace × cost(avg grade)
+    function recomputeGAP() {
+      var resultEl = document.getElementById('run-gap-result');
+      var kmEl   = document.getElementById('run-gap-km');
+      var elevEl = document.getElementById('run-gap-elev');
+      if (!kmEl || !elevEl || !resultEl) return;
+      var km   = parseFloat(kmEl.value);
+      var elev = parseFloat(elevEl.value);
+      var paceSec = parsePace(document.getElementById('run-pace-km').value);
+      if (!km || km <= 0 || !paceSec || paceSec <= 0 || !isFinite(elev) || elev < 0) {
+        resultEl.style.display = 'none'; return;
+      }
+      var grade = (elev / (km * 1000)) * 100; // %
+      var cost  = 1 + 0.0327 * grade + 0.034 * grade * grade;
+      var flatPace = paceSec / cost;
+      resultEl.style.display = '';
+      resultEl.innerHTML =
+        '<div style="display:flex;gap:1.4em;flex-wrap:wrap;">'
+        + '<div><div class="result-big">' + fmtPace(flatPace) + ' /km</div><div class="result-label">Equivalent flat pace</div></div>'
+        + '<div><div class="result-big">' + grade.toFixed(1) + ' %</div><div class="result-label">Avg grade</div></div>'
+        + '<div><div class="result-big">×' + cost.toFixed(3) + '</div><div class="result-label">Cost factor</div></div>'
+        + '</div>';
+    }
+    document.getElementById('run-gap-km').addEventListener('input', recomputeGAP);
+    document.getElementById('run-gap-elev').addEventListener('input', recomputeGAP);
+    onCommit(document.getElementById('run-pace-km'), recomputeGAP);
+    recomputeGAP();
+
     // ── VO2max ──────────────────────────────────────────────
     // Shared math: VO₂max from (distance, time, gender) using Daniels-Gilbert (1979).
     function calcVO2maxFromRace(distKm, timeSec) {
@@ -1558,14 +2194,26 @@
         +   '<div class="vo2-labels">' + labels + '</div>'
         + '</div>';
     }
-    function renderVO2Result(VO2max, gender, predictedTimeSec) {
+    // Simplified WMA-style age decline: ~0.5 % per year past age 30 (linear-floor).
+    // Returns the equivalent VO₂max if the person were 30 years old.
+    function ageGradedVO2(VO2max, age) {
+      if (!age || age <= 30) return null;
+      var factor = 1 - Math.min(0.5, 0.005 * (age - 30));
+      return VO2max / factor;
+    }
+    function renderVO2Result(VO2max, gender, predictedTimeSec, source) {
       var el = document.getElementById('run-vo2-result');
       var cls = vo2Classification(VO2max, gender);
+      var age = parseFloat(document.getElementById('run-vo2-age').value) || 0;
       var html = '<div style="display:flex;gap:2em;flex-wrap:wrap;">'
-        + '<div><div class="result-big">' + VO2max.toFixed(1) + '</div><div class="result-label">mL · kg⁻¹ · min⁻¹</div></div>'
+        + '<div><div class="result-big">' + VO2max.toFixed(1) + '</div><div class="result-label">mL · kg⁻¹ · min⁻¹' + (source ? ' · ' + source : '') + '</div></div>'
         + '<div><div class="result-big">' + cls + '</div><div class="result-label">Classification (' + (gender === 'M' ? 'male' : 'female') + ')</div></div>';
       if (predictedTimeSec != null) {
         html += '<div><div class="result-big">' + fmtTime(predictedTimeSec) + '</div><div class="result-label">Predicted race time</div></div>';
+      }
+      var graded = ageGradedVO2(VO2max, age);
+      if (graded != null) {
+        html += '<div><div class="result-big">' + graded.toFixed(1) + '</div><div class="result-label">Age-graded (vs 30 y)</div></div>';
       }
       html += '</div>' + buildVO2Scale(VO2max, gender);
       el.style.display = '';
@@ -1578,7 +2226,7 @@
       var gender  = document.getElementById('run-vo2-gender').value;
       var el = document.getElementById('run-vo2-result');
       if (!distKm || !timeSec || timeSec <= 0) { el.style.display = 'none'; return; }
-      renderVO2Result(calcVO2maxFromRace(distKm, timeSec), gender, null);
+      renderVO2Result(calcVO2maxFromRace(distKm, timeSec), gender, null, 'from race time');
     });
 
     document.getElementById('run-vo2-rev-calc').addEventListener('click', function () {
@@ -1587,7 +2235,17 @@
       var gender = document.getElementById('run-vo2-gender').value;
       var el = document.getElementById('run-vo2-result');
       if (!VO2max || !distKm || VO2max < 10 || VO2max > 100) { el.style.display = 'none'; return; }
-      renderVO2Result(VO2max, gender, predictTimeFromVO2max(VO2max, distKm));
+      renderVO2Result(VO2max, gender, predictTimeFromVO2max(VO2max, distKm), 'manual input');
+    });
+
+    document.getElementById('run-vo2-hr-calc').addEventListener('click', function () {
+      var hrMax  = parseFloat(document.getElementById('run-vo2-hrmax').value) || 0;
+      var hrRest = parseFloat(document.getElementById('run-vo2-hrrest').value) || 0;
+      var gender = document.getElementById('run-vo2-gender').value;
+      var el = document.getElementById('run-vo2-result');
+      if (hrMax <= hrRest || hrRest < 30 || hrMax > 230) { el.style.display = 'none'; return; }
+      var VO2max = 15.3 * (hrMax / hrRest);
+      renderVO2Result(VO2max, gender, null, 'from HR<sub>max</sub>/HR<sub>rest</sub>');
     });
 
     // ── Race Predictor (Riegel) ──────────────────────────────
@@ -1725,7 +2383,126 @@
       } else {
         summary.style.display = 'none';
       }
+
+      // Monte Carlo overlay
+      var fmode = (document.querySelector('#fire-mode-toggle button.active') || {}).dataset;
+      if (fmode && fmode.fmode === 'mc') {
+        runMonteCarlo({
+          salary0: parseFloat(document.getElementById('fire-salary').value) || 0,
+          salGrowth: salGrowth, taxRate: taxRate, col: col, health: health,
+          inflation: inflation, returnRate: returnRate, vol: ((parseFloat(document.getElementById('fire-mc-vol').value) || 0) / 100),
+          cgt: cgt, invTax: invTax, safety: safety, oneoff: oneoff, years: years,
+          colMultiplier: colMultiplier, runs: parseInt(document.getElementById('fire-mc-runs').value, 10) || 1000,
+          curSym: curSym
+        });
+      } else {
+        var chartEl = document.getElementById('fire-mc-chart');
+        if (chartEl) chartEl.style.display = 'none';
+      }
     }
+
+    // ── Monte Carlo simulation ──────────────────────────────
+    // Box-Muller transform → standard-normal samples for return shocks.
+    function gaussian() {
+      var u = 1 - Math.random(), v = Math.random();
+      return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+    }
+    function runMonteCarlo(p) {
+      var paths = [];
+      var fireYears = [];
+      for (var run = 0; run < p.runs; run++) {
+        var portfolio = p.oneoff;
+        var salary = p.salary0;
+        var inflFactor = 1;
+        var path = [portfolio];
+        var fy = null;
+        for (var y = 0; y < p.years; y++) {
+          if (y > 0) { salary *= (1 + p.salGrowth); inflFactor *= (1 + p.inflation); }
+          var netIncome  = salary * (1 - p.taxRate);
+          var livingCost = (p.col + p.health) * p.colMultiplier * inflFactor;
+          var savings    = netIncome - livingCost;
+          // Return for this year sampled from N(returnRate, vol)
+          var rTrunc = Math.max(-0.5, Math.min(0.6, p.returnRate + p.vol * gaussian()));
+          portfolio = portfolio * (1 + rTrunc) + savings;
+          var passive  = portfolio * p.returnRate * (1 - p.cgt - p.invTax);
+          var required = livingCost * (1 + p.safety);
+          if (fy === null && passive >= required && portfolio > 0) fy = y + 1;
+          path.push(portfolio);
+        }
+        paths.push(path);
+        fireYears.push(fy);
+      }
+      // Compute percentile bands across paths at each year
+      var nY = p.years + 1;
+      function pct(arr, q) {
+        var s = arr.slice().sort(function (a, b) { return a - b; });
+        var idx = Math.max(0, Math.min(s.length - 1, Math.round(q * (s.length - 1))));
+        return s[idx];
+      }
+      var p10 = [], p50 = [], p90 = [];
+      for (var y = 0; y < nY; y++) {
+        var col = paths.map(function (pp) { return pp[y]; });
+        p10.push(pct(col, 0.10)); p50.push(pct(col, 0.50)); p90.push(pct(col, 0.90));
+      }
+      var success = fireYears.filter(function (v) { return v != null; }).length / fireYears.length;
+      var medFy = (function () {
+        var fy = fireYears.filter(function (v) { return v != null; }).sort(function (a, b) { return a - b; });
+        if (!fy.length) return null;
+        return fy[Math.floor(fy.length / 2)];
+      })();
+      renderMcChart(p10, p50, p90, success, medFy, p.curSym, p.years);
+    }
+    function renderMcChart(p10, p50, p90, success, medFy, curSym, years) {
+      var host = document.getElementById('fire-mc-chart');
+      if (!host) return;
+      host.style.display = '';
+      var W = 580, H = 240, padL = 50, padR = 12, padT = 18, padB = 26;
+      var w0 = host.clientWidth || 580; if (w0 < W) W = Math.max(320, w0);
+      var maxY = Math.max(p90[p90.length - 1], 1) * 1.05;
+      var sx = function (i) { return padL + (W - padL - padR) * (i / years); };
+      var sy = function (v) { return H - padB - (H - padT - padB) * (Math.max(0, v) / maxY); };
+      function pathOf(arr) { return arr.map(function (v, i) { return (i === 0 ? 'M' : 'L') + sx(i).toFixed(1) + ' ' + sy(v).toFixed(1); }).join(' '); }
+      // 10–90 band as filled area
+      var band = 'M' + sx(0).toFixed(1) + ' ' + sy(p90[0]).toFixed(1)
+        + p90.map(function (v, i) { return ' L' + sx(i).toFixed(1) + ' ' + sy(v).toFixed(1); }).join('')
+        + p10.slice().reverse().map(function (v, i) { var idx = years - i; return ' L' + sx(idx).toFixed(1) + ' ' + sy(v).toFixed(1); }).join('')
+        + ' Z';
+      // Y axis labels (4 ticks)
+      var yTicks = '';
+      for (var t = 0; t <= 4; t++) {
+        var yv = maxY * t / 4, yy = sy(yv);
+        var lbl = yv >= 1e6 ? (yv / 1e6).toFixed(1) + 'M' : (yv / 1e3).toFixed(0) + 'k';
+        yTicks += '<line x1="' + padL + '" x2="' + (W - padR) + '" y1="' + yy + '" y2="' + yy + '" stroke="#f0f0f0"/>'
+              +  '<text x="' + (padL - 6) + '" y="' + (yy + 3) + '" text-anchor="end" font-size="9" fill="#999">' + curSym + ' ' + lbl + '</text>';
+      }
+      var xTicks = '';
+      var step = Math.max(1, Math.round(years / 6));
+      for (var i = 0; i <= years; i += step) {
+        xTicks += '<text x="' + sx(i) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="9" fill="#999">Y' + i + '</text>';
+      }
+      host.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.6em;margin-bottom:0.4em;">'
+        + '<div style="font-size:0.78em;color:#666;font-weight:600;">'
+        +   'Monte Carlo · success rate: <strong style="color:' + (success > 0.7 ? '#166534' : success > 0.4 ? '#a16207' : '#991b1b') + ';">' + (success * 100).toFixed(0) + '%</strong>'
+        +   (medFy ? ' · median FIRE year: <strong>Y' + medFy + '</strong>' : ' · median: never')
+        + '</div>'
+        + '<div style="font-size:0.72em;color:#aaa;">Band = 10th–90th percentile · Line = median (50th)</div>'
+        + '</div>'
+        + '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:auto;display:block;" aria-label="Monte Carlo projection">'
+        + yTicks + xTicks
+        + '<path d="' + band + '" fill="rgba(93,96,99,0.18)" stroke="none"/>'
+        + '<path d="' + pathOf(p50) + '" fill="none" stroke="#5D6063" stroke-width="1.6"/>'
+        + '</svg>';
+    }
+
+    // FIRE projection-mode toggle
+    document.querySelectorAll('#fire-mode-toggle button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        document.querySelectorAll('#fire-mode-toggle button').forEach(function (x) { x.classList.remove('active'); });
+        b.classList.add('active');
+        document.getElementById('fire-mc-params').style.display = (b.dataset.fmode === 'mc') ? '' : 'none';
+        calc();
+      });
+    });
 
     document.querySelectorAll('#tool-fire input, #tool-fire select').forEach(function (el) {
       el.addEventListener('input', calc);
@@ -1738,12 +2515,45 @@
   // ── Net Salary Calculator ─────────────────────────────────
   (function () {
 
+    // Helpers used by every country's trace generator. fmtN keeps numbers
+    // readable; step() produces a single right-aligned line. Each calc returns
+    // a `trace` array of pre-rendered HTML strings.
+    function fmtN(n) {
+      if (!isFinite(n)) return '—';
+      return Math.round(n).toLocaleString('en-CH');
+    }
+    function step(label, formula, value) {
+      return label + ' <span class="step-eq">= ' + formula + ' =</span> '
+        + '<span class="step-val">' + fmtN(value) + '</span>';
+    }
+    function finalStep(label, value) {
+      return '<div class="step-final">' + label + ' = ' + fmtN(value) + '</div>';
+    }
+
     // Data: { brackets: [[upTo, rate], ...], ss: [[upTo, rate], ...], currency, note }
     // ss = social security (employee side)
     // brackets are marginal on taxable income
     var TAX_DATA = {
       IT: {
         currency: 'EUR', label: 'Italy',
+        meta: {
+          taxYear: '2024',
+          lastVerified: 'Mar 2026',
+          source: 'Agenzia delle Entrate — IRPEF brackets 2024 (DL 216/2023); INPS aliquote 2024.',
+          sourceUrl: 'https://www.agenziaentrate.gov.it/',
+          funds: [
+            ['INPS', 'pensions, sick leave, parental leave, unemployment (NASpI)'],
+            ['IRPEF (national)', 'general state budget — health, education, defence, infrastructure'],
+            ['Addizionale regionale', 'regional services (largely public health, transport)'],
+            ['Addizionale comunale', 'municipal services (waste, schools, social assistance)']
+          ],
+          caveats: [
+            '13th salary (tredicesima) and any 14th not modelled separately — assumed already included in gross.',
+            'Family deductions (coniuge, figli a carico) and bonus Renzi/IRPEF (€100/month under threshold) not applied.',
+            'Self-employment with VAT (Partita IVA) uses Gestione Separata + flat-rate or ordinary regime — not modelled.',
+            'Regional and municipal addizionali use a country-average (1.73 % + 0.5 %); your comune/regione may differ.'
+          ]
+        },
         calc: function (gross, status, emptype) {
           // INPS employee
           var inps = Math.min(gross, 47379) * 0.0919 + Math.max(0, gross - 47379) * 0.0000;
@@ -1761,17 +2571,38 @@
             else if (base <= 28000) det = 1910 + 1190 * (28000 - base) / 13000;
             else if (base <= 50000) det = 1910 * (50000 - base) / 22000;
           }
-          irpef = Math.max(0, irpef - det);
+          var irpefAfter = Math.max(0, irpef - det);
           // Addizionali
           var addReg = base * 0.0173;
           var addCom = base * 0.005;
-          var totalTax = irpef + addReg + addCom;
+          var totalTax = irpefAfter + addReg + addCom;
           var net = gross - inps - totalTax;
-          return { net: net, tax: totalTax, ss: inps,
+
+          var trace = [
+            step('INPS (employee)',
+                 'min(' + fmtN(gross) + ', 47 379) × 9.19 % + 0 above the ceiling', inps),
+            step('IRPEF base',
+                 fmtN(gross) + ' − ' + fmtN(inps) + ' (INPS deductible)', base),
+            (base <= 28000
+              ? step('IRPEF (1 bracket)', fmtN(base) + ' × 23 %', irpef)
+              : base <= 50000
+                ? step('IRPEF (2 brackets)', '28 000 × 23 % + (' + fmtN(base) + ' − 28 000) × 35 %', irpef)
+                : step('IRPEF (3 brackets)', '28 000 × 23 % + 22 000 × 35 % + (' + fmtN(base) + ' − 50 000) × 43 %', irpef)),
+            step('Detrazione lavoro dip.', emptype === 'employee'
+                  ? 'piecewise on base (1 955 → 0 from 15k → 50k)'
+                  : 'self-employed → 0', det),
+            step('IRPEF after detrazione', 'max(0, ' + fmtN(irpef) + ' − ' + fmtN(det) + ')', irpefAfter),
+            step('Add. regionale (1.73 %)', fmtN(base) + ' × 1.73 %', addReg),
+            step('Add. comunale (0.5 %)', fmtN(base) + ' × 0.5 %', addCom),
+            step('Total tax + SS', fmtN(inps) + ' + ' + fmtN(totalTax), inps + totalTax),
+            finalStep('Net', net)
+          ];
+
+          return { net: net, tax: totalTax, ss: inps, trace: trace,
             rows: [
               ['Gross', gross, '100%'],
               ['INPS (employee)', -inps, pct(inps,gross)],
-              ['IRPEF', -irpef, pct(irpef,gross)],
+              ['IRPEF', -irpefAfter, pct(irpefAfter,gross)],
               ['Regional + Municipal addizionale', -(addReg+addCom), pct(addReg+addCom,gross)],
               ['Net', net, pct(net,gross)]
             ]
@@ -1781,6 +2612,25 @@
       CH: {
         currency: 'CHF', label: 'Switzerland',
         regions: ['Zürich','Zug','Geneva','Bern','Basel-Stadt','Vaud','Ticino','Lucerne','Aargau','St. Gallen'],
+        meta: {
+          taxYear: '2024',
+          lastVerified: 'Mar 2026',
+          source: 'admin.ch — AHV 2024 rates, ALV ceiling CHF 148 200; cantonal effective rates from comparis.ch / cantonal tax administrations.',
+          sourceUrl: 'https://www.estv.admin.ch/',
+          funds: [
+            ['AHV / IV / EO', 'old-age + survivors + disability + loss-of-earnings (1st pillar pension)'],
+            ['ALV', 'unemployment insurance'],
+            ['NBUV', 'mandatory non-occupational accident insurance'],
+            ['BVG', 'occupational pension (2nd pillar) — employee share'],
+            ['Income tax', 'federal (modest), cantonal (largest share) and municipal services']
+          ],
+          caveats: [
+            'BVG modelled at a flat 7 % — real rate depends on age, salary, and pension plan choices (4–10 %).',
+            'Cantonal effective rate is interpolated from a coarse income table — actual tax bills depend on commune (Steuerfuss), confession (church tax), wealth, and family situation.',
+            'Quellensteuer (source taxation for foreigners on B/L permits) and Pillar 3a deductions not modelled.',
+            'Health insurance is private and NOT included here — typically CHF 300–600 / month per adult on top.'
+          ]
+        },
         calc: function (gross, status, emptype, region) {
           // Social security (employee)
           var ahv = gross * 0.053;
@@ -1802,9 +2652,24 @@
             'St. Gallen':  [[50000,0.105],[75000,0.15],[100000,0.185],[150000,0.23],[200000,0.265],[300000,0.305]]
           };
           var table = taxRates[region] || taxRates['Zürich'];
-          var incomeTax = gross * interpolate(table, gross);
+          var effRate = interpolate(table, gross);
+          var incomeTax = gross * effRate;
           var net = gross - ss - incomeTax;
-          return { net: net, tax: incomeTax, ss: ss,
+
+          var trace = [
+            step('AHV/IV/EO (5.30 %)', fmtN(gross) + ' × 5.3 %', ahv),
+            step('ALV (1.10 %)', 'min(' + fmtN(gross) + ', 148 200) × 1.1 %', alv),
+            step('NBUV (1.30 %)', fmtN(gross) + ' × 1.3 %', nbuv),
+            step('BVG (≈ 7 %)', fmtN(gross) + ' × 7 % — varies by age', bvg),
+            step('Total social security', fmtN(ahv) + ' + ' + fmtN(alv) + ' + ' + fmtN(nbuv) + ' + ' + fmtN(bvg), ss),
+            'Effective tax rate (' + (region || 'Zürich') + ') <span class="step-eq">≈</span> '
+              + '<span class="step-val">' + (effRate * 100).toFixed(2) + ' %</span> '
+              + '<span class="step-eq">— interpolated from cantonal table at gross ' + fmtN(gross) + '</span>',
+            step('Income tax', fmtN(gross) + ' × ' + (effRate * 100).toFixed(2) + ' %', incomeTax),
+            finalStep('Net', net)
+          ];
+
+          return { net: net, tax: incomeTax, ss: ss, trace: trace,
             rows: [
               ['Gross', gross, '100%'],
               ['AHV/IV/EO', -ahv, pct(ahv,gross)],
@@ -1819,6 +2684,26 @@
       },
       DE: {
         currency: 'EUR', label: 'Germany',
+        meta: {
+          taxYear: '2024',
+          lastVerified: 'Mar 2026',
+          source: 'Bundesfinanzministerium — Einkommensteuer 2024 (§ 32a EStG); Sozialversicherungs-Rechengrößenverordnung 2024.',
+          sourceUrl: 'https://www.bundesfinanzministerium.de/',
+          funds: [
+            ['Rentenversicherung (9.3 %)', 'state pension'],
+            ['Krankenversicherung (≈ 8.15 %)', 'statutory health insurance + Zusatzbeitrag (avg 1.7 %)'],
+            ['Arbeitslosenversicherung (1.3 %)', 'unemployment insurance'],
+            ['Pflegeversicherung (1.7 %)', 'long-term care insurance (childless add 0.6 %)'],
+            ['Lohnsteuer', 'general state budget'],
+            ['Soli', 'reunification / east-German reconstruction (now only on top earners)']
+          ],
+          caveats: [
+            'Single tax class (Steuerklasse I) assumed. Married splitting (Klasse III/V or IV) gives different rates.',
+            'Church tax (Kirchensteuer 8–9 % of income tax) not modelled.',
+            'Health insurance contribution capped at the BBG (Beitragsbemessungsgrenze ≈ €62 100 / yr 2024) — not enforced here.',
+            'Childless surcharge on Pflege not added; Pflege rate uses 1.7 % flat.'
+          ]
+        },
         calc: function (gross) {
           // Social security employee: pension 9.3%, health 7.3%+0.85avg, unemployment 1.3%, care 1.7%
           var ss = gross * (0.093 + 0.0815 + 0.013 + 0.017);
@@ -1834,7 +2719,29 @@
           var soli = tax > 18130 ? tax * 0.055 : 0;
           var totalTax = tax + soli;
           var net = gross - ss - totalTax;
-          return { net: net, tax: totalTax, ss: ss,
+
+          var trace = [
+            step('Rentenversicherung (9.3 %)', fmtN(gross) + ' × 9.3 %', gross * 0.093),
+            step('Krankenversicherung (≈ 8.15 %)', fmtN(gross) + ' × 8.15 %', gross * 0.0815),
+            step('Arbeitslosen (1.3 %)', fmtN(gross) + ' × 1.3 %', gross * 0.013),
+            step('Pflege (1.7 %)', fmtN(gross) + ' × 1.7 %', gross * 0.017),
+            step('Total SV (employee)', fmtN(gross) + ' × 18.45 %', ss),
+            step('Taxable income', fmtN(gross) + ' − 11 604 (Grundfreibetrag)', taxable),
+            (taxable === 0
+              ? 'Income tax <span class="step-eq">=</span> <span class="step-val">0</span> (below allowance)'
+              : taxable <= 15999
+                ? step('Lohnsteuer (zone 2)', '(979.18·y/10⁴ + 1 400)·y/10⁴ with y = ' + fmtN(taxable), tax)
+                : taxable <= 62809
+                  ? step('Lohnsteuer (zone 3)', '(192.59·z/10⁴ + 2 397)·z/10⁴ + 950.96 with z = y − 16 000', tax)
+                  : taxable <= 277825
+                    ? step('Lohnsteuer (zone 4, 42 %)', fmtN(taxable) + ' × 42 % − 9 972.98', tax)
+                    : step('Lohnsteuer (zone 5, 45 %)', fmtN(taxable) + ' × 45 % − 18 307.73', tax)
+            ),
+            step('Soli', tax > 18130 ? fmtN(tax) + ' × 5.5 % (above threshold)' : '0 (below new high-income threshold)', soli),
+            finalStep('Net', net)
+          ];
+
+          return { net: net, tax: totalTax, ss: ss, trace: trace,
             rows: [
               ['Gross', gross, '100%'],
               ['Social security (employee)', -ss, pct(ss,gross)],
@@ -1847,6 +2754,24 @@
       },
       FR: {
         currency: 'EUR', label: 'France',
+        meta: {
+          taxYear: '2024',
+          lastVerified: 'Mar 2026',
+          source: 'impots.gouv.fr — barème de l\'impôt sur le revenu 2024; URSSAF taux salariaux 2024.',
+          sourceUrl: 'https://www.impots.gouv.fr/',
+          funds: [
+            ['CSG + CRDS', 'social-debt repayment, social-protection general fund'],
+            ['Retraite (~6.9 %)', 'state pension (sécurité sociale + AGIRC-ARRCO complementary)'],
+            ['Assurance maladie / chômage', 'public health system; unemployment is now mostly employer-side'],
+            ['Impôt sur le revenu', 'general state budget']
+          ],
+          caveats: [
+            'Single fiscal household (1 part) assumed — quotient familial reduces tax for couples/families.',
+            'Charges sociales averaged at 22 %; cadres pay slightly more on AGIRC-ARRCO.',
+            'PFU (flat 30 %) on capital income, taxe d\'habitation, prélèvement à la source nuances not modelled.',
+            'CSG/CRDS deductibility approximated at 98.5 % of social charges.'
+          ]
+        },
         calc: function (gross) {
           // Charges sociales salarié ~22% (CSG+CRDS ~9.7% + retraite ~6.9% + assur ~0.75% + chômage 0% + complém ~3.15%)
           var ss = gross * 0.22;
@@ -1861,7 +2786,26 @@
           else if (taxable <= 177106) tax = (28797-11294)*0.11 + (82341-28797)*0.30 + (taxable-82341)*0.41;
           else                        tax = (28797-11294)*0.11 + (82341-28797)*0.30 + (177106-82341)*0.41 + (taxable-177106)*0.45;
           var net = gross - ss - tax;
-          return { net: net, tax: tax, ss: ss,
+
+          var trace = [
+            step('Charges sociales (≈ 22 %)', fmtN(gross) + ' × 22 %', ss),
+            step('Abattement 10 % (cap. 14 171)', 'min(' + fmtN(gross) + ' × 10 %, 14 171)', abat),
+            step('Revenu imposable',
+                 fmtN(gross) + ' − ' + fmtN(abat) + ' − ' + fmtN(ss) + ' × 98.5 %', taxable),
+            (taxable <= 11294
+              ? 'Impôt sur le revenu <span class="step-eq">=</span> <span class="step-val">0</span> (under 11 294)'
+              : taxable <= 28797
+                ? step('IR (1 tranche)', '(' + fmtN(taxable) + ' − 11 294) × 11 %', tax)
+                : taxable <= 82341
+                  ? step('IR (2 tranches)', '17 503 × 11 % + (' + fmtN(taxable) + ' − 28 797) × 30 %', tax)
+                  : taxable <= 177106
+                    ? step('IR (3 tranches)', '17 503·11 % + 53 544·30 % + (' + fmtN(taxable) + ' − 82 341) × 41 %', tax)
+                    : step('IR (4 tranches)', '… + (' + fmtN(taxable) + ' − 177 106) × 45 %', tax)
+            ),
+            finalStep('Net', net)
+          ];
+
+          return { net: net, tax: tax, ss: ss, trace: trace,
             rows: [
               ['Gross', gross, '100%'],
               ['Charges sociales salarié (~22%)', -ss, pct(ss,gross)],
@@ -1873,6 +2817,22 @@
       },
       GB: {
         currency: 'GBP', label: 'United Kingdom',
+        meta: {
+          taxYear: '2024/25',
+          lastVerified: 'Mar 2026',
+          source: 'HMRC — Income Tax & NI rates 2024/25 (England & NI; Scotland differs).',
+          sourceUrl: 'https://www.gov.uk/income-tax-rates',
+          funds: [
+            ['Income Tax', 'general state budget — NHS, education, defence, welfare'],
+            ['National Insurance (Class 1)', 'state pension, statutory sick / maternity pay, contributory benefits']
+          ],
+          caveats: [
+            'England & Northern Ireland brackets used. Scotland and Wales differ (Scotland in particular has a different starter/intermediate band).',
+            'Personal allowance taper above £100k modelled (£1 lost per £2 over).',
+            'Student loan repayments, pension salary sacrifice, and marriage allowance not modelled.',
+            'Self-employed pay Class 2 (flat) + Class 4 NI on profits — only Class 1 (employee) is shown here.'
+          ]
+        },
         calc: function (gross, status) {
           // Personal allowance (reduces above 100k)
           var pa = gross > 125140 ? 0 : Math.max(0, 12570 - Math.max(0, gross - 100000) / 2);
@@ -1888,7 +2848,27 @@
             if (gross > 50270) ni += (gross - 50270) * 0.02;
           }
           var net = gross - tax - ni;
-          return { net: net, tax: tax, ss: ni,
+
+          var trace = [
+            step('Personal allowance', gross > 100000
+                  ? 'max(0, 12 570 − (gross − 100 000)/2) — full taper above 125 140'
+                  : '12 570 (full)', pa),
+            step('Taxable income', fmtN(gross) + ' − ' + fmtN(pa), taxable),
+            (taxable <= 37700
+              ? step('Income tax (basic 20 %)', fmtN(taxable) + ' × 20 %', tax)
+              : taxable <= 125140
+                ? step('Income tax (basic + higher)', '37 700 × 20 % + (' + fmtN(taxable) + ' − 37 700) × 40 %', tax)
+                : step('Income tax (3 bands)', '37 700·20 % + … × 40 % + extra × 45 %', tax)
+            ),
+            step('NI (Class 1)', gross <= 12570
+                  ? '0 below primary threshold'
+                  : (gross <= 50270
+                      ? '(' + fmtN(gross) + ' − 12 570) × 8 %'
+                      : '(50 270 − 12 570) × 8 % + (' + fmtN(gross) + ' − 50 270) × 2 %'), ni),
+            finalStep('Net', net)
+          ];
+
+          return { net: net, tax: tax, ss: ni, trace: trace,
             rows: [
               ['Gross', gross, '100%'],
               ['National Insurance (employee)', -ni, pct(ni,gross)],
@@ -1900,13 +2880,31 @@
       },
       IE: {
         currency: 'EUR', label: 'Ireland',
+        meta: {
+          taxYear: '2024',
+          lastVerified: 'Mar 2026',
+          source: 'Revenue.ie — PAYE, USC and PRSI rates 2024.',
+          sourceUrl: 'https://www.revenue.ie/',
+          funds: [
+            ['PAYE (income tax)', 'general state budget'],
+            ['USC', 'introduced 2011, general fund (de-facto extra income tax)'],
+            ['PRSI Class A', 'state pension, jobseekers, treatment benefits, maternity pay']
+          ],
+          caveats: [
+            'Personal + PAYE tax credits at €1 875 each applied; other credits (rent, home carer, single-parent, etc.) not included.',
+            'USC bracket 2 % > €70 044 not refined for medical-card holders (different reduced rates).',
+            'PRSI uses 4 % flat above the threshold; subclasses (A0, AX, AL) ignored.',
+            'Married with one earner uses higher cutoff (€51 000); home-carer credit omitted.'
+          ]
+        },
         calc: function (gross, status) {
           var cutoff = status === 'married' ? 51000 : 42000;
-          var tax = 0;
-          if (gross <= cutoff) tax = gross * 0.20;
-          else                  tax = cutoff * 0.20 + (gross - cutoff) * 0.40;
+          var taxRaw = 0;
+          if (gross <= cutoff) taxRaw = gross * 0.20;
+          else                 taxRaw = cutoff * 0.20 + (gross - cutoff) * 0.40;
           // Tax credits
-          tax = Math.max(0, tax - 1875 - (gross > 8000 ? 1875 : 0)); // personal + PAYE credits
+          var credits = 1875 + (gross > 8000 ? 1875 : 0);
+          var tax = Math.max(0, taxRaw - credits);
           // USC
           var usc = 0;
           if (gross > 13000) {
@@ -1919,7 +2917,25 @@
           var prsi = gross > 18304 ? gross * 0.04 : 0;
           var ss = usc + prsi;
           var net = gross - tax - ss;
-          return { net: net, tax: tax, ss: ss,
+
+          var trace = [
+            step('Tax cutoff', status === 'married' ? '€51 000 (married/civil)' : '€42 000 (single)', cutoff),
+            step('Income tax (gross)',
+                 (gross <= cutoff
+                    ? fmtN(gross) + ' × 20 %'
+                    : fmtN(cutoff) + ' × 20 % + (' + fmtN(gross) + ' − ' + fmtN(cutoff) + ') × 40 %'),
+                 taxRaw),
+            step('Tax credits', 'Personal + PAYE', credits),
+            step('Income tax (net)', 'max(0, ' + fmtN(taxRaw) + ' − ' + fmtN(credits) + ')', tax),
+            step('USC',
+                 gross <= 13000 ? '0 below threshold'
+                 : '12 012 × 0.5 % + 10 908 × 2 % + 47 124 × 4 % + excess × 8 %',
+                 usc),
+            step('PRSI (4 %)', gross > 18304 ? fmtN(gross) + ' × 4 %' : '0 below threshold', prsi),
+            finalStep('Net', net)
+          ];
+
+          return { net: net, tax: tax, ss: ss, trace: trace,
             rows: [
               ['Gross', gross, '100%'],
               ['Income Tax', -tax, pct(tax,gross)],
@@ -1932,15 +2948,50 @@
       },
       NL: {
         currency: 'EUR', label: 'Netherlands',
+        meta: {
+          taxYear: '2024',
+          lastVerified: 'Mar 2026',
+          source: 'Belastingdienst — Box 1 tarieven 2024; arbeidskorting + algemene heffingskorting tabellen.',
+          sourceUrl: 'https://www.belastingdienst.nl/',
+          funds: [
+            ['Loonheffing (Box 1)', 'integrates national income tax + social premiums (AOW, Anw, Wlz)'],
+            ['AOW', 'state pension'],
+            ['Anw', 'survivors\' benefits'],
+            ['Wlz', 'long-term care insurance']
+          ],
+          caveats: [
+            '30 % ruling for incoming highly-skilled migrants is NOT applied (it would substantially raise net).',
+            'Mortgage interest deduction (hypotheekrenteaftrek) and other Box-1 deductions ignored.',
+            'Arbeidskorting and algemene heffingskorting use simplified linear taper; the actual taper has multiple kinks.',
+            'Pension contributions to private pension fund (white pension) not modelled.'
+          ]
+        },
         calc: function (gross) {
           // Box 1: 36.97% up to 73032, 49.5% above
-          var tax = gross <= 73032 ? gross * 0.3697 : 73032 * 0.3697 + (gross - 73032) * 0.495;
+          var taxGross = gross <= 73032 ? gross * 0.3697 : 73032 * 0.3697 + (gross - 73032) * 0.495;
           // Tax credits (arbeidskorting + algemene heffingskorting, simplified)
           var ahk = gross <= 22660 ? 3374 : Math.max(0, 3374 - (gross - 22660) * 0.0636);
           var ak  = gross <= 39957 ? 5052 : Math.max(0, 5052 - (gross - 39957) * 0.06095);
-          tax = Math.max(0, tax - ahk - ak);
+          var tax = Math.max(0, taxGross - ahk - ak);
           var net = gross - tax;
-          return { net: net, tax: tax, ss: 0,
+
+          var trace = [
+            step('Loonheffing (gross)',
+                 (gross <= 73032
+                    ? fmtN(gross) + ' × 36.97 %'
+                    : '73 032 × 36.97 % + (' + fmtN(gross) + ' − 73 032) × 49.5 %'),
+                 taxGross),
+            step('Algemene heffingskorting',
+                 gross <= 22660 ? '3 374 (full)' : 'max(0, 3 374 − (' + fmtN(gross) + ' − 22 660) × 6.36 %)',
+                 ahk),
+            step('Arbeidskorting',
+                 gross <= 39957 ? '5 052 (full)' : 'max(0, 5 052 − (' + fmtN(gross) + ' − 39 957) × 6.095 %)',
+                 ak),
+            step('Loonheffing (net)', 'max(0, ' + fmtN(taxGross) + ' − ' + fmtN(ahk + ak) + ')', tax),
+            finalStep('Net', net)
+          ];
+
+          return { net: net, tax: tax, ss: 0, trace: trace,
             rows: [
               ['Gross', gross, '100%'],
               ['Loonheffing (incl. social contributions)', -tax, pct(tax, gross)],
@@ -1951,9 +3002,27 @@
       },
       BE: {
         currency: 'EUR', label: 'Belgium',
+        meta: {
+          taxYear: '2024',
+          lastVerified: 'Mar 2026',
+          source: 'SPF Finances — barème IPP 2024 (revenus 2023); ONSS taux salarié 13.07 %.',
+          sourceUrl: 'https://finances.belgium.be/',
+          funds: [
+            ['ONSS (13.07 %)', 'pensions, healthcare, unemployment, family allowances, work injuries'],
+            ['Impôt fédéral', 'general state budget'],
+            ['Centimes additionnels (≈ 7 %)', 'commune-level surcharge on federal income tax']
+          ],
+          caveats: [
+            'Quotient conjugal and tax-free allowance for dependents not modelled.',
+            'Professional-expense deduction simplified to 5 % (true rule has caps and steps).',
+            'Regional surcharge averaged at 7 %; individual communes range 0–9 %.',
+            'Special social security contribution (cotisation spéciale) not added.'
+          ]
+        },
         calc: function (gross) {
           var ss = gross * 0.1307;
-          var taxable = gross - ss - gross * 0.05; // professional expense deduction (5%, capped)
+          var profExp = gross * 0.05;
+          var taxable = gross - ss - profExp;
           // Federal brackets + regional ~7%
           var fed = 0;
           if (taxable <= 15200)       fed = taxable * 0.25;
@@ -1963,7 +3032,17 @@
           var reg = fed * 0.07; // average regional centimes
           var tax = fed + reg;
           var net = gross - ss - tax;
-          return { net: net, tax: tax, ss: ss,
+
+          var trace = [
+            step('ONSS (13.07 %)', fmtN(gross) + ' × 13.07 %', ss),
+            step('Frais professionnels (5 %)', fmtN(gross) + ' × 5 %', profExp),
+            step('Revenu imposable', fmtN(gross) + ' − ' + fmtN(ss) + ' − ' + fmtN(profExp), taxable),
+            step('Impôt fédéral (4 tranches)', '25 % up to 15 200 → 40 % → 45 % → 50 % above 46 440', fed),
+            step('Centimes addit. (≈ 7 %)', fmtN(fed) + ' × 7 %', reg),
+            finalStep('Net', net)
+          ];
+
+          return { net: net, tax: tax, ss: ss, trace: trace,
             rows: [
               ['Gross', gross, '100%'],
               ['Social contributions (13.07%)', -ss, pct(ss,gross)],
@@ -1976,6 +3055,24 @@
       },
       SE: {
         currency: 'SEK', label: 'Sweden',
+        meta: {
+          taxYear: '2024',
+          lastVerified: 'Mar 2026',
+          source: 'Skatteverket — kommunalskatt average ≈ 32 %; statlig skatt threshold 598 500 SEK 2024.',
+          sourceUrl: 'https://www.skatteverket.se/',
+          funds: [
+            ['Allmän pension (7 %)', 'state pension (employee share — most pension is paid by employer)'],
+            ['Kommunalskatt (≈ 32 %)', 'municipality + region: schools, healthcare, social services'],
+            ['Statlig skatt (20 %)', 'national budget — defence, courts, universities (only on top earners)'],
+            ['Jobbskatteavdrag', 'in-work tax credit, refunds part of kommunalskatt']
+          ],
+          caveats: [
+            'Kommunalskatt rate varies 28.98–35.15 % by municipality; 32 % is a country-wide average.',
+            'Jobbskatteavdrag is approximated linearly; the real credit has multiple income brackets and uses prisbasbelopp.',
+            'Statlig skatt above 598 500 SEK uses 20 % flat (the 25 % "värnskatt" was abolished in 2020).',
+            'Church-tax (begravningsavgift / kyrkoavgift) for Svenska kyrkan members not modelled.'
+          ]
+        },
         calc: function (gross) {
           var pension = gross * 0.07; // allmän pension (employee)
           var kommunal = (gross - pension) * 0.32; // ~32% kommunalskatt
@@ -1985,7 +3082,20 @@
           var jsd = Math.min(gross * 0.15, 34000);
           var tax = Math.max(0, kommunal + statlig - jsd);
           var net = gross - pension - tax;
-          return { net: net, tax: tax, ss: pension,
+
+          var trace = [
+            step('Allmän pension (7 %)', fmtN(gross) + ' × 7 %', pension),
+            step('Pensionable base', fmtN(gross) + ' − ' + fmtN(pension), gross - pension),
+            step('Kommunalskatt (≈ 32 %)', fmtN(gross - pension) + ' × 32 %', kommunal),
+            step('Statlig skatt (20 %)',
+                 gross > 598500 ? '(' + fmtN(gross) + ' − 598 500) × 20 %' : '0 below threshold',
+                 statlig),
+            step('Jobbskatteavdrag', 'min(' + fmtN(gross) + ' × 15 %, 34 000) — credit', jsd),
+            step('Total tax', 'max(0, kommunal + statlig − JSD)', tax),
+            finalStep('Net', net)
+          ];
+
+          return { net: net, tax: tax, ss: pension, trace: trace,
             rows: [
               ['Gross', gross, '100%'],
               ['Allmän pension (employee 7%)', -pension, pct(pension,gross)],
@@ -1999,6 +3109,23 @@
       },
       NO: {
         currency: 'NOK', label: 'Norway',
+        meta: {
+          taxYear: '2024',
+          lastVerified: 'Mar 2026',
+          source: 'Skatteetaten — Trinnskatt and trygdeavgift rates 2024.',
+          sourceUrl: 'https://www.skatteetaten.no/',
+          funds: [
+            ['Trygdeavgift (7.8 %)', 'national insurance: pension, sick / parental leave, unemployment'],
+            ['Flat tax (22 %)', 'general state + municipal services'],
+            ['Trinnskatt', 'progressive top-up tax (4 brackets)']
+          ],
+          caveats: [
+            'Personal allowance (personfradrag) of 88 250 NOK for 2024 applied; it changes yearly.',
+            'Wealth tax (formuesskatt) and oil-fund-related particulars not relevant for income calc.',
+            'Trinnskatt rates use nominal 2024 thresholds; real values change with the budget.',
+            'Membership in Den norske kirke (church tax) and union dues not modelled.'
+          ]
+        },
         calc: function (gross) {
           var trygd = gross * 0.078; // trygdeavgift
           var pa = 88250;
@@ -2012,7 +3139,17 @@
           if (gross > 937900) trinn += (gross - 937900) * 0.166;
           var tax = flat + trinn;
           var net = gross - trygd - tax;
-          return { net: net, tax: tax, ss: trygd,
+
+          var trace = [
+            step('Trygdeavgift (7.8 %)', fmtN(gross) + ' × 7.8 %', trygd),
+            step('Personfradrag', '88 250 NOK', pa),
+            step('Taxable income', fmtN(gross) + ' − 88 250', taxable),
+            step('Flat tax (22 %)', fmtN(taxable) + ' × 22 %', flat),
+            step('Trinnskatt', '1.7 / 4.0 / 13.6 / 16.6 % over 208 050 / 292 850 / 670 000 / 937 900', trinn),
+            finalStep('Net', net)
+          ];
+
+          return { net: net, tax: tax, ss: trygd, trace: trace,
             rows: [
               ['Gross', gross, '100%'],
               ['Trygdeavgift (7.8%)', -trygd, pct(trygd,gross)],
@@ -2025,6 +3162,24 @@
       },
       DK: {
         currency: 'DKK', label: 'Denmark',
+        meta: {
+          taxYear: '2024',
+          lastVerified: 'Mar 2026',
+          source: 'Skat.dk — bundskat 12.06 %, average kommuneskat 25.4 %, topskat threshold 568 900 DKK 2024.',
+          sourceUrl: 'https://skat.dk/',
+          funds: [
+            ['Arbejdsmarkedsbidrag (8 %)', 'labour-market fund: unemployment, training, sickness'],
+            ['Bundskat (12.06 %)', 'national income tax (bottom)'],
+            ['Kommuneskat (≈ 25.4 %)', 'municipal tax: schools, eldercare, local services'],
+            ['Topskat (15 %)', 'high-income surtax — only above ~568 900 DKK 2024']
+          ],
+          caveats: [
+            'Personal allowance (personfradrag) of 49 700 DKK applied; it differs slightly for residents under 18.',
+            'Kommuneskat 25.4 % is country-average; range 22.8–27.8 % across kommuner.',
+            'Church tax (kirkeskat ≈ 0.65 % avg) for folkekirken members not modelled.',
+            'Skatteloft (combined ceiling ~52.07 %) and labour-market deduction (beskæftigelsesfradrag) ignored.'
+          ]
+        },
         calc: function (gross) {
           var am = gross * 0.08; // arbejdsmarkedsbidrag
           var pa = 49700;
@@ -2034,7 +3189,18 @@
           var topskat = gross > 568900 ? (gross - 568900) * 0.15 : 0;
           var tax = bundskat + kommuneskat + topskat;
           var net = gross - am - tax;
-          return { net: net, tax: tax, ss: am,
+
+          var trace = [
+            step('AM-bidrag (8 %)', fmtN(gross) + ' × 8 %', am),
+            step('Personfradrag', '49 700 DKK', pa),
+            step('Skattepligtig indkomst', fmtN(gross) + ' − ' + fmtN(am) + ' − ' + fmtN(pa), taxable),
+            step('Bundskat (12.06 %)', fmtN(taxable) + ' × 12.06 %', bundskat),
+            step('Kommuneskat (≈ 25.4 %)', fmtN(taxable) + ' × 25.4 %', kommuneskat),
+            step('Topskat (15 %)', gross > 568900 ? '(' + fmtN(gross) + ' − 568 900) × 15 %' : '0 below threshold', topskat),
+            finalStep('Net', net)
+          ];
+
+          return { net: net, tax: tax, ss: am, trace: trace,
             rows: [
               ['Gross', gross, '100%'],
               ['Arbejdsmarkedsbidrag (8%)', -am, pct(am,gross)],
@@ -2047,6 +3213,23 @@
       },
       US: {
         currency: 'USD', label: 'United States (federal)',
+        meta: {
+          taxYear: '2024',
+          lastVerified: 'Mar 2026',
+          source: 'IRS — 2024 federal tax brackets, standard deduction, FICA wage base $168 600.',
+          sourceUrl: 'https://www.irs.gov/',
+          funds: [
+            ['Social Security (6.2 %)', 'OASDI: retirement, survivor, disability benefits'],
+            ['Medicare (1.45 % + 0.9 %)', 'Medicare hospital insurance (Part A) + Additional Medicare Tax above $200k'],
+            ['Federal income tax', 'general federal budget: defence, social services, federal debt service']
+          ],
+          caveats: [
+            'STATE income tax NOT included. Your real take-home depends heavily on state (0 % in TX/FL, ~13 % top in CA).',
+            'Standard deduction used; itemized deductions, HSA / 401(k) pre-tax, ACA premium tax credit ignored.',
+            'Filing status only handles "single" vs "married joint". Head-of-household and married-separate use other brackets.',
+            'No Earned Income Tax Credit, Child Tax Credit, or AMT modelled.'
+          ]
+        },
         calc: function (gross, status) {
           var stdDed = status === 'married' ? 29200 : 14600;
           var taxable = Math.max(0, gross - stdDed);
@@ -2057,13 +3240,27 @@
           brackets.forEach(function(b) {
             if (taxable > prev) { tax += (Math.min(taxable,b[0])-prev)*b[1]; prev = b[0]; }
           });
-          if (taxable > (status==='married'?731200:609350)) tax += (taxable - (status==='married'?731200:609350)) * 0.37;
+          var top = status==='married'?731200:609350;
+          if (taxable > top) tax += (taxable - top) * 0.37;
           // FICA
           var ssTax = Math.min(gross, 168600) * 0.062;
-          var medicare = gross * 0.0145 + (gross > 200000 ? (gross - 200000) * 0.009 : 0);
+          var medicareBase = gross * 0.0145;
+          var medicareAddl = gross > 200000 ? (gross - 200000) * 0.009 : 0;
+          var medicare = medicareBase + medicareAddl;
           var ss = ssTax + medicare;
           var net = gross - tax - ss;
-          return { net: net, tax: tax, ss: ss,
+
+          var trace = [
+            step('Standard deduction', status === 'married' ? '$29 200 (married joint)' : '$14 600 (single)', stdDed),
+            step('Taxable income', fmtN(gross) + ' − ' + fmtN(stdDed), taxable),
+            step('Federal income tax', '7-bracket schedule (10/12/22/24/32/35/37 %)', tax),
+            step('Social Security (6.2 %)', 'min(' + fmtN(gross) + ', 168 600) × 6.2 %', ssTax),
+            step('Medicare (1.45 %)', fmtN(gross) + ' × 1.45 %', medicareBase),
+            step('Additional Medicare (0.9 %)', gross > 200000 ? '(' + fmtN(gross) + ' − 200 000) × 0.9 %' : '0 below threshold', medicareAddl),
+            finalStep('Net (federal only)', net)
+          ];
+
+          return { net: net, tax: tax, ss: ss, trace: trace,
             rows: [
               ['Gross', gross, '100%'],
               ['Social Security (6.2%)', -ssTax, pct(ssTax,gross)],
@@ -2076,6 +3273,26 @@
       },
       JP: {
         currency: 'JPY', label: 'Japan',
+        meta: {
+          taxYear: '2024',
+          lastVerified: 'Mar 2026',
+          source: 'National Tax Agency 国税庁 — Income Tax Act, employment-income deduction tables 2024.',
+          sourceUrl: 'https://www.nta.go.jp/',
+          funds: [
+            ['Pension (≈ 9.15 %)', 'kōsei nenkin (employee\'s pension)'],
+            ['Health insurance (≈ 5 %)', 'kenkō hoken (society-managed or kyōkai-kenpo)'],
+            ['Employment insurance (≈ 0.6 %)', 'koyō hoken — unemployment, training subsidies'],
+            ['National income tax', 'general state budget'],
+            ['Local tax (10 %)', 'prefecture (4 %) + municipality (6 %): schools, infrastructure, social welfare'],
+            ['Restoration surtax (× 1.021)', '2.1 % surcharge funding 2011 Tōhoku earthquake reconstruction (until 2037)']
+          ],
+          caveats: [
+            'Single, no dependents assumed. Spouse / dependent deductions and earnings cap on health-insurance contributions ignored.',
+            'Social-insurance rate uses a flat 14.8 %; actual contributions are stepped (35 standard remuneration brackets).',
+            'Local tax simplified to 10 % of taxable income; actually 4 % prefectural + 6 % municipal + a per-capita levy of ~5 000 JPY.',
+            'Furusato nōzei (hometown tax) and life / earthquake insurance deductions not modelled.'
+          ]
+        },
         calc: function (gross) {
           // Employment income deduction
           var eid = 0;
@@ -2088,21 +3305,33 @@
           var basicDed = 480000;
           var taxable = Math.max(0, gross - eid - basicDed);
           // National income tax
-          var nat = 0;
+          var natRaw = 0;
           var natBrackets = [[1950000,0.05],[3300000,0.10],[6950000,0.20],[9000000,0.23],[18000000,0.33],[40000000,0.40]];
           var prev = 0;
           natBrackets.forEach(function(b) {
-            if (taxable > prev) { nat += (Math.min(taxable,b[0])-prev)*b[1]; prev = b[0]; }
+            if (taxable > prev) { natRaw += (Math.min(taxable,b[0])-prev)*b[1]; prev = b[0]; }
           });
-          if (taxable > 40000000) nat += (taxable - 40000000) * 0.45;
-          nat *= 1.021; // restoration surtax
+          if (taxable > 40000000) natRaw += (taxable - 40000000) * 0.45;
+          var nat = natRaw * 1.021; // restoration surtax
           // Local tax 10% flat
           var local = taxable * 0.10;
           // Social insurance ~15% simplified (health ~5%, pension ~9.15%, employment ~0.6%)
           var ss = gross * 0.148;
           var tax = nat + local;
           var net = gross - ss - tax;
-          return { net: net, tax: tax, ss: ss,
+
+          var trace = [
+            step('Employment-income deduction', 'piecewise on gross (capped at 1 950 000)', eid),
+            step('Basic deduction', '480 000 (under 24 M income)', basicDed),
+            step('Taxable income', fmtN(gross) + ' − ' + fmtN(eid) + ' − 480 000', taxable),
+            step('National tax (raw)', '7-bracket schedule (5/10/20/23/33/40/45 %)', natRaw),
+            step('Restoration surtax', fmtN(natRaw) + ' × 1.021', nat),
+            step('Local inhabitant tax (10 %)', fmtN(taxable) + ' × 10 %', local),
+            step('Social insurance (≈ 14.8 %)', fmtN(gross) + ' × 14.8 %', ss),
+            finalStep('Net', net)
+          ];
+
+          return { net: net, tax: tax, ss: ss, trace: trace,
             rows: [
               ['Gross', gross, '100%'],
               ['Social insurance (~14.8%)', -ss, pct(ss,gross)],
@@ -2115,6 +3344,25 @@
       },
       KR: {
         currency: 'KRW', label: 'South Korea',
+        meta: {
+          taxYear: '2024',
+          lastVerified: 'Mar 2026',
+          source: 'National Tax Service 국세청 — Income Tax Act 2024; NPS / NHIS 2024 rates.',
+          sourceUrl: 'https://www.nts.go.kr/',
+          funds: [
+            ['NPS (4.5 %)', 'national pension'],
+            ['Health insurance (3.545 %) + LTC (≈ 0.46 %)', 'NHIS health + long-term care'],
+            ['Employment insurance (0.9 %)', 'unemployment + retraining'],
+            ['National income tax', 'general state budget'],
+            ['Local income tax (10 %)', 'metropolitan / city / county / district services']
+          ],
+          caveats: [
+            'Single filer with basic deduction of 1 500 000 KRW; spouse / dependents / education credits not modelled.',
+            'Long-term-care contribution (currently ≈ 0.4581 % of gross, formally 12.95 % of health premium) folded into the simple 3.545 %.',
+            'NPS contribution capped at 553 0000 KRW × 12 monthly base; minimum-wage floor not enforced.',
+            'Year-end settlement (연말정산) deductions for housing / pension / cards / insurance ignored.'
+          ]
+        },
         calc: function (gross) {
           // Employment income deduction
           var eid = 0;
@@ -2136,7 +3384,19 @@
           var ss = Math.min(gross, 5530000*12) * 0.045 + gross * (0.03545 + 0.009);
           var tax = nat + local;
           var net = gross - ss - tax;
-          return { net: net, tax: tax, ss: ss,
+
+          var trace = [
+            step('Employment-income deduction', 'piecewise (70 %/40 %/15 %/5 %/2 % stages)', eid),
+            step('Basic deduction', '1 500 000 KRW', 1500000),
+            step('Taxable income', fmtN(gross) + ' − ' + fmtN(eid) + ' − 1 500 000', taxable),
+            step('National income tax', '8-bracket schedule (6/15/24/35/38/40/42/45 %)', nat),
+            step('Local income tax (10 %)', fmtN(nat) + ' × 10 %', local),
+            step('NPS (4.5 %)', 'min(' + fmtN(gross) + ', 66.36 M) × 4.5 %', Math.min(gross, 5530000*12) * 0.045),
+            step('Health + Employment ins.', fmtN(gross) + ' × (3.545 % + 0.9 %)', gross * (0.03545 + 0.009)),
+            finalStep('Net', net)
+          ];
+
+          return { net: net, tax: tax, ss: ss, trace: trace,
             rows: [
               ['Gross', gross, '100%'],
               ['NPS + Health + Employment ins.', -ss, pct(ss,gross)],
@@ -2215,6 +3475,42 @@
           + '<td style="color:#aaa;">' + row[2] + '</td>';
         tbody.appendChild(tr);
       });
+
+      // Currency cross-link: refresh conversion if a target is set
+      updateFxConversion(res.net, cur);
+
+      // Details panel (formula trace, source, what-this-funds, caveats)
+      var meta = data.meta || {};
+      var srcEl = document.getElementById('sal-source');
+      srcEl.innerHTML =
+        '<strong>Tax year:</strong> ' + (meta.taxYear || '—')
+        + ' &nbsp;·&nbsp; <strong>Last verified:</strong> ' + (meta.lastVerified || '—')
+        + (meta.source
+            ? '<br><strong>Source:</strong> '
+              + (meta.sourceUrl
+                  ? '<a href="' + meta.sourceUrl + '" target="_blank" rel="noopener noreferrer">' + meta.source + '</a>'
+                  : meta.source)
+            : '');
+
+      var traceEl = document.getElementById('sal-trace');
+      if (res.trace && res.trace.length) {
+        traceEl.innerHTML = res.trace.map(function (line) {
+          if (line.indexOf('step-final') !== -1) return line; // already wrapped
+          return '<div>' + line + '</div>';
+        }).join('');
+      } else {
+        traceEl.textContent = 'Detailed trace not yet available for this country.';
+      }
+
+      var fundsEl = document.getElementById('sal-funds');
+      fundsEl.innerHTML = (meta.funds || []).map(function (f) {
+        return '<li><strong>' + f[0] + '</strong> — ' + f[1] + '</li>';
+      }).join('') || '<li>—</li>';
+
+      var caveatsEl = document.getElementById('sal-caveats');
+      caveatsEl.innerHTML = (meta.caveats || []).map(function (c) {
+        return '<li>' + c + '</li>';
+      }).join('') || '<li>—</li>';
     }
 
     // Region selector
@@ -2243,6 +3539,37 @@
       el.addEventListener('input', calc);
     });
 
+    // Cross-tool: convert annual net to a target currency using the Currency
+    // tool's cached rates (or a one-shot fetch).
+    function updateFxConversion(annualNet, fromCur) {
+      var sel = document.getElementById('sal-fx-to');
+      var out = document.getElementById('sal-fx-result');
+      if (!sel || !out) return;
+      var to = sel.value;
+      if (!to || !annualNet || annualNet <= 0) { out.textContent = '—'; return; }
+      if (to === fromCur) { out.innerHTML = '<span style="color:#aaa;">Same currency</span>'; return; }
+      if (typeof window.__convertCurrency !== 'function') { out.textContent = 'Currency converter not ready.'; return; }
+      out.innerHTML = '<span style="color:#aaa;">Converting…</span>';
+      window.__convertCurrency(annualNet, fromCur, to).then(function (val) {
+        var fmt = function (n) { return Math.round(n).toLocaleString('en-CH'); };
+        out.innerHTML = '<strong>' + to + ' ' + fmt(val) + '</strong> / yr · '
+          + '<span style="color:#666;">' + to + ' ' + fmt(val / 12) + ' / month</span>';
+      }).catch(function () {
+        out.innerHTML = '<span style="color:#991b1b;">Could not load rate.</span>';
+      });
+    }
+    document.getElementById('sal-fx-to').addEventListener('change', function () {
+      var country = document.getElementById('sal-country').value;
+      var data    = TAX_DATA[country];
+      if (!data) return;
+      var gross  = parseFloat(document.getElementById('sal-gross').value) || 0;
+      var status = document.getElementById('sal-status').value;
+      var emp    = document.getElementById('sal-emptype').value;
+      var region = (document.getElementById('sal-region').value || '');
+      var res    = country === 'CH' ? data.calc(gross, status, emp, region || 'Zürich') : data.calc(gross, status, emp);
+      updateFxConversion(res.net, data.currency);
+    });
+
     // expose interpolate for CH
     window._interpolate = interpolate;
 
@@ -2255,8 +3582,40 @@
   // ── Currency Converter ────────────────────────────────────
   (function () {
     var rates = null;
+    var history = {};   // history[from][to] = [{date, rate}, ...]  — last ~30 days
     var TARGET_CURRENCIES = ['EUR','USD','CHF','GBP','JPY','SEK','NOK','DKK','CAD','AUD','CNY','KRW','PLN'];
     var CURRENCY_SYMBOLS = { EUR:'€', USD:'$', CHF:'Fr', GBP:'£', JPY:'¥', SEK:'kr', NOK:'kr', DKK:'kr', CAD:'$', AUD:'$', CNY:'¥', KRW:'₩', PLN:'zł' };
+
+    function isoDaysAgo(n) {
+      var d = new Date(); d.setUTCDate(d.getUTCDate() - n);
+      return d.toISOString().slice(0, 10);
+    }
+    function buildSparkSVG(series) {
+      if (!series || series.length < 2) return '';
+      var w = 56, h = 14, pad = 1;
+      var ys = series.map(function (p) { return p.rate; });
+      var min = Math.min.apply(null, ys), max = Math.max.apply(null, ys);
+      var span = max - min || 1;
+      var stepX = (w - pad * 2) / (series.length - 1);
+      var path = series.map(function (p, i) {
+        var x = pad + i * stepX;
+        var y = pad + (h - pad * 2) * (1 - (p.rate - min) / span);
+        return (i === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1);
+      }).join(' ');
+      var last = ys[ys.length - 1], first = ys[0];
+      var stroke = last > first ? '#22c55e' : last < first ? '#dc2626' : '#999';
+      return '<svg width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" aria-hidden="true">'
+        + '<path d="' + path + '" fill="none" stroke="' + stroke + '" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    }
+    function buildDelta(series) {
+      if (!series || series.length < 2) return '';
+      var first = series[0].rate, last = series[series.length - 1].rate;
+      if (!first || !last) return '';
+      var pct = (last - first) / first * 100;
+      var cls = Math.abs(pct) < 0.05 ? 'cc-delta-flat' : pct > 0 ? 'cc-delta-up' : 'cc-delta-down';
+      var sign = pct > 0 ? '+' : '';
+      return '<span class="' + cls + '">' + sign + pct.toFixed(2) + '%</span>';
+    }
 
     function render() {
       if (!rates) return;
@@ -2271,10 +3630,47 @@
         var val = (amount * rate).toLocaleString('en-CH', { maximumFractionDigits: code === 'JPY' || code === 'KRW' ? 0 : 2 });
         var cell = document.createElement('div');
         cell.className = 'currency-cell';
+        cell.setAttribute('role', 'button');
+        cell.setAttribute('tabindex', '0');
+        cell.setAttribute('aria-label', 'Copy ' + val + ' ' + code);
         var sym = CURRENCY_SYMBOLS[code] ? ' ' + CURRENCY_SYMBOLS[code] : '';
-        cell.innerHTML = '<div class="cc-code">' + code + sym + '</div><div class="cc-val">' + val + '</div>';
+        var rawCopy = (amount * rate).toFixed(code === 'JPY' || code === 'KRW' ? 0 : 2);
+        var series = history[from] && history[from][code];
+        var spark = '';
+        if (series && series.length >= 2) {
+          var firstDate = series[0].date, lastDate = series[series.length - 1].date;
+          var sparkTip = series.length + ' ECB trading days · ' + firstDate + ' → ' + lastDate;
+          spark = '<div class="cc-spark" title="' + sparkTip + '">' + buildSparkSVG(series) + buildDelta(series) + '</div>';
+        }
+        cell.innerHTML = '<span class="cc-copy-tip">tap to copy</span><div class="cc-code">' + code + sym + '</div><div class="cc-val">' + val + '</div>' + spark;
+        cell.addEventListener('click', function () { copyCurrencyCell(cell, rawCopy); });
+        cell.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); copyCurrencyCell(cell, rawCopy); }
+        });
         grid.appendChild(cell);
       });
+    }
+
+    function copyCurrencyCell(cell, value) {
+      var done = function () {
+        var tip = cell.querySelector('.cc-copy-tip');
+        if (tip) tip.textContent = 'copied ✓';
+        cell.classList.add('copied');
+        setTimeout(function () {
+          cell.classList.remove('copied');
+          if (tip) tip.textContent = 'tap to copy';
+        }, 1400);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(value).then(done, function () { fallbackCopy(value); done(); });
+      } else { fallbackCopy(value); done(); }
+    }
+    function fallbackCopy(text) {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta);
     }
 
     function loadRates() {
@@ -2290,10 +3686,34 @@
           document.getElementById('cur-grid').style.display = '';
           document.getElementById('cur-updated').textContent = 'Rates as of ' + data.date + ' · ECB via frankfurter.dev';
           render();
+          loadHistory(from, to);
         })
         .catch(function() {
           document.getElementById('cur-loading').textContent = 'Could not load rates. Check connection.';
         });
+    }
+
+    function loadHistory(from, to) {
+      if (history[from]) { render(); return; }
+      var startISO = isoDaysAgo(35); // ~30 trading days after weekends/holidays
+      var endISO   = isoDaysAgo(0);
+      fetch('https://api.frankfurter.dev/v1/' + startISO + '..' + endISO + '?from=' + from + '&to=' + to)
+        .then(function(r){return r.json();})
+        .then(function(data) {
+          if (!data || !data.rates) return;
+          var byTo = {};
+          var dates = Object.keys(data.rates).sort();
+          dates.forEach(function (date) {
+            var row = data.rates[date];
+            Object.keys(row).forEach(function (code) {
+              if (!byTo[code]) byTo[code] = [];
+              byTo[code].push({ date: date, rate: row[code] });
+            });
+          });
+          history[from] = byTo;
+          render();
+        })
+        .catch(function () { /* silent — sparkline simply absent */ });
     }
 
     document.getElementById('cur-from').addEventListener('change', function () {
@@ -2302,6 +3722,25 @@
       loadRates();
     });
     document.getElementById('cur-amount').addEventListener('input', render);
+
+    // Public converter for cross-tool use (Net Salary, etc.).
+    // Returns a Promise<number> with the converted amount, or rejects on failure.
+    window.__convertCurrency = function (amount, from, to) {
+      if (!amount || !from || !to) return Promise.reject(new Error('bad args'));
+      if (from === to) return Promise.resolve(amount);
+      if (rates && rates[from] && rates[from][to]) {
+        return Promise.resolve(amount * rates[from][to]);
+      }
+      return fetch('https://api.frankfurter.dev/v1/latest?from=' + from + '&to=' + to)
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (!data || !data.rates || !data.rates[to]) throw new Error('rate missing');
+          if (!rates) rates = {};
+          if (!rates[from]) rates[from] = {};
+          rates[from][to] = data.rates[to];
+          return amount * data.rates[to];
+        });
+    };
 
     loadRates();
   })();
@@ -2504,6 +3943,101 @@
 
       document.getElementById('col-text-on-white').style.color = hex;
       document.getElementById('col-text-on-black').style.color = hex;
+
+      renderPalette(hsl);
+      renderColorBlind(r, g, b);
+    }
+
+    // ── HSL → RGB helper ────────────────────────────────────
+    function hslToRgb(h, s, l) {
+      h /= 360; s /= 100; l /= 100;
+      var r, g, b;
+      if (s === 0) { r = g = b = l; }
+      else {
+        var hue2rgb = function (p, q, t) {
+          if (t < 0) t += 1; if (t > 1) t -= 1;
+          if (t < 1/6) return p + (q - p) * 6 * t;
+          if (t < 1/2) return q;
+          if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+          return p;
+        };
+        var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        var p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3); g = hue2rgb(p, q, h); b = hue2rgb(p, q, h - 1/3);
+      }
+      return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
+    }
+
+    // ── Palette generator ───────────────────────────────────
+    function paletteSchemes(hsl) {
+      var H = hsl.h, S = hsl.s, L = hsl.l;
+      function shift(deg, s, l) { var rgb = hslToRgb((H + deg + 360) % 360, s == null ? S : s, l == null ? L : l); return rgbToHex(rgb.r, rgb.g, rgb.b); }
+      return [
+        { name: 'Analogous',       hexes: [shift(-30), shift(0), shift(30)] },
+        { name: 'Complementary',   hexes: [shift(0),   shift(180)] },
+        { name: 'Triadic',         hexes: [shift(0),   shift(120),  shift(240)] },
+        { name: 'Split-complement',hexes: [shift(0),   shift(150),  shift(210)] },
+        { name: 'Monochrome',      hexes: [shift(0, S, Math.max(10, L - 25)), shift(0), shift(0, S, Math.min(90, L + 25))] }
+      ];
+    }
+    function renderPalette(hsl) {
+      var host = document.getElementById('col-palette');
+      if (!host) return;
+      var html = '';
+      paletteSchemes(hsl).forEach(function (sch) {
+        html += '<div style="flex:1 1 100%;display:flex;flex-wrap:wrap;gap:0.4em;align-items:center;">'
+          + '<div style="font-size:0.74em;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;flex-basis:130px;">' + sch.name + '</div>';
+        sch.hexes.forEach(function (hx) {
+          html += '<div class="col-pal-swatch" data-hex="' + hx + '" title="Click to copy ' + hx + '" '
+            + 'style="cursor:pointer;background:' + hx + ';width:54px;height:34px;border-radius:6px;border:1px solid #e5e5e5;display:flex;align-items:flex-end;justify-content:center;'
+            + 'font-size:0.66em;font-family:ui-monospace,monospace;color:rgba(255,255,255,0.85);text-shadow:0 0 2px rgba(0,0,0,0.5);padding-bottom:0.15em;">' + hx + '</div>';
+        });
+        html += '</div>';
+      });
+      host.innerHTML = html;
+      host.querySelectorAll('.col-pal-swatch').forEach(function (sw) {
+        sw.addEventListener('click', function () {
+          var hex = sw.dataset.hex;
+          if (navigator.clipboard) navigator.clipboard.writeText(hex);
+          var prev = sw.textContent; sw.textContent = '✓ copied';
+          setTimeout(function () { sw.textContent = prev; }, 1100);
+        });
+      });
+    }
+
+    // ── Colour-blind simulation ─────────────────────────────
+    // Brettel/Vienot 1997 simplified linear matrices applied in sRGB space.
+    function applyMatrix(r, g, b, m) {
+      return {
+        r: Math.max(0, Math.min(255, m[0]*r + m[1]*g + m[2]*b)),
+        g: Math.max(0, Math.min(255, m[3]*r + m[4]*g + m[5]*b)),
+        b: Math.max(0, Math.min(255, m[6]*r + m[7]*g + m[8]*b))
+      };
+    }
+    var CB_MATRICES = {
+      Protanopia:   [0.567, 0.433, 0.000,  0.558, 0.442, 0.000,  0.000, 0.242, 0.758],
+      Deuteranopia: [0.625, 0.375, 0.000,  0.700, 0.300, 0.000,  0.000, 0.300, 0.700],
+      Tritanopia:   [0.950, 0.050, 0.000,  0.000, 0.433, 0.567,  0.000, 0.475, 0.525]
+    };
+    function renderColorBlind(r, g, b) {
+      var host = document.getElementById('col-cb');
+      if (!host) return;
+      var origHex = rgbToHex(r, g, b);
+      var html = '<div style="display:flex;flex-direction:column;align-items:center;gap:0.25em;">'
+        + '<div style="background:' + origHex + ';width:88px;height:64px;border-radius:8px;border:1px solid #e5e5e5;"></div>'
+        + '<div style="font-size:0.68em;color:#666;font-weight:600;">Normal</div>'
+        + '<div style="font-size:0.62em;color:#aaa;font-family:ui-monospace,monospace;">' + origHex + '</div>'
+        + '</div>';
+      Object.keys(CB_MATRICES).forEach(function (name) {
+        var c = applyMatrix(r, g, b, CB_MATRICES[name]);
+        var hx = rgbToHex(Math.round(c.r), Math.round(c.g), Math.round(c.b));
+        html += '<div style="display:flex;flex-direction:column;align-items:center;gap:0.25em;">'
+          + '<div style="background:' + hx + ';width:64px;height:48px;border-radius:6px;border:1px solid #e5e5e5;"></div>'
+          + '<div style="font-size:0.66em;color:#666;font-weight:600;">' + name + '</div>'
+          + '<div style="font-size:0.6em;color:#aaa;font-family:ui-monospace,monospace;">' + hx + '</div>'
+          + '</div>';
+      });
+      host.innerHTML = html;
     }
 
     // HEX input → update RGB (only when valid full 6-char hex, no 3-char shorthand)
@@ -2674,6 +4208,59 @@
     document.getElementById('col-cmp-a').addEventListener('change', renderCompare);
     document.getElementById('col-cmp-b').addEventListener('change', renderCompare);
 
+    // Purchasing-power equivalence widget
+    function totalForCity(c) {
+      var v = getVals(c);
+      return Object.keys(v).reduce(function (s, k) { return s + v[k]; }, 0);
+    }
+    function renderPP() {
+      var fromKey = document.getElementById('col-pp-from').value;
+      var toKey   = document.getElementById('col-pp-to').value;
+      var net     = parseFloat(document.getElementById('col-pp-net').value) || 0;
+      var resEl   = document.getElementById('col-pp-result');
+      if (!resEl) return;
+      var A = CITIES[fromKey], B = CITIES[toKey];
+      if (!A || !B || net <= 0) { resEl.textContent = '—'; return; }
+      var totalA = totalForCity(A);
+      var totalB = totalForCity(B);
+      if (totalA <= 0 || totalB <= 0) { resEl.textContent = '—'; return; }
+      var ratio = net / totalA;                  // how many "A baskets" your net buys
+      var requiredB = ratio * totalB;            // same baskets in B's currency
+      var fmt = function (n) { return Math.round(n).toLocaleString('en-CH'); };
+
+      var sameCur = (A.cur === B.cur);
+      var bodyEcho = '<div>' + A.cur + ' ' + fmt(net) + ' / month in <strong>' + A.name + '</strong> '
+        + '= <strong>' + ratio.toFixed(2) + '× monthly cost-of-living</strong>.</div>'
+        + '<div style="margin-top:0.4em;">To match in <strong>' + B.name + '</strong>: <strong>' + B.cur + ' ' + fmt(requiredB) + '</strong> / month.</div>';
+
+      if (sameCur || typeof window.__convertCurrency !== 'function') {
+        resEl.innerHTML = bodyEcho;
+      } else {
+        resEl.innerHTML = bodyEcho + '<div style="color:#aaa;margin-top:0.3em;font-size:0.92em;">Converting reference…</div>';
+        window.__convertCurrency(net, A.cur, B.cur).then(function (netInB) {
+          var diff   = requiredB - netInB;
+          var sign   = diff > 0 ? '+' : '';
+          var arrow  = diff > 0 ? '⬈' : (diff < 0 ? '⬊' : '=');
+          resEl.innerHTML = bodyEcho
+            + '<div style="margin-top:0.4em;color:#666;font-size:0.92em;">'
+            + 'Direct FX of ' + A.cur + ' ' + fmt(net) + ' = <strong>' + B.cur + ' ' + fmt(netInB) + '</strong> '
+            + '<span style="color:' + (diff > 0 ? '#991b1b' : (diff < 0 ? '#166534' : '#888')) + ';">'
+            + ' ' + arrow + ' ' + sign + B.cur + ' ' + fmt(diff) + ' vs purchasing-power need'
+            + '</span></div>';
+        }).catch(function () {
+          resEl.innerHTML = bodyEcho;
+        });
+      }
+    }
+    ['col-pp-from','col-pp-to','col-pp-net'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('change', renderPP);
+        el.addEventListener('input',  renderPP);
+      }
+    });
+    renderPP();
+
     render();
   })();
   </script>
@@ -2683,7 +4270,7 @@
   (function () {
     var modeBtns = document.querySelectorAll('#date-mode-toggle button');
     var current  = 'between';
-    var blocks   = ['between', 'until', 'add'];
+    var blocks   = ['between', 'until', 'add', 'recur'];
 
     function pad(n) { return n < 10 ? '0' + n : '' + n; }
     function isoDate(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
@@ -2773,6 +4360,28 @@
         el.innerHTML = '<div style="font-size:0.85em;color:#666;margin-bottom:0.7em;">'
           + '<strong>' + fmtDateLong(a) + '</strong> → <strong>' + fmtDateLong(b) + '</strong></div>'
           + renderRange(a, b);
+      } else if (current === 'recur') {
+        var rs = parseISO(document.getElementById('date-recur-start').value);
+        var n  = parseInt(document.getElementById('date-recur-n').value, 10);
+        var u  = document.getElementById('date-recur-unit').value;
+        var k  = parseInt(document.getElementById('date-recur-count').value, 10);
+        if (!rs || !n || n < 1 || !k || k < 1) { el.style.display = 'none'; return; }
+        k = Math.min(k, 24);
+        var rows = '';
+        for (var i = 0; i < k; i++) {
+          var d = new Date(rs);
+          if (u === 'day')        d.setDate(d.getDate() + n * i);
+          else if (u === 'week')  d.setDate(d.getDate() + n * 7 * i);
+          else if (u === 'month') d.setMonth(d.getMonth() + n * i);
+          else if (u === 'year')  d.setFullYear(d.getFullYear() + n * i);
+          rows += '<tr><td style="padding:0.3em 0.7em;color:#aaa;">#' + (i + 1) + '</td>'
+            + '<td style="padding:0.3em 0.7em;">' + fmtDateLong(d) + '</td></tr>';
+        }
+        el.style.display = '';
+        el.innerHTML = '<div style="font-size:0.85em;color:#666;margin-bottom:0.7em;">'
+          + 'Every <strong>' + n + ' ' + u + (n === 1 ? '' : 's') + '</strong> from '
+          + '<strong>' + fmtDateLong(rs) + '</strong> · next ' + k + ' occurrences</div>'
+          + '<table class="tool-table">' + rows + '</table>';
       } else if (current === 'until') {
         var t = parseISO(document.getElementById('date-target').value);
         if (!t) { el.style.display = 'none'; return; }
@@ -2826,9 +4435,12 @@
     document.getElementById('date-b').value      = isoDate(oneYr);
     document.getElementById('date-target').value = isoDate(oneYr);
     document.getElementById('date-ref').value    = isoDate(today);
+    document.getElementById('date-recur-start').value = isoDate(today);
 
-    ['date-a', 'date-b', 'date-target', 'date-ref', 'date-offset', 'date-unit'].forEach(function (id) {
+    ['date-a', 'date-b', 'date-target', 'date-ref', 'date-offset', 'date-unit',
+     'date-recur-start', 'date-recur-n', 'date-recur-unit', 'date-recur-count'].forEach(function (id) {
       var el = document.getElementById(id);
+      if (!el) return;
       el.addEventListener('change', compute);
       el.addEventListener('input',  compute);
     });
@@ -2963,18 +4575,141 @@
       }
     }
 
-    // Flat-road power estimate: P = (½·ρ·CdA·v³ + Crr·m·g·v) / η
-    // Defaults: ρ=1.225 kg/m³, CdA≈0.32 m² (typical road position),
-    // m≈80 kg (rider+bike), Crr≈0.005, η=0.97 (drivetrain).
+    // Full road-cycling power model (aero + rolling + gravity)
+    //   P = ( ½·ρ·CdA·(v + v_wind)² · v  +  Crr·m·g·cos(θ)·v  +  m·g·sin(θ)·v ) / η
+    // All parameters read live from the Power-model panel; falls back to sensible
+    // defaults if a field is empty/invalid.
+    function readPowerParams() {
+      function num(id, dflt) {
+        var v = parseFloat(document.getElementById(id).value);
+        return (isFinite(v) && v !== 0) || v === 0 ? v : dflt;
+      }
+      return {
+        m:    num('tri-pm-mass',  80),
+        cda:  num('tri-pm-cda',   0.32),
+        crr:  num('tri-pm-crr',   0.005),
+        eta:  num('tri-pm-eta',   97) / 100,
+        slope: num('tri-pm-slope', 0) / 100,
+        wind:  num('tri-pm-wind',  0) / 3.6,
+        rho:   num('tri-pm-rho',   1.225)
+      };
+    }
     function estimateBikeWatts(kmh) {
       if (!kmh || kmh <= 0) return 0;
+      var p = readPowerParams();
       var v = kmh / 3.6;
-      var pAero = 0.5 * 1.225 * 0.32 * v * v * v;
-      var pRoll = 0.005 * 80 * 9.81 * v;
-      return (pAero + pRoll) / 0.97;
+      var theta = Math.atan(p.slope);
+      var vAir = v + p.wind;                           // wind: + = headwind, - = tailwind
+      // Aerodynamic drag scales with relative-air-speed squared, transmitted at v
+      var pAero = 0.5 * p.rho * p.cda * Math.abs(vAir) * vAir * v;
+      var pRoll = p.crr * p.m * 9.81 * Math.cos(theta) * v;
+      var pGrav = p.m * 9.81 * Math.sin(theta) * v;
+      var total = (pAero + pRoll + pGrav) / p.eta;
+      return Math.max(0, total);
+    }
+
+    function updateLiveWattEstimate() {
+      var kmh = parseFloat(document.getElementById('tri-bike-kmh').value);
+      var est = estimateBikeWatts(kmh);
+      var badgeVal = document.getElementById('tri-bike-w-est');
+      if (badgeVal) badgeVal.textContent = (est > 0 ? Math.round(est) + ' W' : '— W');
+      renderPowerChart();
+    }
+
+    // Power-vs-X SVG chart inside the power-model panel
+    function renderPowerChart() {
+      var host = document.getElementById('tri-pm-chart');
+      if (!host) return;
+      var xVar = (document.getElementById('tri-pm-chart-x') || { value: 'speed' }).value;
+      var p = readPowerParams();
+      var kmh = parseFloat(document.getElementById('tri-bike-kmh').value) || 32;
+
+      // Sweep range per variable
+      var ranges = {
+        speed: { lo: 10, hi: 55, current: kmh,        unit: 'km/h' },
+        slope: { lo: -8, hi: 12, current: p.slope*100, unit: '%' },
+        wind:  { lo: -15, hi: 30, current: p.wind*3.6, unit: 'km/h' },
+        cda:   { lo: 0.18, hi: 0.45, current: p.cda,  unit: 'm²' },
+        mass:  { lo: 50, hi: 110, current: p.m,        unit: 'kg' }
+      };
+      var R = ranges[xVar] || ranges.speed;
+      var N = 60;
+      var xs = [], ys = [];
+      for (var i = 0; i <= N; i++) {
+        var x = R.lo + (R.hi - R.lo) * i / N;
+        // Compute Watts with one parameter swapped to x, others held
+        var w;
+        if (xVar === 'speed') {
+          w = computeWatts(x, p);
+        } else {
+          var pp = Object.assign({}, p);
+          if (xVar === 'slope') pp.slope = x / 100;
+          else if (xVar === 'wind') pp.wind = x / 3.6;
+          else if (xVar === 'cda')  pp.cda  = x;
+          else if (xVar === 'mass') pp.m    = x;
+          w = computeWatts(kmh, pp);
+        }
+        xs.push(x); ys.push(w);
+      }
+      // SVG dimensions
+      var W = 320, H = 140, padL = 36, padB = 22, padT = 8, padR = 10;
+      var w0 = host.clientWidth || 320; if (w0 > 320) W = Math.min(560, w0);
+      var minY = 0;
+      var maxY = Math.max.apply(null, ys); if (!isFinite(maxY) || maxY <= 0) maxY = 100;
+      maxY = Math.ceil(maxY / 50) * 50;
+      var sx = function (v) { return padL + (W - padL - padR) * (v - R.lo) / (R.hi - R.lo); };
+      var sy = function (v) { return H - padB - (H - padB - padT) * (v - minY) / (maxY - minY); };
+      var path = xs.map(function (x, i) { return (i === 0 ? 'M' : 'L') + sx(x).toFixed(1) + ' ' + sy(ys[i]).toFixed(1); }).join(' ');
+      // Y-axis ticks (4)
+      var ticks = '';
+      for (var t = 0; t <= 4; t++) {
+        var yv = minY + (maxY - minY) * t / 4;
+        var yy = sy(yv);
+        ticks += '<line x1="' + padL + '" x2="' + (W - padR) + '" y1="' + yy + '" y2="' + yy + '" stroke="#f0f0f0" stroke-width="1"/>'
+              +  '<text x="' + (padL - 4) + '" y="' + (yy + 3.5) + '" text-anchor="end" font-size="9" fill="#999">' + Math.round(yv) + '</text>';
+      }
+      // X-axis ticks (5)
+      var xticks = '';
+      for (var k = 0; k <= 5; k++) {
+        var xv = R.lo + (R.hi - R.lo) * k / 5;
+        var xx = sx(xv);
+        xticks += '<text x="' + xx + '" y="' + (H - 6) + '" text-anchor="middle" font-size="9" fill="#999">' + (Math.abs(xv) >= 10 ? xv.toFixed(0) : xv.toFixed(2)) + '</text>';
+      }
+      // Current value marker
+      var cx = sx(R.current);
+      var cy = sy(computeWatts(xVar === 'speed' ? R.current : kmh, xVar === 'speed' ? p : (function(){
+        var pp = Object.assign({}, p);
+        if (xVar === 'slope') pp.slope = R.current / 100;
+        else if (xVar === 'wind') pp.wind = R.current / 3.6;
+        else if (xVar === 'cda')  pp.cda  = R.current;
+        else if (xVar === 'mass') pp.m    = R.current;
+        return pp;
+      })()));
+      var marker = (R.current >= R.lo && R.current <= R.hi)
+        ? '<circle cx="' + cx + '" cy="' + cy + '" r="4" fill="#222" stroke="#fff" stroke-width="2"/>'
+          + '<text x="' + cx + '" y="' + (cy - 8) + '" text-anchor="middle" font-size="10" fill="#222" font-weight="600">' + Math.round(cy ? computeWatts(xVar === 'speed' ? R.current : kmh, xVar === 'speed' ? p : (function(){var pp=Object.assign({}, p); if (xVar==='slope') pp.slope=R.current/100; else if (xVar==='wind') pp.wind=R.current/3.6; else if (xVar==='cda') pp.cda=R.current; else if (xVar==='mass') pp.m=R.current; return pp;})()) : 0) + ' W</text>'
+        : '';
+      host.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:auto;display:block;" aria-label="Power vs ' + xVar + '">'
+        + ticks + xticks
+        + '<path d="' + path + '" fill="none" stroke="#5D6063" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>'
+        + marker
+        + '<text x="' + (W - padR) + '" y="' + (padT + 10) + '" text-anchor="end" font-size="9" fill="#bbb">W</text>'
+        + '<text x="' + (W - padR) + '" y="' + (H - 6) + '" text-anchor="end" font-size="9" fill="#bbb">' + R.unit + '</text>'
+        + '</svg>';
+    }
+    function computeWatts(kmh, p) {
+      if (!kmh || kmh <= 0) return 0;
+      var v = kmh / 3.6;
+      var theta = Math.atan(p.slope);
+      var vAir = v + p.wind;
+      var pAero = 0.5 * p.rho * p.cda * Math.abs(vAir) * vAir * v;
+      var pRoll = p.crr * p.m * 9.81 * Math.cos(theta) * v;
+      var pGrav = p.m * 9.81 * Math.sin(theta) * v;
+      return Math.max(0, (pAero + pRoll + pGrav) / p.eta);
     }
 
     function updateTotal() {
+      updateLiveWattEstimate();
       var sw = parseTime(document.getElementById('tri-swim-time').value) || 0;
       var t1 = parseTime(document.getElementById('tri-t1').value)        || 0;
       var bk = parseTime(document.getElementById('tri-bike-time').value) || 0;
@@ -3017,6 +4752,38 @@
     document.getElementById('tri-t1').addEventListener('input', function () { autoFmt(this, false); updateTotal(); });
     document.getElementById('tri-t2').addEventListener('input', function () { autoFmt(this, false); updateTotal(); });
 
+    // Power-model preset → numeric field sync (and vice-versa)
+    function bindPmPreset(presetId, valueId) {
+      var presetEl = document.getElementById(presetId);
+      var valueEl  = document.getElementById(valueId);
+      presetEl.addEventListener('change', function () {
+        if (this.value === 'custom') { valueEl.focus(); return; }
+        valueEl.value = this.value;
+        updateTotal();
+      });
+      valueEl.addEventListener('input', function () {
+        // If the typed value matches an option, keep its label; otherwise show "custom"
+        var match = false;
+        for (var i = 0; i < presetEl.options.length; i++) {
+          if (presetEl.options[i].value !== 'custom' &&
+              Math.abs(parseFloat(presetEl.options[i].value) - parseFloat(valueEl.value)) < 1e-6) {
+            presetEl.value = presetEl.options[i].value; match = true; break;
+          }
+        }
+        if (!match) presetEl.value = 'custom';
+        updateTotal();
+      });
+    }
+    bindPmPreset('tri-pm-cda-preset', 'tri-pm-cda');
+    bindPmPreset('tri-pm-crr-preset', 'tri-pm-crr');
+    ['tri-pm-mass','tri-pm-eta','tri-pm-slope','tri-pm-wind','tri-pm-rho'].forEach(function (id) {
+      document.getElementById(id).addEventListener('input', updateTotal);
+    });
+    var chartXSel = document.getElementById('tri-pm-chart-x');
+    if (chartXSel) chartXSel.addEventListener('change', renderPowerChart);
+    var pmDetails = document.getElementById('tri-power-details');
+    if (pmDetails) pmDetails.addEventListener('toggle', function () { if (pmDetails.open) renderPowerChart(); });
+
     // Preset switcher: fill standard distances, then re-sync each leg to recompute time from pace
     document.getElementById('tri-preset').addEventListener('change', function () {
       var p = PRESETS[this.value];
@@ -3047,7 +4814,7 @@
       if (!ref || !sw || !bk || !rn) return;
       var t1 = parseTime(document.getElementById('tri-t1').value) || 120;
       var t2 = parseTime(document.getElementById('tri-t2').value) || 90;
-      var labels = { sprint: 'Sprint', olympic: 'Olympic', t100: 'T100', half: 'Half · 70.3', full: 'Full Ironman' };
+      var labels = { sprint: 'Sprint', olympic: 'Olympic', t100: 'T100', half: 'Half Ironman • 70.3', full: 'Ironman' };
       var tbody = document.getElementById('tri-pred-tbody');
       tbody.innerHTML = '';
       Object.keys(PRESETS).forEach(function (key) {
@@ -3169,6 +4936,28 @@
       return L[t] || t;
     }
 
+    var _lastPlan = null;
+
+    function planToCSV(plan) {
+      var hdr = ['Week', 'Phase'].concat(DAYS).concat(['Total km']).join(',');
+      var rows = plan.weeks.map(function (w) {
+        return [w.idx, w.phase].concat(w.cells.map(function (c) {
+          if (c.type === 'rest') return 'Rest';
+          if (c.type === 'gym')  return 'Gym (~30 min)';
+          return c.label + ' ' + c.km + 'km';
+        })).concat([w.total + ' km']).join(',');
+      }).join('\n');
+      return hdr + '\n' + rows + '\n';
+    }
+    function downloadFile(name, mime, data) {
+      var blob = new Blob([data], { type: mime });
+      var url  = URL.createObjectURL(blob);
+      var a    = document.createElement('a');
+      a.href = url; a.download = name; document.body.appendChild(a); a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+
     function generate() {
       var race    = document.getElementById('plan-race').value;
       var weeks   = Math.max(4, Math.min(32, parseInt(document.getElementById('plan-weeks').value, 10) || 12));
@@ -3205,26 +4994,38 @@
         + DAYS.map(function (d) { return '<th>' + d + '</th>'; }).join('')
         + '<th>Total</th></tr></thead>';
       var rows = '';
+      var planWeeks = [];
+      var EDITABLE = { interval: 1, tempo: 1, threshold: 1, long: 1 };
       for (var w = 0; w < weeks; w++) {
         var ph = phaseAt(w);
         var total = weekKm(w);
         var template = adjustForDays(adjustForPhase(templateFor(phil), ph, phil), days);
-        // Place gym on running-free days when the user opted in; race week skips
-        // strength entirely (taper logic).
         if (strength && ph !== 'Taper') template = placeGymOnRestDays(template);
         var kms = distributeKm(template, total, goal.longCap);
         var actualTotal = kms.reduce(function (a, b) { return a + b; }, 0);
+        var weekObj = { idx: w + 1, phase: ph, total: actualTotal, cells: [] };
+        var weekIdx1 = w + 1;
         rows += '<tr>'
-          + '<td><strong>' + (w + 1) + '</strong></td>'
+          + '<td><strong>' + weekIdx1 + '</strong></td>'
           + '<td><span style="color:#666;font-size:0.85em;">' + ph + '</span></td>'
           + template.map(function (t, i) {
-              if (t === 'rest') return '<td style="color:#ccc;">—</td>';
-              if (t === 'gym')  return '<td>' + workoutLabel(t) + '<br><span style="color:#888;font-size:0.85em;">~30 min</span></td>';
-              return '<td>' + workoutLabel(t) + '<br><span style="color:#888;font-size:0.85em;">' + kms[i] + ' km</span></td>';
+              if (t === 'rest') { weekObj.cells.push({ type: 'rest', label: 'Rest', km: 0 }); return '<td style="color:#ccc;">—</td>'; }
+              if (t === 'gym')  { weekObj.cells.push({ type: 'gym',  label: workoutLabel(t), km: 0 }); return '<td>' + workoutLabel(t) + '<br><span style="color:#888;font-size:0.85em;">~30 min</span></td>'; }
+              weekObj.cells.push({ type: t, label: workoutLabel(t), km: kms[i] });
+              var editBtn = EDITABLE[t]
+                ? ' <button type="button" class="plan-edit-link" data-wo="' + t + '" data-km="' + kms[i] + '" data-wk="' + weekIdx1 + '" data-day="' + DAYS[i] + '" title="Edit in Session Builder">✏</button>'
+                : '';
+              return '<td>' + workoutLabel(t) + editBtn + '<br><span style="color:#888;font-size:0.85em;">' + kms[i] + ' km</span></td>';
             }).join('')
           + '<td><strong>' + actualTotal + ' km</strong></td>'
           + '</tr>';
+        planWeeks.push(weekObj);
       }
+      _lastPlan = {
+        meta: { race: race, weeks: weeks, daysPerWeek: days, philosophy: phil, strength: strength, goalPace: goalPace, generatedAt: new Date().toISOString() },
+        days: DAYS,
+        weeks: planWeeks
+      };
 
       var strengthBlock = strength
         ? '<h3 style="margin:1.4em 0 0.3em;font-size:0.95em;">💪 Strength &amp; injury prevention (1–2 / week)</h3>'
@@ -3252,11 +5053,36 @@
         + (goalPace ? ' · goal pace <strong>' + goalPace + '</strong> /km' : '')
         + '</div>';
 
+      var exportBar =
+          '<div style="display:flex;gap:0.5em;flex-wrap:wrap;margin:0.8em 0 0.4em;">'
+        +   '<button type="button" id="plan-export-csv"  class="tool-btn" style="font-size:0.84em;padding:0.4em 1em;">⬇ CSV</button>'
+        +   '<button type="button" id="plan-export-json" class="tool-btn" style="font-size:0.84em;padding:0.4em 1em;">⬇ JSON</button>'
+        + '</div>';
+
       document.getElementById('plan-result').style.display = '';
       document.getElementById('plan-result').innerHTML = head
+        + exportBar
         + '<div style="overflow-x:auto;"><table class="tool-table">' + thead + '<tbody>' + rows + '</tbody></table></div>'
         + strengthBlock
         + nutritionBlock;
+
+      document.getElementById('plan-export-csv').addEventListener('click', function () {
+        if (!_lastPlan) return;
+        downloadFile('training-plan-' + _lastPlan.meta.race + '-' + _lastPlan.meta.weeks + 'wk.csv', 'text/csv;charset=utf-8', planToCSV(_lastPlan));
+      });
+      document.getElementById('plan-export-json').addEventListener('click', function () {
+        if (!_lastPlan) return;
+        downloadFile('training-plan-' + _lastPlan.meta.race + '-' + _lastPlan.meta.weeks + 'wk.json', 'application/json', JSON.stringify(_lastPlan, null, 2));
+      });
+      // Plan → Session Builder hand-off
+      document.querySelectorAll('#plan-result .plan-edit-link').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var wo = b.dataset.wo, km = b.dataset.km, wk = b.dataset.wk, day = b.dataset.day;
+          if (typeof window.__loadSessionFromPlan === 'function') {
+            window.__loadSessionFromPlan(wo, km, wk, day);
+          }
+        });
+      });
     }
 
     // Toggle wiring
@@ -3267,6 +5093,524 @@
       });
     });
     document.getElementById('plan-generate').addEventListener('click', generate);
+  })();
+  </script>
+
+  <script>
+  // ── Training Session Builder ─────────────────────────────
+  // Unified segment model: each row = { kind: 'active'|'recovery', mode: 'distance'|'time',
+  //   value: number (km if distance, sec if time), pace: sec/km, hr: 'Z1'..'Z5'|'', label: string }.
+  // Live recompute on every change; persists "saved sessions" to localStorage; exports TCX
+  // (Garmin Training Center XML) — Apple Watch has no native import path so we don't claim support.
+  (function () {
+    var STORE_KEY = 'jweb-tools-sessions-v1';
+
+    // ── Time helpers ────────────────────────────────────────
+    function pad2(n) { n = Math.round(n); return n < 10 ? '0' + n : '' + n; }
+    function fmtClock(sec) {
+      if (!isFinite(sec) || sec < 0) sec = 0;
+      sec = Math.round(sec);
+      var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+      return h > 0 ? h + ':' + pad2(m) + ':' + pad2(s) : m + ':' + pad2(s);
+    }
+    function fmtPace(secPerKm) {
+      if (!isFinite(secPerKm) || secPerKm <= 0) return '—';
+      var m = Math.floor(secPerKm / 60), s = Math.round(secPerKm % 60);
+      if (s === 60) { s = 0; m++; }
+      return m + ':' + pad2(s);
+    }
+    function parseClock(str) {
+      if (!str) return 0;
+      var p = String(str).trim().split(':').map(function (x) { return parseFloat(x) || 0; });
+      if (p.length === 1) return p[0];
+      if (p.length === 2) return p[0] * 60 + p[1];
+      return p[0] * 3600 + p[1] * 60 + p[2];
+    }
+
+    // Auto-insert ':' as the user types in clock-style fields
+    function autoFmtClock(el, allowH) {
+      var max = allowH ? 6 : 4;
+      var d = (el.value || '').replace(/\D/g, '').slice(0, max);
+      el.value = d.length <= 2 ? d
+        : d.length <= 4 ? d.slice(0, d.length - 2) + ':' + d.slice(-2)
+        : d.slice(0, d.length - 4) + ':' + d.slice(-4, -2) + ':' + d.slice(-2);
+    }
+
+    // ── Presets ─────────────────────────────────────────────
+    function PRESETS(key) {
+      var r = function (kind, mode, value, pace, hr, label) {
+        return { kind: kind, mode: mode, value: value, pace: pace, hr: hr, label: label || '' };
+      };
+      switch (key) {
+        case '6x400': {
+          var rows = [r('active', 'time', 600, 360, 'Z2', 'Warm-up')];
+          for (var i = 0; i < 6; i++) {
+            rows.push(r('active', 'distance', 0.4, 225, 'Z4', 'Rep ' + (i + 1) + ' (400 m)'));
+            rows.push(r('recovery', 'distance', 0.2, 420, 'Z1', 'Jog'));
+          }
+          rows.push(r('active', 'time', 600, 360, 'Z2', 'Cool-down'));
+          return rows;
+        }
+        case '5x1k': {
+          var rows = [r('active', 'time', 900, 360, 'Z2', 'Warm-up')];
+          for (var i = 0; i < 5; i++) {
+            rows.push(r('active', 'distance', 1, 240, 'Z4', 'Rep ' + (i + 1) + ' (1 km)'));
+            rows.push(r('recovery', 'time', 90, 480, 'Z1', 'Jog'));
+          }
+          rows.push(r('active', 'time', 600, 360, 'Z2', 'Cool-down'));
+          return rows;
+        }
+        case 'pyramid': {
+          var dists = [0.2, 0.4, 0.8, 0.4, 0.2];
+          var rows = [r('active', 'time', 600, 360, 'Z2', 'Warm-up')];
+          dists.forEach(function (d, i) {
+            rows.push(r('active', 'distance', d, 225, 'Z4', 'Rep ' + (d * 1000) + ' m'));
+            if (i < dists.length - 1) rows.push(r('recovery', 'time', 90, 480, 'Z1', 'Jog'));
+          });
+          rows.push(r('active', 'time', 600, 360, 'Z2', 'Cool-down'));
+          return rows;
+        }
+        case 'prog5k': {
+          var paces = [330, 315, 300, 285, 270];
+          return paces.map(function (p, i) {
+            return r('active', 'distance', 1, p, i < 2 ? 'Z2' : i < 4 ? 'Z3' : 'Z4', 'km ' + (i + 1));
+          });
+        }
+        case 'tempo20':
+          return [
+            r('active', 'time', 600, 360, 'Z2', 'Warm-up'),
+            r('active', 'time', 1200, 270, 'Z4', 'Tempo'),
+            r('active', 'time', 600, 360, 'Z2', 'Cool-down')
+          ];
+        case 'long15':
+          return [
+            r('active', 'distance', 12, 360, 'Z2', 'Easy aerobic'),
+            r('active', 'distance', 3,  300, 'Z3', 'MP finish')
+          ];
+        case 'fartlek30': {
+          var rows = [];
+          for (var i = 0; i < 15; i++) {
+            rows.push(r('active', 'time', 60, 240, 'Z4', 'Hard ' + (i + 1)));
+            rows.push(r('recovery', 'time', 60, 420, 'Z1', 'Easy'));
+          }
+          return rows;
+        }
+      }
+      return null;
+    }
+
+    function defaultsFor(type) {
+      switch (type) {
+        case 'fartlek':     return PRESETS('fartlek30');
+        case 'progressive': return PRESETS('prog5k');
+        case 'tempo':       return PRESETS('tempo20');
+        case 'long':        return PRESETS('long15');
+        default:            return PRESETS('6x400');
+      }
+    }
+
+    // ── State ───────────────────────────────────────────────
+    var segments = defaultsFor('intervals');
+
+    // ── Rendering ───────────────────────────────────────────
+    function renderSegments() {
+      var wrap = document.getElementById('ses-segments');
+      wrap.innerHTML = '';
+      segments.forEach(function (seg, idx) {
+        var row = document.createElement('div');
+        row.className = 'session-segment' + (seg.kind === 'recovery' ? ' recovery' : '');
+        row.dataset.idx = idx;
+
+        var modeLabel = seg.mode === 'distance' ? 'km' : 'time';
+        var valueText = seg.mode === 'distance'
+          ? (seg.value || 0).toString()
+          : fmtClock(seg.value || 0);
+
+        row.innerHTML =
+          '<div class="seg-handle" draggable="true" title="Drag to reorder">⠿</div>'
+          + '<div class="seg-move">'
+          +   '<button type="button" class="seg-up"   title="Move up"   aria-label="Move up"'   + (idx === 0                       ? ' disabled' : '') + '>▲</button>'
+          +   '<button type="button" class="seg-down" title="Move down" aria-label="Move down"' + (idx === segments.length - 1 ? ' disabled' : '') + '>▼</button>'
+          + '</div>'
+          + '<div class="seg-idx">' + (idx + 1) + '</div>'
+          + '<div class="seg-cell"><span class="seg-lbl">Kind</span>'
+          + '<select data-f="kind">'
+          + '<option value="active"' + (seg.kind === 'active' ? ' selected' : '') + '>Active</option>'
+          + '<option value="recovery"' + (seg.kind === 'recovery' ? ' selected' : '') + '>Recovery</option>'
+          + '</select></div>'
+          + '<div class="seg-cell"><span class="seg-lbl">Mode</span>'
+          + '<select data-f="mode">'
+          + '<option value="distance"' + (seg.mode === 'distance' ? ' selected' : '') + '>Distance (km)</option>'
+          + '<option value="time"' + (seg.mode === 'time' ? ' selected' : '') + '>Time (mm:ss)</option>'
+          + '</select></div>'
+          + '<div class="seg-cell"><span class="seg-lbl">' + (seg.mode === 'distance' ? 'Distance (km)' : 'Time') + '</span>'
+          + '<input type="text" data-f="value" value="' + valueText + '"'
+          + (seg.mode === 'distance' ? ' inputmode="decimal"' : ' style="font-family:monospace"')
+          + '></div>'
+          + '<div class="seg-cell"><span class="seg-lbl">Pace (mm:ss / km)</span>'
+          + '<input type="text" data-f="pace" value="' + fmtPace(seg.pace || 0) + '" style="font-family:monospace" placeholder="5:00"></div>'
+          + '<div class="seg-cell" style="flex:0 0 90px;"><span class="seg-lbl">HR zone</span>'
+          + '<select data-f="hr">'
+          + ['', 'Z1', 'Z2', 'Z3', 'Z4', 'Z5'].map(function (z) {
+              return '<option value="' + z + '"' + (seg.hr === z ? ' selected' : '') + '>' + (z || '—') + '</option>';
+            }).join('')
+          + '</select></div>'
+          + '<div class="seg-cell"><span class="seg-lbl">Label</span>'
+          + '<input type="text" data-f="label" value="' + (seg.label || '').replace(/"/g, '&quot;') + '" placeholder="opt."></div>'
+          + '<button type="button" class="seg-rm" title="Remove">×</button>';
+
+        wrap.appendChild(row);
+      });
+      bindSegmentInputs();
+      recompute();
+    }
+
+    function bindSegmentInputs() {
+      document.querySelectorAll('.session-segment').forEach(function (row) {
+        var idx = parseInt(row.dataset.idx, 10);
+        var seg = segments[idx];
+        row.querySelectorAll('[data-f]').forEach(function (el) {
+          var field = el.dataset.f;
+          if (el.tagName === 'SELECT') {
+            el.addEventListener('change', function () { applyField(idx, field, el.value); });
+            return;
+          }
+          // Pace field is always mm:ss; value field is mm:ss when mode=='time'.
+          var isClock = (field === 'pace') || (field === 'value' && seg && seg.mode === 'time');
+          if (isClock) {
+            el.addEventListener('input', function () {
+              autoFmtClock(el, false);
+            });
+            var commit = function () { applyField(idx, field, el.value); };
+            el.addEventListener('blur', commit);
+            el.addEventListener('change', commit);
+          } else {
+            el.addEventListener('input', function () { applyField(idx, field, el.value); });
+          }
+        });
+        row.querySelector('.seg-rm').addEventListener('click', function () {
+          segments.splice(idx, 1);
+          renderSegments();
+        });
+        var up   = row.querySelector('.seg-up');
+        var down = row.querySelector('.seg-down');
+        if (up)   up.addEventListener('click',   function () { moveSegment(idx, idx - 1); });
+        if (down) down.addEventListener('click', function () { moveSegment(idx, idx + 1); });
+
+        // HTML5 drag-and-drop (desktop). Touch users have ↑↓ buttons as fallback.
+        var handle = row.querySelector('.seg-handle');
+        handle.addEventListener('dragstart', function (e) {
+          row.classList.add('dragging');
+          if (e.dataTransfer) {
+            e.dataTransfer.effectAllowed = 'move';
+            try { e.dataTransfer.setData('text/plain', String(idx)); } catch (_) {}
+          }
+        });
+        handle.addEventListener('dragend', function () {
+          row.classList.remove('dragging');
+          document.querySelectorAll('.session-segment.drag-over').forEach(function (r) { r.classList.remove('drag-over'); });
+        });
+        row.addEventListener('dragover', function (e) {
+          e.preventDefault();
+          row.classList.add('drag-over');
+        });
+        row.addEventListener('dragleave', function () { row.classList.remove('drag-over'); });
+        row.addEventListener('drop', function (e) {
+          e.preventDefault();
+          row.classList.remove('drag-over');
+          var src = parseInt(e.dataTransfer ? e.dataTransfer.getData('text/plain') : '', 10);
+          if (!isNaN(src) && src !== idx) moveSegment(src, idx);
+        });
+      });
+    }
+
+    function moveSegment(from, to) {
+      if (from === to || from < 0 || to < 0 || from >= segments.length || to >= segments.length) return;
+      var item = segments.splice(from, 1)[0];
+      segments.splice(to, 0, item);
+      renderSegments();
+    }
+
+    function applyField(idx, field, raw) {
+      var seg = segments[idx];
+      if (!seg) return;
+      if (field === 'kind') {
+        seg.kind = raw;
+        var row = document.querySelector('.session-segment[data-idx="' + idx + '"]');
+        if (row) row.classList.toggle('recovery', raw === 'recovery');
+      }
+      else if (field === 'mode') {
+        // When switching modes, keep the underlying duration consistent
+        var oldT = currentSeconds(seg);
+        seg.mode = raw;
+        if (seg.mode === 'distance' && seg.pace > 0) {
+          seg.value = oldT / seg.pace; // km
+        } else if (seg.mode === 'time') {
+          seg.value = oldT; // sec
+        }
+        renderSegments();
+        return;
+      } else if (field === 'value') {
+        seg.value = seg.mode === 'distance' ? (parseFloat(raw) || 0) : parseClock(raw);
+      } else if (field === 'pace') {
+        seg.pace = parseClock(raw);
+      } else if (field === 'hr') seg.hr = raw;
+      else if (field === 'label') seg.label = raw;
+      recompute();
+    }
+
+    function currentSeconds(seg) {
+      if (seg.mode === 'time') return seg.value || 0;
+      if (seg.mode === 'distance' && seg.pace > 0) return seg.value * seg.pace;
+      return 0;
+    }
+    function currentKm(seg) {
+      if (seg.mode === 'distance') return seg.value || 0;
+      if (seg.mode === 'time' && seg.pace > 0) return seg.value / seg.pace;
+      return 0;
+    }
+
+    // ── Compute summary ─────────────────────────────────────
+    function recompute() {
+      var act = { km: 0, sec: 0 }, all = { km: 0, sec: 0 };
+      segments.forEach(function (seg) {
+        var km = currentKm(seg), sec = currentSeconds(seg);
+        all.km += km; all.sec += sec;
+        if (seg.kind === 'active') { act.km += km; act.sec += sec; }
+      });
+      var avgAct = act.km > 0 ? act.sec / act.km : 0;
+      var avgAll = all.km > 0 ? all.sec / all.km : 0;
+      document.getElementById('ses-result').innerHTML =
+        '<div class="session-summary-grid">'
+        + cell(act.km.toFixed(2) + ' km', 'Active distance')
+        + cell(fmtClock(act.sec),         'Active time')
+        + cell(fmtPace(avgAct) + ' /km',  'Avg active pace')
+        + cell(all.km.toFixed(2) + ' km', 'Total distance')
+        + cell(fmtClock(all.sec),         'Total time')
+        + cell(fmtPace(avgAll) + ' /km',  'Avg overall pace')
+        + '</div>';
+    }
+    function cell(big, label) {
+      return '<div><div class="result-big" style="font-size:1.5em;">' + big + '</div>'
+           + '<div class="result-label">' + label + '</div></div>';
+    }
+
+    // ── Add / clear ─────────────────────────────────────────
+    document.getElementById('ses-add-active').addEventListener('click', function () {
+      segments.push({ kind: 'active', mode: 'distance', value: 1, pace: 300, hr: 'Z3', label: '' });
+      renderSegments();
+    });
+    document.getElementById('ses-add-recovery').addEventListener('click', function () {
+      segments.push({ kind: 'recovery', mode: 'time', value: 60, pace: 480, hr: 'Z1', label: 'Jog' });
+      renderSegments();
+    });
+    document.getElementById('ses-clear').addEventListener('click', function () {
+      segments = [];
+      renderSegments();
+    });
+
+    // ── Type / preset ───────────────────────────────────────
+    document.getElementById('ses-type').addEventListener('change', function () {
+      segments = defaultsFor(this.value) || [];
+      renderSegments();
+    });
+    document.getElementById('ses-preset').addEventListener('change', function () {
+      var v = this.value;
+      if (!v) return;
+      var s = PRESETS(v);
+      if (s) { segments = s; renderSegments(); }
+      this.value = '';
+    });
+
+    // ── Save / load (localStorage) ──────────────────────────
+    function loadStore() {
+      try { return JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); }
+      catch (e) { return []; }
+    }
+    function saveStore(arr) {
+      try { localStorage.setItem(STORE_KEY, JSON.stringify(arr)); } catch (e) {}
+    }
+    function renderSaved() {
+      var list = loadStore();
+      var wrap = document.getElementById('ses-saved-wrap');
+      var ul   = document.getElementById('ses-saved-list');
+      if (!list.length) { wrap.style.display = 'none'; ul.innerHTML = ''; return; }
+      wrap.style.display = '';
+      ul.innerHTML = '';
+      list.forEach(function (s, i) {
+        var li = document.createElement('li');
+        li.className = 'session-saved-item';
+        var totalKm = (s.segments || []).reduce(function (a, sg) { return a + currentKm(sg); }, 0);
+        li.innerHTML =
+          '<span class="ssi-name">' + escapeHtml(s.name || '(untitled)') + '</span>'
+          + '<span class="ssi-meta">' + (s.type || '—') + ' · ' + totalKm.toFixed(1) + ' km · ' + (s.savedAt || '') + '</span>'
+          + '<span class="ssi-actions">'
+          + '<button data-act="load" data-i="' + i + '">Load</button>'
+          + '<button data-act="tcx" data-i="' + i + '">TCX</button>'
+          + '<button class="del" data-act="del" data-i="' + i + '">Delete</button>'
+          + '</span>';
+        ul.appendChild(li);
+      });
+      ul.querySelectorAll('button').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var i = parseInt(b.dataset.i, 10), act = b.dataset.act;
+          var arr = loadStore();
+          var entry = arr[i]; if (!entry) return;
+          if (act === 'load') {
+            document.getElementById('ses-type').value = entry.type || 'intervals';
+            document.getElementById('ses-name').value = entry.name || '';
+            segments = (entry.segments || []).map(function (s) { return Object.assign({}, s); });
+            renderSegments();
+          } else if (act === 'tcx') {
+            downloadTCX(entry.name || 'session', entry.segments || []);
+          } else if (act === 'del') {
+            if (confirm('Delete "' + (entry.name || '(untitled)') + '"?')) {
+              arr.splice(i, 1); saveStore(arr); renderSaved();
+            }
+          }
+        });
+      });
+    }
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, function (c) {
+        return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
+      });
+    }
+
+    document.getElementById('ses-save').addEventListener('click', function () {
+      var name = document.getElementById('ses-name').value.trim() || ('Session ' + new Date().toISOString().slice(0,10));
+      var arr = loadStore();
+      arr.push({
+        name: name,
+        type: document.getElementById('ses-type').value,
+        segments: segments.map(function (s) { return Object.assign({}, s); }),
+        savedAt: new Date().toISOString().slice(0,10)
+      });
+      saveStore(arr);
+      renderSaved();
+    });
+
+    // ── TCX export ──────────────────────────────────────────
+    // Outputs a Garmin Training Center XML "Course" with one Trackpoint per
+    // segment endpoint. Pace is encoded via DistanceMeters / Time stamps —
+    // Garmin Connect imports this as a "Workout" you can send to a watch.
+    function buildTCX(name, segs) {
+      var t0 = new Date();
+      var iso = function (d) { return d.toISOString(); };
+      var total = { dist: 0, sec: 0 };
+      var lines = [];
+      lines.push('<?xml version="1.0" encoding="UTF-8"?>');
+      lines.push('<TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd">');
+      lines.push('  <Workouts>');
+      lines.push('    <Workout Sport="Running">');
+      lines.push('      <Name>' + escapeHtml(name).slice(0, 15) + '</Name>'); // Garmin caps at 15 chars
+      segs.forEach(function (seg, idx) {
+        var sec = currentSeconds(seg);
+        var km  = currentKm(seg);
+        var stepName = (seg.label || ((seg.kind === 'recovery' ? 'Rec' : 'Step') + (idx + 1))).slice(0, 15);
+        lines.push('      <Step xsi:type="Step_t">');
+        lines.push('        <StepId>' + (idx + 1) + '</StepId>');
+        lines.push('        <Name>' + escapeHtml(stepName) + '</Name>');
+        if (seg.mode === 'time' || km <= 0) {
+          lines.push('        <Duration xsi:type="Time_t"><Seconds>' + Math.round(sec) + '</Seconds></Duration>');
+        } else {
+          lines.push('        <Duration xsi:type="Distance_t"><Meters>' + Math.round(km * 1000) + '</Meters></Duration>');
+        }
+        lines.push('        <Intensity>' + (seg.kind === 'recovery' ? 'Resting' : 'Active') + '</Intensity>');
+        // Pace-target hint (heart-rate target if HR zone is set, else speed)
+        if (seg.hr) {
+          var zoneNum = parseInt(seg.hr.replace('Z',''), 10) || 1;
+          lines.push('        <Target xsi:type="HeartRate_t"><Zone xsi:type="PredefinedHeartRateZone_t"><Number>' + zoneNum + '</Number></Zone></Target>');
+        } else if (seg.pace > 0) {
+          var mps = 1000 / seg.pace;
+          var lo = (mps * 0.95).toFixed(2), hi = (mps * 1.05).toFixed(2);
+          lines.push('        <Target xsi:type="Speed_t"><Zone xsi:type="CustomSpeedZone_t"><LowInMetersPerSecond>' + lo + '</LowInMetersPerSecond><HighInMetersPerSecond>' + hi + '</HighInMetersPerSecond></Zone></Target>');
+        } else {
+          lines.push('        <Target xsi:type="None_t"/>');
+        }
+        lines.push('      </Step>');
+        total.dist += km; total.sec += sec;
+      });
+      lines.push('      <ScheduledOn>' + iso(t0).slice(0,10) + '</ScheduledOn>');
+      lines.push('    </Workout>');
+      lines.push('  </Workouts>');
+      lines.push('</TrainingCenterDatabase>');
+      return lines.join('\n');
+    }
+
+    function download(filename, content, mime) {
+      var blob = new Blob([content], { type: mime || 'application/octet-stream' });
+      var url  = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click();
+      setTimeout(function () { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+    }
+    function safeName(name) {
+      return String(name || 'session').replace(/[^a-zA-Z0-9_-]+/g, '_').slice(0, 40);
+    }
+    function downloadTCX(name, segs) {
+      download(safeName(name) + '.tcx', buildTCX(name, segs), 'application/vnd.garmin.tcx+xml');
+    }
+
+    document.getElementById('ses-export-tcx').addEventListener('click', function () {
+      var name = document.getElementById('ses-name').value.trim() || 'session';
+      downloadTCX(name, segments);
+    });
+    document.getElementById('ses-export-json').addEventListener('click', function () {
+      var name = document.getElementById('ses-name').value.trim() || 'session';
+      var data = {
+        name: name,
+        type: document.getElementById('ses-type').value,
+        segments: segments,
+        exportedAt: new Date().toISOString()
+      };
+      download(safeName(name) + '.json', JSON.stringify(data, null, 2), 'application/json');
+    });
+
+    // Initial paint
+    renderSegments();
+    renderSaved();
+
+    // Public API: lets the Training Plan pre-fill a session and switch the tool
+    // panel to Builder. `type` is one of the plan workout types (interval, tempo,
+    // threshold, long); `km` is the day's distance.
+    window.__loadSessionFromPlan = function (type, km, weekIdx, dayName) {
+      var sesType, presetKey;
+      var d = parseFloat(km) || 0;
+      if (type === 'interval')                      { sesType = 'intervals'; presetKey = (d <= 8 ? '6x400' : d <= 14 ? '5x1k' : 'pyramid'); }
+      else if (type === 'tempo' || type === 'threshold') { sesType = 'tempo';    presetKey = 'tempo20'; }
+      else if (type === 'long')                     { sesType = 'long';      presetKey = 'long15'; }
+      else return false;
+
+      var preset = PRESETS(presetKey);
+      if (!preset) return false;
+
+      // For 'long', scale total distance to the actual day's km (preserve pace).
+      if (sesType === 'long' && d > 0) {
+        var total = preset.reduce(function (a, s) { return a + (s.mode === 'distance' ? s.value : 0); }, 0);
+        if (total > 0) {
+          var scale = d / total;
+          preset = preset.map(function (s) {
+            if (s.mode === 'distance') return Object.assign({}, s, { value: +(s.value * scale).toFixed(2) });
+            return Object.assign({}, s);
+          });
+        }
+      }
+
+      segments = preset;
+      var typeEl = document.getElementById('ses-type');
+      var nameEl = document.getElementById('ses-name');
+      if (typeEl) typeEl.value = sesType;
+      if (nameEl) nameEl.value = (dayName ? dayName + ' · ' : '') + 'Wk ' + (weekIdx || '?') + ' · ' + (sesType === 'intervals' ? 'Intervals' : sesType.charAt(0).toUpperCase() + sesType.slice(1)) + (d ? ' · ' + d + ' km' : '');
+      renderSegments();
+      // Scroll to the Builder card after a tick (panel switch animation)
+      setTimeout(function () {
+        var card = document.getElementById('ses-segments');
+        if (card && card.scrollIntoView) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 80);
+      return true;
+    };
   })();
   </script>
 

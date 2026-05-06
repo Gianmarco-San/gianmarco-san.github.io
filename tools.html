@@ -221,6 +221,21 @@
     .tw-city  { font-size: 0.8em; color: #aaa; }
     .tw-desc  { font-size: 0.88em; font-weight: 500; color: #444; margin-top: 0.2em; }
     .tw-extra, .tw-uvaqi { font-size: 0.78em; color: #999; line-height: 1.6; }
+    .tw-sunmoon { font-size: 0.78em; color: #888; line-height: 1.6; margin-top: 0.15em; }
+    .tw-forecast {
+      display: flex; gap: 0.25em; margin-top: 0.5em;
+      padding: 0.45em 0.3em; background: #fff;
+      border-radius: 8px; border: 1px solid #ececec;
+    }
+    .tw-day {
+      flex: 1 1 0; min-width: 0; text-align: center;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 0.05em; font-size: 0.7em; line-height: 1.2; color: #555;
+    }
+    .tw-day-name  { color: #999; font-size: 0.92em; }
+    .tw-day-emoji { font-size: 1em; margin: 0.05em 0; }
+    .tw-day-hi    { color: #222; font-weight: 600; }
+    .tw-day-lo    { color: #999; font-size: 0.92em; }
 
     /* ── Currency ────────────────────────────── */
     /* Flex + center so odd-count rows (e.g. a lonely last cell) stay centered
@@ -385,10 +400,16 @@
     /* ── Plan → Builder edit link ─────────────── */
     .plan-edit-link {
       background: none; border: none; cursor: pointer;
-      color: #aaa; font-size: 0.85em; padding: 0 0.18em; line-height: 1;
-      vertical-align: 0; transition: color 0.18s ease, transform 0.12s ease;
+      color: #54575A; font-size: 1.1em; padding: 0 0.22em; line-height: 1;
+      vertical-align: -0.05em; opacity: 0.9;
+      /* Tilt ✏ to a writing-stance angle — tip points roughly straight down at the cell. */
+      display: inline-block; transform: rotate(45deg);
+      transition: color 0.18s ease, transform 0.14s ease, opacity 0.14s ease;
     }
-    .plan-edit-link:hover { color: #5D6063; transform: scale(1.15); }
+    .plan-edit-link:hover {
+      color: #2a2c2f; opacity: 1;
+      transform: rotate(45deg) scale(1.22);
+    }
 
     /* ── Training Session Builder ─────────────── */
     .session-segment {
@@ -1034,7 +1055,29 @@
                 <tbody id="fire-tbody"></tbody>
               </table>
             </div>
-            <div class="tool-note">Returns based on compound annual growth. Taxes applied on passive income at capital gains rate. Safety buffer adds surplus to required living cost. Not financial advice.</div>
+            <div class="tool-note">
+              Returns based on compound annual growth. Taxes applied on passive income at capital gains rate. Safety buffer adds surplus to required living cost. <strong>Not financial advice.</strong>
+              <details style="margin-top:0.6em;">
+                <summary style="cursor:pointer;color:#666;font-weight:500;">How the Monte Carlo mode works — and how to pick a sensible σ</summary>
+                <div style="margin-top:0.5em;line-height:1.6;">
+                  <strong>What “Simple” does.</strong> One deterministic path. Each year the portfolio grows by exactly the expected return rate <em>r</em> (e.g. 7 %), and savings are added. Inflation is applied separately to costs &amp; salary. This shows the <em>average</em> outcome — but in the real world returns vary, and the average outcome is not the typical outcome.
+                  <br><br>
+                  <strong>What “Monte Carlo” does.</strong> Each year, instead of using <em>r</em> exactly, a random shock is drawn from a normal distribution <code>N(r, σ²)</code> using the <em>Box-Muller transform</em> (two uniform samples → one Gaussian sample). Returns are clamped to [-50 %, +60 %] to avoid pathological tails. We run 500 / 1 000 / 2 000 independent paths through your full timeline (years on the x-axis, portfolio value on the y-axis), then sort the paths year-by-year to compute the 10th, 50th and 90th percentiles. The shaded band is the 80 % confidence interval; the dark line is the median. Per-path FIRE years are aggregated into a “success rate” (% of paths that ever cross the FIRE threshold) and a median FIRE year.
+                  <br><br>
+                  <strong>How to pick σ.</strong> σ is the annual standard deviation of returns. Use historical reference points:
+                  <ul style="margin:0.4em 0 0.4em 1.4em;padding:0;">
+                    <li><strong>5–8 %</strong> — bond-heavy / conservative portfolio, or a global multi-asset fund with low equity tilt.</li>
+                    <li><strong>10–13 %</strong> — diversified 60/40 portfolio (S&amp;P 500 + treasuries, post-1950).</li>
+                    <li><strong>15–18 %</strong> — diversified all-equity portfolio (MSCI World, S&amp;P 500 long-term).</li>
+                    <li><strong>20–25 %</strong> — single-country emerging-market or sector-tilted equity (small-cap, tech-heavy).</li>
+                    <li><strong>30 %+</strong> — concentrated single-stock or crypto-style exposure. Tail-risk dominates; results are unstable.</li>
+                  </ul>
+                  Default <strong>σ = 15 %</strong> matches the long-run S&amp;P 500 / MSCI World volatility. Lower σ ⇒ tighter band but the median path is essentially the simple projection. Higher σ ⇒ much wider band, more downside scenarios, and the success rate becomes very sensitive to your savings rate.
+                  <br><br>
+                  <strong>Caveats.</strong> The model assumes (a) returns are i.i.d. Gaussian, (b) σ is constant, (c) no fat tails, (d) no return-of-capital risk (e.g. a single-stock collapse). Real markets are mildly fat-tailed (kurtosis &gt; 3) and exhibit volatility clustering (GARCH effects) — so the model slightly <em>underestimates</em> tail risk. For most retirement-planning purposes the bias is small relative to the σ-choice itself. The simulation is also memoryless: a bad year has no influence on the next.
+                </div>
+              </details>
+            </div>
           </div>
         </div>
 
@@ -1125,7 +1168,7 @@
                 <div class="tool-field">
                   <label>Convert net to</label>
                   <select id="sal-fx-to">
-                    <option value="">— pick a currency —</option>
+                    <option value="">Pick a currency</option>
                     <option value="EUR">EUR — Euro</option>
                     <option value="USD">USD — US Dollar</option>
                     <option value="CHF">CHF — Swiss Franc</option>
@@ -1229,6 +1272,8 @@
                 <div class="tw-desc"  id="tw-desc-0">Loading…</div>
                 <div class="tw-extra" id="tw-extra-0"></div>
                 <div class="tw-uvaqi" id="tw-uvaqi-0"></div>
+                <div class="tw-sunmoon" id="tw-sunmoon-0"></div>
+                <div class="tw-forecast" id="tw-forecast-0"></div>
               </div>
               <div class="tw-slot">
                 <select class="tw-sel" id="tw-sel-1" data-slot="1"></select>
@@ -1237,6 +1282,8 @@
                 <div class="tw-desc"  id="tw-desc-1">Loading…</div>
                 <div class="tw-extra" id="tw-extra-1"></div>
                 <div class="tw-uvaqi" id="tw-uvaqi-1"></div>
+                <div class="tw-sunmoon" id="tw-sunmoon-1"></div>
+                <div class="tw-forecast" id="tw-forecast-1"></div>
               </div>
               <div class="tw-slot">
                 <select class="tw-sel" id="tw-sel-2" data-slot="2"></select>
@@ -1245,6 +1292,8 @@
                 <div class="tw-desc"  id="tw-desc-2">Loading…</div>
                 <div class="tw-extra" id="tw-extra-2"></div>
                 <div class="tw-uvaqi" id="tw-uvaqi-2"></div>
+                <div class="tw-sunmoon" id="tw-sunmoon-2"></div>
+                <div class="tw-forecast" id="tw-forecast-2"></div>
               </div>
             </div>
           </div>
@@ -1262,19 +1311,19 @@
             <div class="tool-row">
               <div class="tool-field">
                 <label>HEX</label>
-                <input type="text" id="col-hex" value="#54575A" maxlength="7" style="font-family:monospace;" onclick="this.select()" placeholder="#rrggbb" autocomplete="off" spellcheck="false">
+                <input type="text" id="col-hex" value="#D296B4" maxlength="7" style="font-family:monospace;" onclick="this.select()" placeholder="#rrggbb" autocomplete="off" spellcheck="false">
               </div>
               <div class="tool-field">
                 <label>R (0–255)</label>
-                <input type="number" id="col-r" min="0" max="255" value="84" onclick="this.select()">
+                <input type="number" id="col-r" min="0" max="255" value="210" onclick="this.select()">
               </div>
               <div class="tool-field">
                 <label>G (0–255)</label>
-                <input type="number" id="col-g" min="0" max="255" value="87" onclick="this.select()">
+                <input type="number" id="col-g" min="0" max="255" value="150" onclick="this.select()">
               </div>
               <div class="tool-field">
                 <label>B (0–255)</label>
-                <input type="number" id="col-b" min="0" max="255" value="90" onclick="this.select()">
+                <input type="number" id="col-b" min="0" max="255" value="180" onclick="this.select()">
               </div>
               <div class="tool-field" style="flex-basis:100%;">
                 <label>RGB paste</label>
@@ -1747,6 +1796,39 @@
                 </div>
               </div>
             </div>
+
+            <details id="plan-vdot-details" style="margin:0.6em 0 0.4em;">
+              <summary style="cursor:pointer;color:#666;font-weight:500;font-size:0.92em;padding:0.3em 0;">
+                🎯 Pace calibration <span style="color:#aaa;font-weight:400;">— current best + goal time → Daniels VDOT pace zones in the plan</span>
+              </summary>
+              <div style="background:#fafafa;border:1px solid #eee;border-radius:8px;padding:0.8em 1em;margin-top:0.4em;">
+                <div class="tool-row" style="align-items:flex-end;">
+                  <div class="tool-field">
+                    <label>Current race distance</label>
+                    <select id="plan-vdot-cur-dist">
+                      <option value="3">3 km</option>
+                      <option value="5" selected>5 km</option>
+                      <option value="10">10 km</option>
+                      <option value="21.0975">½ marathon</option>
+                      <option value="42.195">Marathon</option>
+                    </select>
+                  </div>
+                  <div class="tool-field">
+                    <label>Current race time</label>
+                    <input type="text" id="plan-vdot-cur-time" placeholder="e.g. 25:00" style="font-family:monospace;" onclick="this.select()">
+                  </div>
+                  <div class="tool-field">
+                    <label>Goal time at race distance (opt.)</label>
+                    <input type="text" id="plan-vdot-goal-time" placeholder="e.g. 22:30" style="font-family:monospace;" onclick="this.select()">
+                  </div>
+                </div>
+                <div id="plan-vdot-preview" style="margin-top:0.6em;font-size:0.86em;color:#888;">Enter your current race time to compute VDOT and pace zones.</div>
+                <div class="tool-note" style="border:none;padding:0;margin-top:0.6em;font-size:0.78em;line-height:1.55;">
+                  <strong>Daniels VDOT</strong> (Jack Daniels, 1979 — refined 2014) maps a recent race time + distance to a VO₂max equivalent, then derives five training paces:
+                  <strong>E</strong> (easy, ~70 % effort), <strong>M</strong> (marathon, ~80 %), <strong>T</strong> (threshold / tempo, ~88 %), <strong>I</strong> (interval / VO₂max, ~100 %), <strong>R</strong> (repetition / speed, ~110 %). Math: VDOT computed via Daniels-Gilbert (already used by the VO₂max Estimator); paces solved from the inverse Daniels-Gilbert at fixed effort fractions. If you also enter a goal time, both VDOT levels and their pace zones are shown side by side so you can see the gap to close.
+                </div>
+              </div>
+            </details>
 
             <button id="plan-generate" class="tool-btn">Generate plan</button>
             <div class="tool-result" id="plan-result" style="display:none;margin-top:1em;"></div>
@@ -2350,6 +2432,13 @@
       var VO2max = 15.3 * (hrMax / hrRest);
       renderVO2Result(VO2max, gender, null, 'from HR<sub>max</sub>/HR<sub>rest</sub>');
     });
+
+    // Cross-tool: expose VO₂max math so the Training Plan tool can compute VDOT
+    // without duplicating the Daniels-Gilbert formula.
+    window.__vo2 = {
+      fromRace: calcVO2maxFromRace,
+      timeFor:  predictTimeFromVO2max
+    };
 
     // ── Race Predictor (Riegel) ──────────────────────────────
     // Bidirectional time ↔ pace sync at the selected PB distance.
@@ -3917,13 +4006,41 @@
       }).join('');
     }
 
+    // Moon phase via Conway (1985) — returns lunar age fraction [0, 1):
+    // 0 = new moon, 0.5 = full moon. Average error ≈ 1 day, plenty for an emoji label.
+    function moonPhaseFraction(date) {
+      var y = date.getFullYear(), m = date.getMonth() + 1, d = date.getDate();
+      if (m < 3) { y--; m += 12; }
+      m++;
+      var jd = Math.floor(365.25 * y) + Math.floor(30.6 * m) + d - 694039.09;
+      jd /= 29.5305882;
+      var f = jd - Math.floor(jd);
+      return f < 0 ? f + 1 : f;
+    }
+    function moonLabel(f) {
+      if (f < 0.03 || f >= 0.97) return { emoji: '🌑', name: 'New Moon' };
+      if (f < 0.22)              return { emoji: '🌒', name: 'Waxing Crescent' };
+      if (f < 0.28)              return { emoji: '🌓', name: 'First Quarter' };
+      if (f < 0.47)              return { emoji: '🌔', name: 'Waxing Gibbous' };
+      if (f < 0.53)              return { emoji: '🌕', name: 'Full Moon' };
+      if (f < 0.72)              return { emoji: '🌖', name: 'Waning Gibbous' };
+      if (f < 0.78)              return { emoji: '🌗', name: 'Last Quarter' };
+      return                            { emoji: '🌘', name: 'Waning Crescent' };
+    }
+    function fmtHHMM(iso) {
+      if (!iso || typeof iso !== 'string') return '—';
+      var t = iso.split('T')[1];
+      return t ? t.slice(0, 5) : '—';
+    }
+
     function fetchSlot(i, cityKey) {
       var c = CITIES[cityKey];
       document.getElementById('tw-emoji-' + i).textContent = '⏳';
       document.getElementById('tw-temp-' + i).textContent  = '—';
       var wxUrl = 'https://api.open-meteo.com/v1/forecast?latitude=' + c.lat + '&longitude=' + c.lon
         + '&current_weather=true&hourly=relativehumidity_2m,apparent_temperature,uv_index'
-        + '&timezone=auto&forecast_days=1';
+        + '&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset,weathercode,precipitation_probability_max'
+        + '&timezone=auto&forecast_days=7';
       var aqUrl = 'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=' + c.lat + '&longitude=' + c.lon
         + '&hourly=european_aqi&timezone=auto&forecast_days=1';
       fetch(wxUrl).then(function(r){ return r.json(); }).then(function(d) {
@@ -3946,6 +4063,43 @@
           'Feels like ' + feelsLike + ' &nbsp;·&nbsp; 💨 ' + wind + ' &nbsp;·&nbsp; 💧 ' + humidity + '%';
         document.getElementById('tw-uvaqi-' + i).innerHTML   =
           '☀️ UV ' + uvLabel(uv) + ' &nbsp;·&nbsp; 🌬️ AQI …';
+
+        // Sunrise / sunset (today, city-local timezone via &timezone=auto) + moon phase
+        var daily = d.daily || {};
+        var sunrise = fmtHHMM(daily.sunrise && daily.sunrise[0]);
+        var sunset  = fmtHHMM(daily.sunset  && daily.sunset[0]);
+        var moon = moonLabel(moonPhaseFraction(now));
+        document.getElementById('tw-sunmoon-' + i).innerHTML =
+          '🌅 ' + sunrise + ' &nbsp;·&nbsp; 🌇 ' + sunset + ' &nbsp;·&nbsp; ' + moon.emoji + ' ' + moon.name;
+
+        // 7-day forecast strip
+        var fcEl = document.getElementById('tw-forecast-' + i);
+        var dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        var times = daily.time || [];
+        var tMax  = daily.temperature_2m_max || [];
+        var tMin  = daily.temperature_2m_min || [];
+        var codes = daily.weathercode || [];
+        var pop   = daily.precipitation_probability_max || [];
+        var fcHtml = '';
+        for (var k = 0; k < times.length; k++) {
+          var dt  = new Date(times[k] + 'T12:00');
+          var lbl = k === 0 ? 'Today' : dayNames[dt.getDay()];
+          var em  = EMOJI[codes[k]] || '🌡️';
+          var hi  = (tMax[k] != null) ? Math.round(tMax[k]) + '°' : '—';
+          var lo  = (tMin[k] != null) ? Math.round(tMin[k]) + '°' : '—';
+          var desc = WMO[codes[k]] || 'Unknown';
+          var popN = (typeof pop[k] === 'number') ? pop[k] : null;
+          var tip  = dt.toLocaleDateString(undefined, { weekday:'long', month:'short', day:'numeric' })
+                   + ' — ' + desc + (popN != null ? ' · ' + popN + '% precip.' : '');
+          fcHtml += '<div class="tw-day" title="' + tip + '">'
+                  +   '<div class="tw-day-name">' + lbl + '</div>'
+                  +   '<div class="tw-day-emoji">' + em + '</div>'
+                  +   '<div class="tw-day-hi">' + hi + '</div>'
+                  +   '<div class="tw-day-lo">' + lo + '</div>'
+                  + '</div>';
+        }
+        fcEl.innerHTML = fcHtml;
+
         fetch(aqUrl).then(function(r){ return r.json(); }).then(function(aq) {
           var aqi = (aq.hourly && aq.hourly.european_aqi) ? aq.hourly.european_aqi[hour] : null;
           document.getElementById('tw-uvaqi-' + i).innerHTML =
@@ -4369,29 +4523,44 @@
       var totalA = totalForCity(A);
       var totalB = totalForCity(B);
       if (totalA <= 0 || totalB <= 0) { resEl.textContent = '—'; return; }
-      var ratio = net / totalA;                  // how many "A baskets" your net buys
-      var requiredB = ratio * totalB;            // same baskets in B's currency
+      var ratio = net / totalA;                  // baskets your net buys in A
+      var requiredB = ratio * totalB;            // same baskets, in B's local currency
+      var ratioB = requiredB / totalB;           // = ratio by construction; shown for symmetry
       var fmt = function (n) { return Math.round(n).toLocaleString('en-CH'); };
-
       var sameCur = (A.cur === B.cur);
-      var bodyEcho = '<div>' + A.cur + ' ' + fmt(net) + ' / month in <strong>' + A.name + '</strong> '
-        + '= <strong>' + ratio.toFixed(2) + '× monthly cost-of-living</strong>.</div>'
-        + '<div style="margin-top:0.4em;">To match in <strong>' + B.name + '</strong>: <strong>' + B.cur + ' ' + fmt(requiredB) + '</strong> / month.</div>';
 
-      if (sameCur || typeof window.__convertCurrency !== 'function') {
+      // Body: explicit "X's" prefix on each ratio so the user can see at a glance
+      // that the same multiplier applies to both cities (purchasing-power match).
+      var bodyEcho = '<div>' + A.cur + ' ' + fmt(net) + ' / month in <strong>' + A.name + '</strong> '
+        + '= <strong>' + ratio.toFixed(2) + '× ' + A.name + '’s monthly cost-of-living</strong>.</div>'
+        + '<div style="margin-top:0.4em;">To match in <strong>' + B.name + '</strong>: '
+        + '<strong>' + B.cur + ' ' + fmt(requiredB) + '</strong> / month '
+        + '<span style="color:#888;font-size:0.92em;">(' + ratioB.toFixed(2) + '× ' + B.name + '’s — same purchasing power)</span>.</div>';
+
+      // Comparison line: always shown. Same-currency uses net directly; cross-currency uses live FX.
+      function comparisonLine(directInB) {
+        var diff  = requiredB - directInB;
+        var sign  = diff > 0 ? '+' : '';
+        var arrow = diff > 0 ? '⬈' : (diff < 0 ? '⬊' : '=');
+        var color = diff > 0 ? '#991b1b' : (diff < 0 ? '#166534' : '#888');
+        var labelL = sameCur
+          ? 'Same currency — moving with the same nominal salary'
+          : 'Direct FX of ' + A.cur + ' ' + fmt(net) + ' = <strong>' + B.cur + ' ' + fmt(directInB) + '</strong>';
+        return '<div style="margin-top:0.4em;color:#666;font-size:0.92em;">'
+          + labelL + ' '
+          + '<span style="color:' + color + ';">'
+          + arrow + ' ' + sign + B.cur + ' ' + fmt(diff) + ' vs purchasing-power need'
+          + '</span></div>';
+      }
+
+      if (sameCur) {
+        resEl.innerHTML = bodyEcho + comparisonLine(net);
+      } else if (typeof window.__convertCurrency !== 'function') {
         resEl.innerHTML = bodyEcho;
       } else {
         resEl.innerHTML = bodyEcho + '<div style="color:#aaa;margin-top:0.3em;font-size:0.92em;">Converting reference…</div>';
         window.__convertCurrency(net, A.cur, B.cur).then(function (netInB) {
-          var diff   = requiredB - netInB;
-          var sign   = diff > 0 ? '+' : '';
-          var arrow  = diff > 0 ? '⬈' : (diff < 0 ? '⬊' : '=');
-          resEl.innerHTML = bodyEcho
-            + '<div style="margin-top:0.4em;color:#666;font-size:0.92em;">'
-            + 'Direct FX of ' + A.cur + ' ' + fmt(net) + ' = <strong>' + B.cur + ' ' + fmt(netInB) + '</strong> '
-            + '<span style="color:' + (diff > 0 ? '#991b1b' : (diff < 0 ? '#166534' : '#888')) + ';">'
-            + ' ' + arrow + ' ' + sign + B.cur + ' ' + fmt(diff) + ' vs purchasing-power need'
-            + '</span></div>';
+          resEl.innerHTML = bodyEcho + comparisonLine(netInB);
         }).catch(function () {
           resEl.innerHTML = bodyEcho;
         });
@@ -4769,77 +4938,85 @@
       var p = readPowerParams();
       var kmh = parseFloat(document.getElementById('tri-bike-kmh').value) || 32;
 
-      // Sweep range per variable
+      // Sweep range + axis label per variable
       var ranges = {
-        speed: { lo: 10, hi: 55, current: kmh,        unit: 'km/h' },
-        slope: { lo: -8, hi: 12, current: p.slope*100, unit: '%' },
-        wind:  { lo: -15, hi: 30, current: p.wind*3.6, unit: 'km/h' },
-        cda:   { lo: 0.18, hi: 0.45, current: p.cda,  unit: 'm²' },
-        mass:  { lo: 50, hi: 110, current: p.m,        unit: 'kg' }
+        speed: { lo: 10, hi: 55,    current: kmh,         unit: 'km/h', label: 'Speed' },
+        slope: { lo: -8, hi: 12,    current: p.slope*100, unit: '%',    label: 'Slope' },
+        wind:  { lo: -15, hi: 30,   current: p.wind*3.6,  unit: 'km/h', label: 'Headwind' },
+        cda:   { lo: 0.18, hi: 0.45, current: p.cda,      unit: 'm²',   label: 'CdA' },
+        mass:  { lo: 50, hi: 110,   current: p.m,         unit: 'kg',   label: 'Mass' }
       };
       var R = ranges[xVar] || ranges.speed;
+
+      // Build the param-set for any X (one param swapped, others held).
+      // Refactored from a deeply-nested ternary so the marker computation is readable.
+      function paramsAt(x) {
+        if (xVar === 'speed') return p;
+        var pp = Object.assign({}, p);
+        if (xVar === 'slope') pp.slope = x / 100;
+        else if (xVar === 'wind') pp.wind = x / 3.6;
+        else if (xVar === 'cda')  pp.cda  = x;
+        else if (xVar === 'mass') pp.m    = x;
+        return pp;
+      }
+      function wattsAt(x) {
+        return computeWatts(xVar === 'speed' ? x : kmh, paramsAt(x));
+      }
+
       var N = 60;
       var xs = [], ys = [];
       for (var i = 0; i <= N; i++) {
         var x = R.lo + (R.hi - R.lo) * i / N;
-        // Compute Watts with one parameter swapped to x, others held
-        var w;
-        if (xVar === 'speed') {
-          w = computeWatts(x, p);
-        } else {
-          var pp = Object.assign({}, p);
-          if (xVar === 'slope') pp.slope = x / 100;
-          else if (xVar === 'wind') pp.wind = x / 3.6;
-          else if (xVar === 'cda')  pp.cda  = x;
-          else if (xVar === 'mass') pp.m    = x;
-          w = computeWatts(kmh, pp);
-        }
-        xs.push(x); ys.push(w);
+        xs.push(x); ys.push(wattsAt(x));
       }
-      // SVG dimensions
-      var W = 320, H = 140, padL = 36, padB = 22, padT = 8, padR = 10;
-      var w0 = host.clientWidth || 320; if (w0 > 320) W = Math.min(560, w0);
+
+      // SVG dimensions — extra left/bottom padding for the axis labels.
+      var W = 360, H = 170, padL = 50, padB = 38, padT = 10, padR = 14;
+      var w0 = host.clientWidth || 360; if (w0 > 360) W = Math.min(620, w0);
       var minY = 0;
       var maxY = Math.max.apply(null, ys); if (!isFinite(maxY) || maxY <= 0) maxY = 100;
       maxY = Math.ceil(maxY / 50) * 50;
       var sx = function (v) { return padL + (W - padL - padR) * (v - R.lo) / (R.hi - R.lo); };
       var sy = function (v) { return H - padB - (H - padB - padT) * (v - minY) / (maxY - minY); };
       var path = xs.map(function (x, i) { return (i === 0 ? 'M' : 'L') + sx(x).toFixed(1) + ' ' + sy(ys[i]).toFixed(1); }).join(' ');
-      // Y-axis ticks (4)
+
+      // Y-axis grid + ticks (4 intervals → 5 labels)
       var ticks = '';
       for (var t = 0; t <= 4; t++) {
         var yv = minY + (maxY - minY) * t / 4;
         var yy = sy(yv);
-        ticks += '<line x1="' + padL + '" x2="' + (W - padR) + '" y1="' + yy + '" y2="' + yy + '" stroke="#f0f0f0" stroke-width="1"/>'
-              +  '<text x="' + (padL - 4) + '" y="' + (yy + 3.5) + '" text-anchor="end" font-size="9" fill="#999">' + Math.round(yv) + '</text>';
+        ticks += '<line x1="' + padL + '" x2="' + (W - padR) + '" y1="' + yy + '" y2="' + yy + '" stroke="#ececec" stroke-width="1"/>'
+              +  '<text x="' + (padL - 6) + '" y="' + (yy + 3.5) + '" text-anchor="end" font-size="10" fill="#555" font-weight="500">' + Math.round(yv) + '</text>';
       }
-      // X-axis ticks (5)
+      // X-axis ticks (5 intervals → 6 labels)
       var xticks = '';
       for (var k = 0; k <= 5; k++) {
         var xv = R.lo + (R.hi - R.lo) * k / 5;
         var xx = sx(xv);
-        xticks += '<text x="' + xx + '" y="' + (H - 6) + '" text-anchor="middle" font-size="9" fill="#999">' + (Math.abs(xv) >= 10 ? xv.toFixed(0) : xv.toFixed(2)) + '</text>';
+        xticks += '<text x="' + xx + '" y="' + (H - padB + 14) + '" text-anchor="middle" font-size="10" fill="#555" font-weight="500">' + (Math.abs(xv) >= 10 ? xv.toFixed(0) : xv.toFixed(2)) + '</text>';
       }
-      // Current value marker
+
+      // Current-value marker
       var cx = sx(R.current);
-      var cy = sy(computeWatts(xVar === 'speed' ? R.current : kmh, xVar === 'speed' ? p : (function(){
-        var pp = Object.assign({}, p);
-        if (xVar === 'slope') pp.slope = R.current / 100;
-        else if (xVar === 'wind') pp.wind = R.current / 3.6;
-        else if (xVar === 'cda')  pp.cda  = R.current;
-        else if (xVar === 'mass') pp.m    = R.current;
-        return pp;
-      })()));
+      var cy = sy(wattsAt(R.current));
       var marker = (R.current >= R.lo && R.current <= R.hi)
         ? '<circle cx="' + cx + '" cy="' + cy + '" r="4" fill="#222" stroke="#fff" stroke-width="2"/>'
-          + '<text x="' + cx + '" y="' + (cy - 8) + '" text-anchor="middle" font-size="10" fill="#222" font-weight="600">' + Math.round(cy ? computeWatts(xVar === 'speed' ? R.current : kmh, xVar === 'speed' ? p : (function(){var pp=Object.assign({}, p); if (xVar==='slope') pp.slope=R.current/100; else if (xVar==='wind') pp.wind=R.current/3.6; else if (xVar==='cda') pp.cda=R.current; else if (xVar==='mass') pp.m=R.current; return pp;})()) : 0) + ' W</text>'
+          + '<text x="' + cx + '" y="' + (cy - 8) + '" text-anchor="middle" font-size="11" fill="#222" font-weight="700">' + Math.round(wattsAt(R.current)) + ' W</text>'
         : '';
+
+      // Axis labels: rotated Y at left, descriptive X centered below tick row.
+      var yAxisLabel = '<text transform="rotate(-90 ' + (padL - 36) + ' ' + ((padT + (H - padB)) / 2) + ')" '
+        + 'x="' + (padL - 36) + '" y="' + ((padT + (H - padB)) / 2) + '" text-anchor="middle" font-size="11" fill="#333" font-weight="600">Power (W)</text>';
+      var xAxisLabel = '<text x="' + ((padL + W - padR) / 2) + '" y="' + (H - 6) + '" text-anchor="middle" font-size="11" fill="#333" font-weight="600">' + R.label + ' (' + R.unit + ')</text>';
+
       host.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:auto;display:block;" aria-label="Power vs ' + xVar + '">'
         + ticks + xticks
-        + '<path d="' + path + '" fill="none" stroke="#5D6063" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>'
+        + '<line x1="' + padL + '" y1="' + padT + '" x2="' + padL + '" y2="' + (H - padB) + '" stroke="#bbb" stroke-width="1"/>'
+        + '<line x1="' + padL + '" y1="' + (H - padB) + '" x2="' + (W - padR) + '" y2="' + (H - padB) + '" stroke="#bbb" stroke-width="1"/>'
+        + '<path d="' + path + '" fill="none" stroke="#5D6063" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>'
         + marker
-        + '<text x="' + (W - padR) + '" y="' + (padT + 10) + '" text-anchor="end" font-size="9" fill="#bbb">W</text>'
-        + '<text x="' + (W - padR) + '" y="' + (H - 6) + '" text-anchor="end" font-size="9" fill="#bbb">' + R.unit + '</text>'
+        + yAxisLabel
+        + xAxisLabel
         + '</svg>';
     }
     function computeWatts(kmh, p) {
@@ -4865,9 +5042,11 @@
       var kmh    = parseFloat(document.getElementById('tri-bike-kmh').value);
       var wIsEst = !(wInput > 0);
       var w      = wIsEst ? estimateBikeWatts(kmh) : wInput;
-      var wHtml  = (w > 0)
+      // Show in result row only when user typed a real value — otherwise the inline
+      // "est X W" badge next to the field already shows the same number.
+      var wHtml  = (w > 0 && !wIsEst)
         ? '<div><div class="result-big">' + Math.round(w) + ' W</div>'
-          + '<div class="result-label">Bike power' + (wIsEst ? ' (est.)' : '') + '</div></div>'
+          + '<div class="result-label">Bike power</div></div>'
         : '';
       document.getElementById('tri-result').innerHTML =
         '<div style="display:flex;gap:1.6em;flex-wrap:wrap;">'
@@ -5224,6 +5403,101 @@
       setTimeout(function () { URL.revokeObjectURL(url); }, 0);
     }
 
+    // ── VDOT pace calibration (Daniels-Gilbert via window.__vo2) ──────────
+    function parseTimeStr(s) {
+      s = (s || '').trim(); if (!s) return null;
+      var p = s.split(':').map(function (x) { return parseFloat(x); });
+      if (p.some(function (n) { return isNaN(n) || n < 0; })) return null;
+      if (p.length === 3) return p[0] * 3600 + p[1] * 60 + p[2];
+      if (p.length === 2) return p[0] * 60 + p[1];
+      return null;
+    }
+    function fmtPaceSec(sec) {
+      if (!sec || sec <= 0 || !isFinite(sec)) return '—';
+      var m = Math.floor(sec / 60), s = Math.round(sec % 60);
+      if (s === 60) { s = 0; m++; }
+      return m + ':' + (s < 10 ? '0' + s : s);
+    }
+    // Solve the Daniels-Gilbert VO₂ velocity equation for a target effort.
+    //   VO₂ = -4.60 + 0.182258·v + 0.000104·v² (v in m/min)
+    // For a fixed effort fraction f, we find v such that VO₂(v) = f × VDOT,
+    // then convert to pace per km.
+    function paceForVDOTFraction(vdot, frac) {
+      var target = frac * vdot;
+      var a = 0.000104, b = 0.182258, c = -(target + 4.60);
+      var disc = b * b - 4 * a * c;
+      if (disc < 0) return null;
+      var v = (-b + Math.sqrt(disc)) / (2 * a); // m/min
+      if (v <= 0) return null;
+      return 1000 / v * 60; // sec/km
+    }
+    var VDOT_FRACTIONS = [
+      { key: 'E', name: 'Easy',       frac: 0.70, hint: '~70 % · long & recovery' },
+      { key: 'M', name: 'Marathon',   frac: 0.80, hint: '~80 % · race-pace runs'  },
+      { key: 'T', name: 'Threshold',  frac: 0.88, hint: '~88 % · tempo, ~1 h race pace' },
+      { key: 'I', name: 'Interval',   frac: 1.00, hint: '~100 % · 3–5 min reps'   },
+      { key: 'R', name: 'Repetition', frac: 1.10, hint: '~110 % · 200–600 m reps' }
+    ];
+    function vdotFromInputs() {
+      var dist = parseFloat(document.getElementById('plan-vdot-cur-dist').value);
+      var t    = parseTimeStr(document.getElementById('plan-vdot-cur-time').value);
+      if (!dist || !t || t < 60 || t > 6 * 3600) return null;
+      if (!window.__vo2 || typeof window.__vo2.fromRace !== 'function') return null;
+      return window.__vo2.fromRace(dist, t);
+    }
+    function goalVdotFromInputs() {
+      var dist = parseFloat(document.getElementById('plan-vdot-cur-dist').value);
+      var gT   = parseTimeStr(document.getElementById('plan-vdot-goal-time').value);
+      if (!dist || !gT || gT < 60 || gT > 6 * 3600) return null;
+      if (!window.__vo2 || typeof window.__vo2.fromRace !== 'function') return null;
+      return window.__vo2.fromRace(dist, gT);
+    }
+    function buildPaceTable(vdot, header) {
+      var rows = VDOT_FRACTIONS.map(function (z) {
+        var p = paceForVDOTFraction(vdot, z.frac);
+        return '<tr>'
+          + '<td><strong>' + z.key + '</strong></td>'
+          + '<td>' + z.name + '</td>'
+          + '<td style="font-family:ui-monospace,monospace;">' + fmtPaceSec(p) + ' /km</td>'
+          + '<td style="color:#888;font-size:0.92em;">' + z.hint + '</td>'
+          + '</tr>';
+      }).join('');
+      return '<div style="margin-top:0.4em;font-size:0.86em;">'
+        + '<div style="font-weight:600;color:#444;margin-bottom:0.3em;">' + header + ' · VDOT <strong>' + vdot.toFixed(1) + '</strong></div>'
+        + '<table class="tool-table" style="font-size:0.86em;"><thead><tr>'
+        +   '<th style="width:2em;">Z</th><th>Zone</th><th>Pace</th><th>Use</th>'
+        + '</tr></thead><tbody>' + rows + '</tbody></table>'
+        + '</div>';
+    }
+    function renderVdotPreview() {
+      var host = document.getElementById('plan-vdot-preview');
+      if (!host) return;
+      var v = vdotFromInputs();
+      if (v == null) {
+        host.innerHTML = '<span style="color:#999;">Enter your current race time to compute VDOT and pace zones.</span>';
+        return;
+      }
+      var g = goalVdotFromInputs();
+      var html = buildPaceTable(v, 'Current');
+      if (g != null) {
+        var delta = g - v;
+        var arrow = delta > 0 ? '⬈' : (delta < 0 ? '⬊' : '=');
+        var color = delta > 0 ? '#166534' : (delta < 0 ? '#991b1b' : '#888');
+        html += buildPaceTable(g, 'Goal') +
+          '<div style="margin-top:0.4em;font-size:0.86em;color:' + color + ';">' + arrow + ' VDOT change: '
+          + (delta > 0 ? '+' : '') + delta.toFixed(1) + ' (' + (delta >= 0 ? '+' : '') + ((delta / v) * 100).toFixed(1) + ' %)</div>';
+      }
+      host.innerHTML = html;
+    }
+    ['plan-vdot-cur-dist','plan-vdot-cur-time','plan-vdot-goal-time'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('input',  renderVdotPreview);
+      el.addEventListener('change', renderVdotPreview);
+    });
+    // Defer until VO₂max IIFE exposes the math (loaded later in the file order).
+    setTimeout(renderVdotPreview, 0);
+
     function generate() {
       var race    = document.getElementById('plan-race').value;
       var weeks   = Math.max(4, Math.min(32, parseInt(document.getElementById('plan-weeks').value, 10) || 12));
@@ -5325,10 +5599,28 @@
         +   '<button type="button" id="plan-export-json" class="tool-btn" style="font-size:0.84em;padding:0.4em 1em;">⬇ JSON</button>'
         + '</div>';
 
+      // VDOT pace-zone block: only included if the user filled the calibration inputs
+      var vdotBlock = '';
+      var curVdot  = vdotFromInputs();
+      var goalVdot = goalVdotFromInputs();
+      if (curVdot != null) {
+        vdotBlock = '<h3 style="margin:1.4em 0 0.3em;font-size:0.95em;">🎯 VDOT pace zones (Daniels)</h3>'
+          + '<div style="display:flex;gap:1.2em;flex-wrap:wrap;align-items:flex-start;">'
+          +   '<div style="flex:1 1 320px;min-width:0;">' + buildPaceTable(curVdot, 'Current') + '</div>'
+          +   (goalVdot != null ? '<div style="flex:1 1 320px;min-width:0;">' + buildPaceTable(goalVdot, 'Goal') + '</div>' : '')
+          + '</div>'
+          + '<div style="font-size:0.78em;color:#888;margin-top:0.4em;line-height:1.55;">'
+          +   'Apply zones in the plan: <strong>easy</strong> &amp; long → <strong>E</strong> pace · <strong>tempo</strong> → <strong>T</strong> · '
+          +   '<strong>threshold</strong> → <strong>T</strong> (slightly faster reps OK) · <strong>interval</strong> → <strong>I</strong> · '
+          +   '<strong>repetition</strong>/strides → <strong>R</strong>. Build progressively — most weeks should be 80 %+ at E pace.'
+          + '</div>';
+      }
+
       document.getElementById('plan-result').style.display = '';
       document.getElementById('plan-result').innerHTML = head
         + exportBar
         + '<div style="overflow-x:auto;"><table class="tool-table">' + thead + '<tbody>' + rows + '</tbody></table></div>'
+        + vdotBlock
         + strengthBlock
         + nutritionBlock;
 

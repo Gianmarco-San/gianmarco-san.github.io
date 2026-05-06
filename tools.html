@@ -398,18 +398,25 @@
     .tri-fuel-tot { background: #f4f6f8; font-weight: 600; }
 
     /* ── Plan → Builder edit link ─────────────── */
+    /* Visual matches phase-5 (✏ at 1.1em, rotated 45°, scale 1.22 on hover).
+       Blink-fix: glyph lives in ::before with pointer-events:none, while the
+       <button>'s hit area is the un-transformed inline-block — siblings never
+       shift, cursor never slides off during the scale transition. */
     .plan-edit-link {
       background: none; border: none; cursor: pointer;
       color: #54575A; font-size: 1.1em; padding: 0 0.22em; line-height: 1;
       vertical-align: -0.05em; opacity: 0.9;
-      /* Tilt ✏ to a writing-stance angle — tip points roughly straight down at the cell. */
-      display: inline-block; transform: rotate(45deg);
-      transition: color 0.18s ease, transform 0.14s ease, opacity 0.14s ease;
+      display: inline-block;
+      transition: color 0.18s ease, opacity 0.14s ease;
     }
-    .plan-edit-link:hover {
-      color: #2a2c2f; opacity: 1;
-      transform: rotate(45deg) scale(1.22);
+    .plan-edit-link:hover { color: #2a2c2f; opacity: 1; }
+    .plan-edit-link::before {
+      content: '✏'; display: inline-block;
+      transform: rotate(45deg); transform-origin: 50% 50%;
+      transition: transform 0.14s ease;
+      pointer-events: none;
     }
+    .plan-edit-link:hover::before { transform: rotate(45deg) scale(1.22); }
 
     /* ── Training Session Builder ─────────────── */
     .session-segment {
@@ -1165,7 +1172,7 @@
                 </table>
               </div>
               <div class="tool-row" style="align-items:flex-end;margin-top:0.8em;">
-                <div class="tool-field">
+                <div class="tool-field" style="flex:0 0 200px;min-width:200px;">
                   <label>Convert net to</label>
                   <select id="sal-fx-to">
                     <option value="">Pick a currency</option>
@@ -1547,8 +1554,8 @@
                 <input type="text" id="tri-bike-time" value="1:15:00" style="font-family:monospace;" onclick="this.select()">
               </div>
               <div class="tool-field">
-                <label>Power (W) <span style="color:#aaa;font-weight:400;">— Edit parameters below to refine</span> <span id="tri-bike-w-est-badge" style="display:inline-block;margin-left:0.4em;padding:0.05em 0.5em;background:#f4f6f8;border:1px solid #e3e7eb;border-radius:10px;font-size:0.78em;color:#666;font-weight:500;font-variant-numeric:tabular-nums;">est <span id="tri-bike-w-est">— W</span></span></label>
-                <input type="number" id="tri-bike-w" step="1" min="0" placeholder="auto from speed" onclick="this.select()">
+                <label>Power (W) <span style="color:#aaa;font-weight:400;">— edit parameters below to refine</span></label>
+                <input type="number" id="tri-bike-w" step="1" min="0" readonly tabindex="-1" style="background:#f7f8f9;color:#444;font-weight:600;cursor:default;">
               </div>
             </div>
 
@@ -4403,7 +4410,7 @@
     });
 
     // Init
-    updateFromRGB(84,87,90);
+    updateFromRGB(210, 150, 180);
   })();
   </script>
 
@@ -4523,46 +4530,69 @@
       var totalA = totalForCity(A);
       var totalB = totalForCity(B);
       if (totalA <= 0 || totalB <= 0) { resEl.textContent = '—'; return; }
-      var ratio = net / totalA;                  // baskets your net buys in A
-      var requiredB = ratio * totalB;            // same baskets, in B's local currency
-      var ratioB = requiredB / totalB;           // = ratio by construction; shown for symmetry
+      var ratioA   = net / totalA;        // your net measured in A's monthly cost-of-living
+      var requiredB = ratioA * totalB;    // same purchasing power, in B's local currency
       var fmt = function (n) { return Math.round(n).toLocaleString('en-CH'); };
       var sameCur = (A.cur === B.cur);
 
-      // Body: explicit "X's" prefix on each ratio so the user can see at a glance
-      // that the same multiplier applies to both cities (purchasing-power match).
-      var bodyEcho = '<div>' + A.cur + ' ' + fmt(net) + ' / month in <strong>' + A.name + '</strong> '
-        + '= <strong>' + ratio.toFixed(2) + '× ' + A.name + '’s monthly cost-of-living</strong>.</div>'
-        + '<div style="margin-top:0.4em;">To match in <strong>' + B.name + '</strong>: '
-        + '<strong>' + B.cur + ' ' + fmt(requiredB) + '</strong> / month '
-        + '<span style="color:#888;font-size:0.92em;">(' + ratioB.toFixed(2) + '× ' + B.name + '’s — same purchasing power)</span>.</div>';
+      // Express any ratio as "surplus % above CoL", with the raw ratio in parens.
+      //   1.94 → "+94 % (1.94× CoL)"   0.85 → "−15 % (0.85× CoL)"
+      // The percentage framing is what most readers expect ("how much above the
+      // bare-minimum monthly cost"); the multiplier is kept as a secondary cue.
+      function fmtSurplus(r, cityName) {
+        var pct = (r - 1) * 100;
+        var sign = pct >= 0 ? '+' : '−';
+        var n = Math.abs(pct).toFixed(0);
+        return '<strong>' + sign + n + ' %</strong> '
+          + '<span style="color:#888;font-size:0.92em;">(' + r.toFixed(2) + '× ' + cityName + '’s CoL)</span>';
+      }
 
-      // Comparison line: always shown. Same-currency uses net directly; cross-currency uses live FX.
-      function comparisonLine(directInB) {
-        var diff  = requiredB - directInB;
-        var sign  = diff > 0 ? '+' : '';
-        var arrow = diff > 0 ? '⬈' : (diff < 0 ? '⬊' : '=');
-        var color = diff > 0 ? '#991b1b' : (diff < 0 ? '#166534' : '#888');
-        var labelL = sameCur
-          ? 'Same currency — moving with the same nominal salary'
-          : 'Direct FX of ' + A.cur + ' ' + fmt(net) + ' = <strong>' + B.cur + ' ' + fmt(directInB) + '</strong>';
-        return '<div style="margin-top:0.4em;color:#666;font-size:0.92em;">'
-          + labelL + ' '
-          + '<span style="color:' + color + ';">'
-          + arrow + ' ' + sign + B.cur + ' ' + fmt(diff) + ' vs purchasing-power need'
-          + '</span></div>';
+      // Render two lines that both depend on BOTH cities:
+      //   1) Direct relocation: surplus of net (after FX) vs B's CoL — depends on B.
+      //   2) Purchasing-power match: surplus is the same as A's, but the required
+      //      amount is in B's currency — naturally depends on B's CoL & currency.
+      function renderBody(netInB) {
+        var ratioDirect = netInB / totalB;
+        var directLine =
+          '<div>'
+          + A.cur + ' ' + fmt(net) + ' / month in <strong>' + A.name + '</strong>'
+          + (sameCur
+              ? ' is '
+              : ' ≈ <strong>' + B.cur + ' ' + fmt(netInB) + '</strong> at FX — that\'s ')
+          + fmtSurplus(ratioDirect, B.name)
+          + ' '
+          + '<span style="color:#888;font-size:0.92em;">(direct relocation, no purchasing-power adjustment).</span>'
+          + '</div>';
+        var matchLine =
+          '<div style="margin-top:0.4em;">'
+          + 'For the <strong>same purchasing power</strong> as in ' + A.name + ' '
+          + '<span style="color:#888;font-size:0.92em;">(your net is ' + fmtSurplus(ratioA, A.name) + ')</span>, '
+          + 'you’d need <strong>' + B.cur + ' ' + fmt(requiredB) + '</strong> / month in ' + B.name + '.'
+          + '</div>';
+        var diff   = requiredB - netInB;
+        var sign   = diff > 0 ? '+' : '';
+        var arrow  = diff > 0 ? '⬈' : (diff < 0 ? '⬊' : '=');
+        var color  = diff > 0 ? '#991b1b' : (diff < 0 ? '#166534' : '#888');
+        var gap = '<div style="margin-top:0.4em;color:#666;font-size:0.92em;">'
+          + 'Gap to close: '
+          + '<span style="color:' + color + ';">' + arrow + ' ' + sign + B.cur + ' ' + fmt(diff) + ' / month</span> '
+          + '<span style="color:#888;">(positive = your direct FX falls short of the purchasing-power need).</span>'
+          + '</div>';
+        resEl.innerHTML = directLine + matchLine + gap;
       }
 
       if (sameCur) {
-        resEl.innerHTML = bodyEcho + comparisonLine(net);
+        renderBody(net);
       } else if (typeof window.__convertCurrency !== 'function') {
-        resEl.innerHTML = bodyEcho;
+        // No FX available → fall back to a body that doesn't show "≈ B.cur ..."
+        var ratioDirect = '?';
+        resEl.innerHTML = '<div style="color:#aaa;font-size:0.92em;">Currency converter not ready.</div>';
       } else {
-        resEl.innerHTML = bodyEcho + '<div style="color:#aaa;margin-top:0.3em;font-size:0.92em;">Converting reference…</div>';
+        resEl.innerHTML = '<div style="color:#aaa;font-size:0.92em;">Converting reference…</div>';
         window.__convertCurrency(net, A.cur, B.cur).then(function (netInB) {
-          resEl.innerHTML = bodyEcho + comparisonLine(netInB);
+          renderBody(netInB);
         }).catch(function () {
-          resEl.innerHTML = bodyEcho;
+          resEl.innerHTML = '<div style="color:#991b1b;font-size:0.92em;">Could not load FX rate.</div>';
         });
       }
     }
@@ -4923,10 +4953,8 @@
     }
 
     function updateLiveWattEstimate() {
-      var kmh = parseFloat(document.getElementById('tri-bike-kmh').value);
-      var est = estimateBikeWatts(kmh);
-      var badgeVal = document.getElementById('tri-bike-w-est');
-      if (badgeVal) badgeVal.textContent = (est > 0 ? Math.round(est) + ' W' : '— W');
+      // The "Bike power" tile in the result row already shows the estimate live,
+      // so this function only needs to keep the chart in sync with parameter edits.
       renderPowerChart();
     }
 
@@ -5038,15 +5066,16 @@
       var t2 = parseTime(document.getElementById('tri-t2').value)        || 0;
       var rn = parseTime(document.getElementById('tri-run-time').value)  || 0;
       var total = sw + t1 + bk + t2 + rn;
-      var wInput = parseFloat(document.getElementById('tri-bike-w').value);
-      var kmh    = parseFloat(document.getElementById('tri-bike-kmh').value);
-      var wIsEst = !(wInput > 0);
-      var w      = wIsEst ? estimateBikeWatts(kmh) : wInput;
-      // Show in result row only when user typed a real value — otherwise the inline
-      // "est X W" badge next to the field already shows the same number.
-      var wHtml  = (w > 0 && !wIsEst)
+      // Power is always an estimate from the road-cycling model — populated in
+      // both the inline field and the result tile. Reading from the field keeps
+      // the two displays in sync (single source of truth).
+      var kmh = parseFloat(document.getElementById('tri-bike-kmh').value);
+      var w   = estimateBikeWatts(kmh);
+      var wField = document.getElementById('tri-bike-w');
+      if (wField) wField.value = (w > 0 ? Math.round(w) : '');
+      var wHtml = (w > 0)
         ? '<div><div class="result-big">' + Math.round(w) + ' W</div>'
-          + '<div class="result-label">Bike power</div></div>'
+          + '<div class="result-label">Bike power (est.)</div></div>'
         : '';
       document.getElementById('tri-result').innerHTML =
         '<div style="display:flex;gap:1.6em;flex-wrap:wrap;">'
@@ -5187,7 +5216,6 @@
     document.getElementById('tri-bike-kmh').addEventListener('input', function () { syncBike('kmh'); });
     document.getElementById('tri-bike-time').addEventListener('input', function () { autoFmt(this, true); });
     onCommit(document.getElementById('tri-bike-time'), function () { syncBike('time'); });
-    document.getElementById('tri-bike-w').addEventListener('input', updateTotal);
     document.getElementById('tri-t1').addEventListener('input', function () { autoFmt(this, false); updateTotal(); });
     document.getElementById('tri-t2').addEventListener('input', function () { autoFmt(this, false); updateTotal(); });
 
@@ -5489,6 +5517,18 @@
       }
       host.innerHTML = html;
     }
+    // Auto-insert ":" while typing — same convention as Triathlon / Run tools.
+    // Up to 6 digits (h:mm:ss) since marathon times can exceed an hour.
+    function autoFmtTime(el) {
+      var d = (el.value || '').replace(/\D/g, '').slice(0, 6);
+      el.value = d.length <= 2 ? d
+        : d.length <= 4 ? d.slice(0, d.length - 2) + ':' + d.slice(-2)
+        : d.slice(0, d.length - 4) + ':' + d.slice(-4, -2) + ':' + d.slice(-2);
+    }
+    ['plan-vdot-cur-time','plan-vdot-goal-time'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('input', function () { autoFmtTime(el); });
+    });
     ['plan-vdot-cur-dist','plan-vdot-cur-time','plan-vdot-goal-time'].forEach(function (id) {
       var el = document.getElementById(id);
       if (!el) return;
@@ -5553,7 +5593,7 @@
               if (t === 'gym')  { weekObj.cells.push({ type: 'gym',  label: workoutLabel(t), km: 0 }); return '<td>' + workoutLabel(t) + '<br><span style="color:#888;font-size:0.85em;">~30 min</span></td>'; }
               weekObj.cells.push({ type: t, label: workoutLabel(t), km: kms[i] });
               var editBtn = EDITABLE[t]
-                ? ' <button type="button" class="plan-edit-link" data-wo="' + t + '" data-km="' + kms[i] + '" data-wk="' + weekIdx1 + '" data-day="' + DAYS[i] + '" title="Edit in Session Builder">✏</button>'
+                ? ' <button type="button" class="plan-edit-link" data-wo="' + t + '" data-km="' + kms[i] + '" data-wk="' + weekIdx1 + '" data-day="' + DAYS[i] + '" title="Edit in Session Builder" aria-label="Edit in Session Builder"></button>'
                 : '';
               return '<td>' + workoutLabel(t) + editBtn + '<br><span style="color:#888;font-size:0.85em;">' + kms[i] + ' km</span></td>';
             }).join('')

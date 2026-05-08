@@ -8,9 +8,49 @@
   <title>Gianmarco | Timeline</title>
   
   <link rel='stylesheet' href='typo.css'/>
-  <link rel="icon" href="docs/J-favicon_tech.png">  <!-- docs/J-favicon_gray.png docs/MyDuckR.png -->
+  <link rel="icon" id="favicon-link" href="docs/J-favicon_tech.png">
+  <link rel="apple-touch-icon" id="apple-icon-link" href="docs/J-favicon_tech.png">
+  <link rel="manifest" id="manifest-link" href="manifest.webmanifest">
+  <meta name="theme-color" content="#EEEEEE">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="J – App">
+  <meta name="application-name" content="J – App">
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- for responsiveness -->
+  <script>  // Apply saved app icon (set on index.html via icon picker)
+  (function () {
+    var ICONS = {
+      tech: 'docs/J-favicon_tech.png',
+      gray: 'docs/j-favicon_tech-gray.png',
+      plus: 'docs/J-favicon_plus.png',
+      duck: 'docs/MyDuck.png'
+    };
+    var key = localStorage.getItem('jweb-app-icon');
+    var path = ICONS[key];
+    if (!path) return;
+    var fav = document.getElementById('favicon-link');
+    var apple = document.getElementById('apple-icon-link');
+    var mani = document.getElementById('manifest-link');
+    if (fav)   fav.href = path;
+    if (apple) apple.href = path;
+    if (mani) {
+      var m = {
+        name: 'J – App', short_name: 'J – App',
+        description: 'Gianmarco Santoro — AI Engineer',
+        start_url: './', scope: './', display: 'standalone',
+        background_color: '#EEEEEE', theme_color: '#EEEEEE',
+        icons: [
+          { src: path, sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: path, sizes: '512x512', type: 'image/png', purpose: 'any' }
+        ]
+      };
+      mani.href = URL.createObjectURL(new Blob([JSON.stringify(m)],
+        { type: 'application/manifest+json' }));
+    }
+  })();
+  </script>
 
   <link rel="preload" href="docs/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="docs/fonts/InterVariable-Italic.woff2" as="font" type="font/woff2" crossorigin>

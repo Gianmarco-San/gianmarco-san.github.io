@@ -9,7 +9,15 @@
   
   <link rel='stylesheet' href='typo.css'/>
   <!-- <link rel="icon" href="docs/favicon.svg" type="image/svg+xml"> -->
-  <link rel="icon" href="docs/J-favicon_tech.png">  <!-- fallback for older browsers -->
+  <link rel="icon" id="favicon-link" href="docs/J-favicon_tech.png">
+  <link rel="apple-touch-icon" id="apple-icon-link" href="docs/J-favicon_tech.png">
+  <link rel="manifest" id="manifest-link" href="manifest.webmanifest">
+  <meta name="theme-color" content="#EEEEEE">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="J – App">
+  <meta name="application-name" content="J – App">
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- for responsiveness -->
 
@@ -734,7 +742,26 @@
     
     J.R.R. Tolkien ®'>
 
-    
+    <div class="icon-picker" aria-label="Choose home-screen app icon">
+      <div class="icon-picker-row">
+        <span class="icon-picker-label">App icon:</span>
+        <button type="button" class="icon-picker-swatch" data-icon="tech" aria-label="Tech (default)">
+          <img src="docs/J-favicon_tech.png" alt="" loading="lazy" decoding="async">
+        </button>
+        <button type="button" class="icon-picker-swatch" data-icon="gray" aria-label="Tech Gray">
+          <img src="docs/j-favicon_tech-gray.png" alt="" loading="lazy" decoding="async">
+        </button>
+        <button type="button" class="icon-picker-swatch" data-icon="plus" aria-label="Plus">
+          <img src="docs/J-favicon_plus.png" alt="" loading="lazy" decoding="async">
+        </button>
+        <button type="button" class="icon-picker-swatch" data-icon="duck" aria-label="MyDuck">
+          <img src="docs/MyDuck.png" alt="" loading="lazy" decoding="async">
+        </button>
+      </div>
+      <div class="icon-picker-hint">Choose before installing this website as a Web App</div>
+    </div>
+
+
     <div  title="Serendipity rewards the prepared 🌅" class="show-on-small show-on-middle">
       <br><br><em>To Freedom & Opportunity.</em>
       <br><br><em>To my Friends. To Ary+. </em>
@@ -1262,6 +1289,69 @@ document.addEventListener("DOMContentLoaded", () => {
     var on = toggle.checked;
     localStorage.setItem('easterEgg', on);
     applyEggMode(on);
+  });
+})();
+</script>
+
+<script>  // App icon picker (PWA): swap favicon, apple-touch-icon, manifest
+(function () {
+  var ICONS = {
+    tech: 'docs/J-favicon_tech.png',
+    gray: 'docs/j-favicon_tech-gray.png',
+    plus: 'docs/J-favicon_plus.png',
+    duck: 'docs/MyDuck.png'
+  };
+  var KEY = 'jweb-app-icon';
+  var blobUrl = null;
+
+  function getSaved() {
+    var v = localStorage.getItem(KEY);
+    return ICONS[v] ? v : 'tech';
+  }
+
+  function buildManifestBlob(iconPath) {
+    var manifest = {
+      name: 'J – App',
+      short_name: 'J – App',
+      description: 'Gianmarco Santoro — AI Engineer',
+      start_url: './',
+      scope: './',
+      display: 'standalone',
+      background_color: '#EEEEEE',
+      theme_color: '#EEEEEE',
+      icons: [
+        { src: iconPath, sizes: '192x192', type: 'image/png', purpose: 'any' },
+        { src: iconPath, sizes: '512x512', type: 'image/png', purpose: 'any' }
+      ]
+    };
+    if (blobUrl) URL.revokeObjectURL(blobUrl);
+    blobUrl = URL.createObjectURL(new Blob([JSON.stringify(manifest)],
+      { type: 'application/manifest+json' }));
+    return blobUrl;
+  }
+
+  function apply(key) {
+    var path = ICONS[key] || ICONS.tech;
+    var fav = document.getElementById('favicon-link');
+    var apple = document.getElementById('apple-icon-link');
+    var mani = document.getElementById('manifest-link');
+    if (fav)   fav.href = path;
+    if (apple) apple.href = path;
+    if (mani)  mani.href = buildManifestBlob(path);
+    document.querySelectorAll('.icon-picker-swatch').forEach(function (b) {
+      b.classList.toggle('is-selected', b.dataset.icon === key);
+    });
+  }
+
+  function pick(key) {
+    if (!ICONS[key]) return;
+    localStorage.setItem(KEY, key);
+    apply(key);
+  }
+
+  apply(getSaved());
+  document.querySelectorAll('.icon-picker-swatch').forEach(function (b) {
+    b.addEventListener('click', function () { pick(b.dataset.icon); });
   });
 })();
 </script>

@@ -1,0 +1,14 @@
+{
+  "name": "J – App",
+  "short_name": "J – App",
+  "description": "Gianmarco Santoro — AI Engineer",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#EEEEEE",
+  "theme_color": "#EEEEEE",
+  "icons": [
+    { "src": "docs/J-favicon_tech.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "docs/J-favicon_tech.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
